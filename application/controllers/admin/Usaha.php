@@ -40,6 +40,11 @@ class Usaha extends CI_Controller
     $this->load->view("admin/Penjual/Usaha/edit", $data_page);
   }
 
+  public function add($id_penjual)
+  {
+    # code...
+  }
+
   public function editV2($type, $id)
   {
     $url_API = $this->url_API;
