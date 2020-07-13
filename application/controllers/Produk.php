@@ -1,0 +1,631 @@
+<?php
+/**
+ * 
+ */
+class Produk extends CI_Controller
+{
+	
+	function __construct()
+	{
+		parent::__construct();
+		header("Access-Control-Allow-Origin: *");
+		// header("'Access-Control-Allow-Credentials' : true");
+		$this->load->model("Model_produk", "produk");
+		$this->load->model("Model_penjual", "penjual");
+	}
+
+	public function index()
+	{
+		exit("The Page Are Not Allowed!");
+	}
+
+	public function ambil_produk_penjual()
+	{
+		$id_akun = $this->input->post('id_akun');
+		// echo $id_akun;
+		$data_produk = $this->produk->ambil_produk_penjual($id_akun);
+		$ambil_data = $data_produk->result_array();
+		$response = array();
+		if($data_produk->num_rows() > 0):
+			$response = $data_produk;
+			header("Content-type: application/json");
+			echo json_encode($ambil_data);
+		else:
+			echo json_encode($response);
+		endif;
+	}
+
+	public function ambil_produk_penjual_by_id()
+	{
+		$id_usaha = $this->input->get('id_usaha');
+		$filter = ($this->input->get('filter')!==null) ? $this->input->get('filter') : '';
+		$data_produk = $this->produk->ambil_produk_penjual_by_id($id_usaha, $filter);
+		$data = $data_produk->result_array();
+		$this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function getProdukDashboard()
+	{
+		$id_usaha = $this->input->get('id_usaha');
+		// var_dump($id_usaha);
+		// exit();
+		try {
+			$where = "u.id_usaha = '$id_usaha'";
+			$data_produk_by_id_usaha = $this->produk->get_detail_produk_where($where);
+			// echo $this->db->last_query();
+			// exit();
+			if($data_produk_by_id_usaha->num_rows() > 0){
+				$data = $data_produk_by_id_usaha->result_array();
+				$this->output
+		            ->set_status_header(200)
+		            ->set_content_type('application/json', 'utf-8')
+		            ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			}else{
+				$this->output
+		            ->set_status_header(404)
+		            ->set_content_type('application/json', 'utf-8')
+		            ->set_output(json_encode(array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			}
+		} catch (Exception $e) {
+			$this->output
+		            ->set_status_header(500)
+		            ->set_content_type('application/json', 'utf-8')
+		            ->set_output(json_encode(array('Server Error'), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		}
+	}
+
+	public function cariProdukLike()
+	{
+		$input = $this->input->get('input');
+		$id_usaha = $this->input->get('id_usaha');
+		$data = array();
+		$status_header = 500;
+		try {
+			$data_produk = $this->produk->ambil_produk_penjual_by_id($id_usaha, NULL, $input);
+			if($data_produk->num_rows() > 0){
+				$status_header = 200;
+				$data['data'] = $data_produk->result_array();
+				$data['status'] = 'sukses';
+			}else{
+				$status_header = 404;
+				$data['data'] = array();
+				$data['status'] = 'kosong';
+			}
+			// $data = $data_produk->result_array();
+		} catch (Exception $e) {
+			$status_header = 500;
+			$data['data'] = array();
+			$data['status'] = 'gagal';
+		}
+		
+		$this->output
+            ->set_status_header($status_header)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function prosesinput_produk()
+	{
+		$nama_produk = $this->input->post('nama_produk');
+		$kategori = $this->input->post('kategori');
+		
+		$berat_produk = $this->input->post('berat_produk');
+		$min_pemesanan = $this->input->post('min_pemesanan');
+		$id_usaha = $this->input->post('id_usaha');
+		// SETTING UPLOAD FOTO
+		$file_name						= date('dmYHis') . $_FILES['foto_produk']['name'];
+		// var_dump($_FILES);
+		$config['upload_path']          = './foto_usaha/produk/';
+		$config['allowed_types']        = 'gif|jpg|jpeg|png';
+		$config['max_size']             = 20480;
+		$config['max_width']            = 5000;
+		$config['max_height']           = 5000;
+		$config['file_name']			= $file_name;
+		// var_dump($config);
+		// exit();
+		$array_produk = array(
+			'nama_produk' =>$nama_produk,
+			'kategori' => $kategori,
+			'berat_produk' => $berat_produk,
+			'min_pemesanan' => $min_pemesanan,
+			'id_usaha' => $id_usaha);
+		$this->load->library('upload', $config);
+
+		if ( ! $this->upload->do_upload('foto_produk')){
+			$dataFoto = array('error' => $this->upload->display_errors());
+			// var_dump($dataFoto);
+			
+		}else{
+			$dataFoto = array('upload_data' => $this->upload->data());
+			$config = array();
+			$config['image_library']='gd2';
+            $config['source_image']='./foto_usaha/produk/'.$dataFoto['upload_data']['file_name'];
+            $config['create_thumb']= FALSE;
+            $config['maintain_ratio']= FALSE;
+            $config['quality']= '50%';
+            $config['width']= 600;
+            $config['height']= 400;
+            $config['new_image']= './foto_usaha/produk/'.$dataFoto['upload_data']['file_name'];
+            $this->load->library('image_lib', $config);
+            $this->image_lib->resize();
+			// var_dump($dataFoto);
+			// exit();
+			$foto_produk		=   $dataFoto['upload_data']['file_name'];
+			$array_produk['foto_produk'] = $foto_produk;
+		}
+		
+		// END UPLOAD FOTO
+		
+		$status = 500;
+		$responseMessage = '';
+		$response = array();
+		
+		$insert_produk = $this->produk->insert_produk($array_produk);
+		if($insert_produk){
+			$id_produk = $this->db->insert_id();
+			$variasi = $this->produk->ambil_data_variasi()->result();
+			$insert=false;
+			$variasi_produk = array();
+			foreach ($variasi as $key) {
+				$variasi_produk[] = array('id_produk' => $id_produk, 'id_variasi' => $key->id_variasi, 'harga' => 0, 'stok' => 0, 'status_vp' => 'tidak aktif');
+			}
+			$insert = $this->db->insert_batch("data_variasi_produk", $variasi_produk);
+
+			if ($insert) {
+				$status = 200;
+				$responseMessage = 'Berhasil Menambahkan Produk Dengan Variasi';
+				$response = array('status' => 'berhasil', 'responseMessage' => $responseMessage, 'id_produk' => $id_produk);
+			} else {
+				// echo $koneksi->error . '<br>';
+				$status = 202;
+				$responseMessage = 'Berhasil Menambahkan Produk, Tetapi Gagal Menambahkan Variasi';
+				$response = array('status' => 'berhasil', 'responseMessage' => $responseMessage, 'id_produk' => $id_produk);
+				// echo $status;
+				// exit();
+			}
+		} else {
+			$status=400;
+			$responseMessage = 'Gagal Menginput Produk';
+			$response = array('status' => 'gagal', 'responseMessage' => $responseMessage);
+		}
+
+		$this->output
+		            ->set_status_header($status)
+		            ->set_content_type('application/json', 'utf-8')
+		            ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function ambil_data_produk_update()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$data = $this->produk->ambil_data_by_id($id_produk);
+		if($data->num_rows() > 0){
+			$produk = $data->row_array();
+		}else{
+			$produk = array();
+		}
+		header("Content-type:application/json");
+		echo json_encode($produk);
+	}
+
+	public function getAllVariasi()
+	{
+		$data = $this->db->get("data_variasi")->result_array();
+		$response = array('data' => $data, 'responseMessage' => 'success');
+		$this->responseJSON(200, $response);
+	}
+
+	public function ambil_data_variasi()
+	{
+		$id_produk = $this->input->get('id_produk');
+		$ambil_data_variasi = $this->produk->ambil_data_variasi($id_produk);
+		if($ambil_data_variasi->num_rows() > 0){
+			foreach ($ambil_data_variasi->result_array() as $dv) {
+				$produk_var = $this->produk->ambil_variasi_produk($id_produk, $dv['id_variasi']);
+				// echo $this->db->last_query();
+				if($produk_var->num_rows() > 0){
+					$SELECT = 'checked';
+				}else{
+					$SELECT = '';
+				}
+				$data[] = array('id'=>$dv['id_variasi'], 'text'=>$dv['nama_variasi'], 'selected' => $SELECT);
+			}
+		}else{
+			$data = array();
+		}
+		header("Content-type:application/json");
+		echo json_encode($data);
+	}
+
+	public function prosesupdate_produk()
+	{
+		$id_produk			= $this->input->post('id_produk');
+		$nama_produk		= $this->input->post('nama_produk');
+		$berat_produk		= $this->input->post('berat_produk');
+		$id_toko			= $this->input->post('id_toko');
+		$min_pemesanan		= $this->input->post('minOrder');
+		// $variasi			= ($_POST['variasi']) ? $_POST['variasi'] : [];
+		// $variasi			= ($this->input->post('variasi')!==null) ? $this->input->post('variasi') : null;
+
+		// SETTING UPLOAD FOTO
+		$file_name						= date('dmYHis') . $_FILES['foto_produk']['name'];
+		$config['upload_path']          = './foto_usaha/produk/';
+		$config['allowed_types']        = 'gif|jpg|png';
+		$config['max_size']             = 20480;
+		$config['max_width']            = 5000;
+		$config['max_height']           = 5000;
+		$config['file_name']			= $file_name;
+		// $config['file_name']			= $foto_name;
+		$this->load->library('upload', $config);
+
+		if ( ! $this->upload->do_upload('foto_produk')){
+			$dataFoto = array('error' => $this->upload->display_errors());
+			$datafoto_produk = $this->produk->ambil_data_by_id($id_produk)->row();
+			$foto_produk	= $datafoto_produk->foto_produk;
+			// echo "Gagal";
+			// var_dump($dataFoto);
+			// ->row()->foto_produk
+			// echo $this->db->last_query();
+		}else{
+			$dataFoto			= array('upload_data' => $this->upload->data());
+			// var_dump($dataFoto);
+			$foto_produk		= $dataFoto['upload_data']['file_name'];
+			$config = array();
+			$config['image_library']='gd2';
+            $config['source_image']='./foto_usaha/produk/'.$dataFoto['upload_data']['file_name'];
+            $config['create_thumb']= FALSE;
+            $config['maintain_ratio']= TRUE;
+            $config['quality']= '50%';
+            $config['width']= 600;
+            $config['height']= 400;
+            $config['new_image']= './foto_usaha/produk/'.$dataFoto['upload_data']['file_name'];
+            $this->load->library('image_lib', $config);
+            $this->image_lib->resize();
+            $datafoto_produk = $this->produk->ambil_data_by_id($id_produk)->row();
+            if(unlink('./foto_usaha/produk/'.$datafoto_produk->foto_produk)){
+
+            }
+		}
+		// exit();
+		// END UPLOAD FOTO
+		$data_update = array(
+			'nama_produk' => $nama_produk,
+			'foto_produk' => $foto_produk,
+			'berat_produk' => $berat_produk,
+			'min_pemesanan' => $min_pemesanan
+		);
+		try {
+			$update = $this->produk->ubah_produk($data_update, $id_produk);
+			// echo $this->db->last_query();
+			$statusCode = 200;
+			if($update){
+				$status = 'berhasil';
+			}else{
+				$statusCode = 304;
+				$status = 'Gagal Mengubah Data Produk ';
+			}
+			$response = array(
+				'status' => $status
+			);
+			$this->output
+	        ->set_status_header($statusCode)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		} catch (Exception $e) {
+			$response = array(
+				'status' => 'Failed'
+			);
+			$this->output
+	        ->set_status_header(500)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		}
+		
+	}
+
+	public function prosesupdate_variasiproduk()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$variasi = $this->input->post('variasi');
+
+	}
+
+	public function hapus_data_produk()
+	{
+		$id_produk = $this->input->post('produk');
+		$data = array('status_p' => 'tidak_aktif');
+		
+		$status_code = 0;
+		$status = '';
+		try {
+			$update = $this->produk->ubah_produk($data, $id_produk);
+			if($update){
+				$status_code = 200;
+				$status = 'berhasil';
+			}else{
+				$status_code = 404;
+				$status = 'gagal';
+			}
+		} catch (Exception $e) {
+			$status_code = 500;
+			$status = 'error ' . $e->getMessage();
+		}
+
+		$response = array(
+			'status' => $status
+		);
+
+		$this->output
+	        ->set_status_header($status_code)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function aktifkan_produk()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$array = array('status_p' => 'aktif');
+		try {
+			$update = $this->produk->ubah_produk($array, $id_produk);
+			if($update){
+				$status_code = 200;
+				$status = 'berhasil';
+			}else{
+				$status_code = 404;
+				$status = 'gagal';
+			}
+		} catch (Exception $e) {
+			$status_code = 500;
+			$status = 'error ' . $e->getMessage();
+		}
+		$response = array(
+			'status' => $status
+		);
+
+		$this->output
+	        ->set_status_header($status_code)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function detail_produk()
+	{
+		$id_produk = $this->input->get('id_produk');
+		$data = $this->produk->ambil_data_by_id($id_produk);
+		$result = $data->row_array();
+		echo json_encode($result);
+	}
+
+	public function detail_produk_variasi()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$variasi = $this->input->post('variasi');
+		$data = $this->produk->ambilVariasiProduk($id_produk, $variasi);
+		$result = $data->row_array();
+		echo json_encode($result);
+	}
+
+	public function ambil_stok_variasi()
+	{
+		$variasi = $this->input->post('variasi');
+		$data_stok = $this->produk->ambil_stok_variasi($variasi);
+		if($data_stok->num_rows() > 0){
+			echo json_encode($data_stok->row());
+		}else{
+			echo "{}";
+		}
+		header("Content-type: Applicatoin/json");
+	}
+
+	public function all_var_produk()
+	{
+		$id_produk = $this->input->get('id_produk');
+		$data = $this->produk->ambil_var_by_produk($id_produk);
+
+		$this->output
+	        ->set_status_header(200)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($data->result_array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function detail_var_produk()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$data = $this->produk->ambil_var_by_produk($id_produk);
+		$result = $data->row_array();
+		echo json_encode($result);
+	}
+
+	public function updatevariasi_produk()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$variasi = ($this->input->post('dVariasi')) ? $this->input->post('dVariasi') : [];
+		$harga = $this->input->post('harga');
+		if(count($variasi) > 0){
+			$insert_variasi = $this->produk->insert_variasi($data);
+		}
+	}
+
+	public function ambil_variasi_produk()
+	{
+		$id_produk = $this->input->get('id_produk');
+		$data = $this->produk->ambil_variasi_produk($id_produk);
+		// echo $this->db->last_query()
+		// exit();
+		$result = $data->result_array();
+		$this->output
+	        ->set_status_header(200)
+	        ->set_content_type('application/json', 'utf-8')
+	        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function ambil_variasi_by_id()
+	{
+		$id_var = $this->input->post('id_var');
+		$data = $this->produk->ambil_variasi_by_id($id_var);
+		$result = $data->row_array();
+		header("Content-type:application/json");
+		echo json_encode($result);
+	}
+
+	public function cek_variasi_var()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$id_var = $this->input->post('var');
+		$ambil_data_variasi = $this->produk->ambil_data_variasi();
+		if($ambil_data_variasi->num_rows() > 0){
+			foreach ($ambil_data_variasi->result_array() as $dv) {
+				$produk_var = $this->produk->ambil_variasi_by_id($id_var, $dv['id_variasi']);
+				// echo $this->db->last_query();
+				if($produk_var->num_rows() > 0){
+					$SELECT = 'checked';
+				}else{
+					$SELECT = '';
+				}
+				$data[] = array('id'=>$dv['id_variasi'], 'text'=>$dv['nama_variasi'], 'selected' => $SELECT);
+			}
+		}else{
+			$data = array();
+		}
+		header("Content-type:application/json");
+		echo json_encode($data);
+	}
+
+	public function updatevariasi_produk2()
+	{
+		$variasi = $this->input->post('variasi');
+		$harga = $this->input->post('harga');
+		$id_variasiproduk = $this->input->post('id_variasiproduk');
+
+		$data = array('id_variasi' => $variasi, 'harga' => $harga);
+		$update = $this->produk->update_variasi($data, $id_variasiproduk);
+		if($update){
+			$status = 'berhasil';
+		}else{
+			$status = 'gagal';
+		}
+		$response = array('status' => $status);
+		header("Content-type:application/json");
+		echo json_encode($response);
+	}
+
+	public function updateVariasiProdukV3()
+	{
+		$jenis_variasi = $this->input->post('variasi');
+		$id_produk = $this->input->post('id_produk');
+		$hargaInput = $this->input->post('harga');
+		$stokInput = $this->input->post('stok');
+		$arrayData = array();
+		try {
+			$disablingVariasi = $this->db->update("data_variasi_produk", array('status_vp' => 'tidak aktif'), "id_produk = '$id_produk'");
+			if(!empty($jenis_variasi)){
+				for ($i=0; $i < count($jenis_variasi); $i++) { 
+					$id = $jenis_variasi[$i];
+					$harga = $hargaInput[$i];
+					$stok = $stokInput[$i];
+					$where = "id_produk = '$id_produk' AND id_variasi = '$id'";
+					$get_row = $this->db->get_where("data_variasi_produk", $where, 1);
+					$arrayData = array('harga' => $harga, 'stok' => $stok, 'status_vp' => 'aktif');
+					if($get_row->num_rows() > 0){
+						$update = $this->db->update("data_variasi_produk", $arrayData, $where);
+					}else{
+						$arrayData['id_produk'] = $id_produk;
+						$arrayData['id_variasi'] = $id;
+						$insert_variasi = $this->db->insert("data_variasi_produk", $arrayData);
+					}
+					
+					$this->db->reset_query();
+				}
+			}
+			$response = array('status' => 'success');
+			$this->responseJSON(200, $response);
+		} catch (Exception $e) {
+			$response = array('status' => 'failed');
+			$this->responseJSON(500, $response);
+		}	
+	}
+
+	public function responseJSON($statusHeader, $response)
+	{
+		$this->output
+		        ->set_status_header($statusHeader)
+		        ->set_content_type('application/json', 'utf-8')
+		        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	}
+
+	public function tambahvariasi_produk()
+	{
+		$id_produk = $this->input->post('id_produk');
+		$variasi = $this->input->post('variasi');
+		$harga = $this->input->post('harga');
+
+		$data = array('id_produk' => $id_produk, 'id_variasi' => $variasi, 'harga' => $harga);
+		$tambah = $this->produk->insert_variasi($data);
+		if($tambah){
+			$status = "berhasil";
+		}else{
+			$status = "gagal";
+		}
+		$response = array('status' => $status);
+		header("Content-type:application/json");
+		echo json_encode($response);
+	}
+
+	public function hapus_variasi_by_id()
+	{
+		$id_variasiproduk = $this->input->post('id_var');
+		$hapus = $this->produk->hapus_variasi_produk_by_id($id_variasiproduk);
+		if($hapus){
+			$status = "berhasil";
+		}else{
+			$status = "gagal";
+		}
+		$response = array('status' => $status);
+		header("Content-type:application/json");
+		echo json_encode($response);
+	}
+
+	public function get_image_slider()
+	{
+		$data = $this->produk->ambil_img_slider_produk();
+		$response = array();
+		if($data->num_rows() > 0){
+			$response = array('data' => $data->result_array(), 'max' => $data->num_rows());
+		}else{
+			$response = array('data' => null);
+		}
+		header("X-Content-Type-Options: nosniff");
+		header("Content-type: application/json");
+		echo json_encode($response);
+	}
+
+	public function get_all()
+	{
+		# code...
+	}
+
+	public function ambil_produk_kategori()
+	{
+		$kategori = $this->input->post('kat');
+		$data = $this->produk->ambil_produk_kategori($kategori);
+		$response = array();
+		if($data->num_rows() > 0){
+			$response = $data->result_array();
+		}
+
+		header("Content-type: application/json");
+		echo json_encode($response);
+	}
+
+	public function all_produk()
+	{
+		echo "ALL PRODUK";
+	}
+
+	
+
+	
+}
