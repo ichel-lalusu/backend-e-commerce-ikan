@@ -136,7 +136,7 @@ class Produk extends CI_Controller
 
 		if ( ! $this->upload->do_upload('foto_produk')){
 			$dataFoto = array('error' => $this->upload->display_errors());
-			// var_dump($dataFoto);
+			var_dump($dataFoto);
 			
 		}else{
 			$dataFoto = array('upload_data' => $this->upload->data());
@@ -527,17 +527,12 @@ class Produk extends CI_Controller
 					$harga = $hargaInput[$i];
 					$stok = $stokInput[$i];
 					$where = "id_produk = '$id_produk' AND id_variasi = '$id'";
-					$get_row = $this->db->get_where("data_variasi_produk", $where, 1);
 					$arrayData = array('harga' => $harga, 'stok' => $stok, 'status_vp' => 'aktif');
-					if($get_row->num_rows() > 0){
-						$update = $this->db->update("data_variasi_produk", $arrayData, $where);
-					}else{
-						$arrayData['id_produk'] = $id_produk;
-						$arrayData['id_variasi'] = $id;
-						$insert_variasi = $this->db->insert("data_variasi_produk", $arrayData);
-					}
-					
+					$update = $this->db->update("data_variasi_produk", $arrayData, $where);
 					$this->db->reset_query();
+					if(!$update){
+						$this->responseJSON(400, array('status' => 'Failed'));
+					}
 				}
 			}
 			$response = array('status' => 'success');

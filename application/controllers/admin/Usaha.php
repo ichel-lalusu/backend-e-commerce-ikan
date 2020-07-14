@@ -7,7 +7,7 @@ class Usaha extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    if(!$this->session->userdata("username")){
+    if (!$this->session->userdata("username")) {
       redirect(base_url('admin/User/login'));
     }
     $this->load->model("admin/Model_usaha", "usaha");
@@ -32,6 +32,14 @@ class Usaha extends CI_Controller
     $this->load->view($menu . '/index', $data_page);
   }
 
+  public function add_usaha($id_pj)
+  {
+    $menu = "Penjual";
+    $data_usaha = $this->usaha->get_all_usaha();
+    $data_page = array('title' => 'Tambah Data Usaha', 'menu' => 'penjual', 'id_pj' => $id_pj);
+    $this->load->view('admin/' . $menu . '/usaha/add', $data_page);
+  }
+
   public function edit($id)
   {
     $url_API = $this->url_API;
@@ -40,22 +48,7 @@ class Usaha extends CI_Controller
     $this->load->view("admin/Penjual/Usaha/edit", $data_page);
   }
 
-  public function add($id_penjual)
-  {
-    # code...
-  }
-
-  public function editV2($type, $id)
-  {
-    $url_API = $this->url_API;
-    $data_usaha = $this->usaha->getAllDetailShopByid($id)->row();
-    if ($type == "produk") {
-      $where = "id_produk = '$id'";
-      $data_produk = $this->db->get_where('data_produk', $where)->row();
-      $data_page = array('title' => 'Data Usaha', 'menu' => 'usaha', 'url_API' => $url_API, 'data_produk' => $data_produk, 'id' => $id);
-      $this->load->view("admin/Penjual/Usaha/Produk/edit", $data_page);
-    }
-  }
+  
 
   public function update()
   {
@@ -91,10 +84,11 @@ class Usaha extends CI_Controller
   {
     $where = " id_usaha = '$id_usaha'";
     $order = " id_pemesanan DESC, waktu_pemesanan DESC ";
-    $dataPemesanan = $this->Pemesanan->get_where("*", $where, NULL, $order, NULL);
+    $select_pemesanan = "`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`";
+    $dataPemesanan = $this->Pemesanan->get_where($select_pemesanan, $where, NULL, $order, NULL);
     $page = "Transaksi";
-    $data = array('title'=> 'Data Transaki','menu' => 'penjual', 'page' => $page, 'id_usaha' => $id_usaha, 'data_transaksi' => $dataPemesanan);
-    $this->load->view("admin/Penjual/".$page."/index", $data);
+    $data = array('title' => 'Data Transaki', 'menu' => 'penjual', 'page' => $page, 'id_usaha' => $id_usaha, 'data_transaksi' => $dataPemesanan);
+    $this->load->view("admin/Penjual/" . $page . "/index", $data);
   }
 
   public function detail($id)
@@ -106,23 +100,32 @@ class Usaha extends CI_Controller
     $data_produk = $this->produk->ambil_produk_penjual($id);
     $data_kurir = $this->Model_kurir->get_kurir_usaha($id);
     $data_kendaraan = $this->Model_kendaraan->getKendaraanUsaha($id);
-    $data_page = array('data_usaha' => $data_shop, 'title' => 'Detail Usaha ' . $data_shop->nama_usaha, 'menu' => 'penjual', 'data_produk' => $data_produk, 'id_usaha' => $id, 'data_kurir' => $data_kurir, 'data_kendaraan' => $data_kendaraan);
-    $this->load->view('admin/'.$menu."/usaha/detail", $data_page);
+    $data_page = array(
+      'data_usaha' => $data_shop,
+      'title' => 'Detail Usaha ' . $data_shop->nama_usaha,
+      'menu' => 'penjual', 
+      'data_produk' => $data_produk,
+      'id_usaha' => $id, 
+      'data_kurir' => $data_kurir,
+      'data_kendaraan' => $data_kendaraan
+    );
+    $this->load->view('admin/' . $menu . "/usaha/detail", $data_page);
   }
 
   public function add_kendaraan($id_usaha)
   {
-    if(!$this->session->userdata("username")){
-
-    }else{
+    if (!$this->session->userdata("username")) {
+    } else {
       $menu = "Penjual";
       $where = "id_usaha = '$id_usaha'";
       $data_shop = $this->usaha->get_where("*", $where)->row();
       $id_usaha = $data_shop->id_usaha;
-      $data_page = array('title' => 'Tambah Data Kendaraan ' . $data_shop->nama_usaha, 
+      $data_page = array(
+        'title' => 'Tambah Data Kendaraan ' . $data_shop->nama_usaha,
         'menu' => 'penjual',
-        'id_usaha' => $id_usaha);
-      $this->load->view('admin/'.$menu."/Usaha/Kendaraan/add_kendaraan", $data_page);
+        'id_usaha' => $id_usaha
+      );
+      $this->load->view('admin/' . $menu . "/Usaha/Kendaraan/add_kendaraan", $data_page);
     }
   }
 
@@ -135,27 +138,29 @@ class Usaha extends CI_Controller
     $array_insert = array('jenis_kendaraan' => $jenis_kendaraan, 'plat_kendaraan' => $plat_kendaraan, 'kapasitas_kendaraan' => $kapasitas_kendaraan, 'id_usaha' => $id_usaha);
     $INSERT = $this->Model_kendaraan->createKendaraan($array_insert);
     // $insert = $this->db->insert("data_kendaraan", $array_insert);
-    if($this->db->affected_rows() > 0){
+    if ($this->db->affected_rows() > 0) {
       $this->session->set_flashdata("success", "Berhasil Tambahkan Data Kendaraan");
-      redirect(base_url('admin/Usaha/detail/'.$id_usaha));
-    }else{
+      redirect(base_url('admin/Usaha/detail/' . $id_usaha));
+    } else {
       $this->session->set_flashdata("error", "Gagal Tambahkan Data Kendaraan");
-      redirect(base_url('admin/Usaha/add_kendaraan/'.$id_usaha));
+      redirect(base_url('admin/Usaha/add_kendaraan/' . $id_usaha));
     }
   }
 
   public function edit_kendaraan($id_kendaraan, $id_usaha)
   {
     $data = $this->detail_kendaraan($id_kendaraan);
-    if($data->num_rows() > 0):
+    if ($data->num_rows() > 0) :
       $menu = "Penjual";
-      $data_page = array('title' => 'Ubah Data Kendaraan ' . $data->row()->jenis_kendaraan, 
+      $data_page = array(
+        'title' => 'Ubah Data Kendaraan ' . $data->row()->jenis_kendaraan,
         'menu' => 'penjual',
         'id_usaha' => $id_usaha,
-        'data' => $data->row());
-      $this->load->view('admin/'.$menu."/Usaha/Kendaraan/edit_kendaraan", $data_page);
-    else:
-      redirect(base_url('admin/Usaha/detail/'.$id_usaha));
+        'data' => $data->row()
+      );
+      $this->load->view('admin/' . $menu . "/Usaha/Kendaraan/edit_kendaraan", $data_page);
+    else :
+      redirect(base_url('admin/Usaha/detail/' . $id_usaha));
     endif;
   }
 
@@ -176,24 +181,24 @@ class Usaha extends CI_Controller
     $where = 'id_kendaraan = ' . $id_kendaraan;
     $data = array('jenis_kendaraan' => $jenis_kendaraan, 'plat_kendaraan' => $plat_kendaraan, 'kapasitas_kendaraan' => $kapasitas_kendaraan);
     $update = $this->kendaraan->updateKendaraan($data, $where);
-    if($update){
+    if ($update) {
       $this->session->set_flashdata("success", "Berhasil Ubah Data Kendaraan");
-      redirect(base_url('admin/Usaha/detail/'.$id_usaha));
-    }else{
+      redirect(base_url('admin/Usaha/detail/' . $id_usaha));
+    } else {
       $this->session->set_flashdata("error", "Gagal Ubah Data Kendaraan");
-      redirect(base_url('admin/Usaha/edit_kendaraan/'.$id_kendaraan.'/'.$id_usaha));
+      redirect(base_url('admin/Usaha/edit_kendaraan/' . $id_kendaraan . '/' . $id_usaha));
     }
   }
 
   public function delete_kendaraan($id_kendaraan, $id_usaha)
   {
     $delete = $this->Model_kendaraan->delete_kendaraan($id_kendaraan);
-    if($delete){
+    if ($delete) {
       $this->session->set_flashdata("success", "Berhasil Hapus Data Kendaraan");
-      redirect(base_url('admin/Usaha/detail/'.$id_usaha));
-    }else{
+      redirect(base_url('admin/Usaha/detail/' . $id_usaha));
+    } else {
       $this->session->set_flashdata("error", "Gagal Hapus Data Kendaraan");
-      redirect(base_url('admin/Usaha/detail/'.$id_usaha));
+      redirect(base_url('admin/Usaha/detail/' . $id_usaha));
     }
   }
 

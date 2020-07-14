@@ -54,25 +54,37 @@ class Pemesanan extends CI_Controller
 	private function detail_pesanan($menu, $id_pemesanan)
 	{
 		$where = "id_pemesanan = '$id_pemesanan'";
-	    $data_pesanan = $this->Model_pemesanan->get_where("*", $where, NULL, NULL, 1)->row();
-	    $data_detail_pesanan = $this->Model_pemesanan->get_detail_where("*", $where);
-	    $data_pembayaran = $this->Pembayaran->get_where("*", $where, NULL, NULL, 1)->row();
+		$select_pesanan = "`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`";
+		$data_pesanan = $this->Model_pemesanan->get_where($select_pesanan, $where, NULL, NULL, 1)->row();
+
+		$select_detail_pesanan = "`id_dp`, `harga`, `jml_produk`, `sub_total`, `id_pemesanan`, `id_produk`, `berat_akhir`";
+		$data_detail_pesanan = $this->Model_pemesanan->get_detail_where($select_detail_pesanan, $where);
+
+		$select_pembayaran = "`id_pembayaran`, `metode_pembayaran`, `expiredDate`, `waktu_pembayaran`, `kode_bank`, `no_rekening_pb`, `nama_rekening_pb`, `struk_pembayaran`, `status_pembayaran`, `id_pemesanan`, `verifikasi`";
+		$data_pembayaran = $this->Pembayaran->get_where($select_pembayaran, $where, NULL, NULL, 1)->row();
+		
 	    $select_sub_total_produk_all= "SUM(harga*(jml_produk/10)) AS TOTAL_HARGA_PRODUK";
 	    $TOTAL_HARGA_PESANAN = $this->Model_pemesanan->get_detail_where($select_sub_total_produk_all, $where)->row()->TOTAL_HARGA_PRODUK;
 
-	    $select_tanggal = "DATE(waktu_pemesanan) as TANGGAL";
-	    $TANGGAL = $this->Model_pemesanan->get_where($select_tanggal, $where, NULL, NULL, 1)->row()->TANGGAL;
+	    $select_tanggal = "DATE(waktu_pemesanan) as tanggal";
+		$data_tanggal = $this->Model_pemesanan->get_where($select_tanggal, $where, NULL, NULL, 1);
+		if($data_tanggal->num_rows() > 0){
+			$TANGGAL = $data_tanggal->row()->tanggal;
+		}
 
 	    $id_usaha = $data_pesanan->id_usaha;
 	    $where_usaha = "id_usaha = '$id_usaha'";
 	    $id_pb = $data_pesanan->id_pb;
 	    $where_pembeli = "id_pb = '$id_pb'";
 
-	    // $data_penjual = $this->Penjual->get_where("*", $where_penjual, NULL, NULL, 1)->row();
-	    $data_usaha = $this->usaha->get_where("*", $where_usaha, NULL, NULL, 1)->row();
+		// $data_penjual = $this->Penjual->get_where("*", $where_penjual, NULL, NULL, 1)->row();
+		$select_usaha = " `id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`";
+		$data_usaha = $this->usaha->get_where($select_usaha, $where_usaha, NULL, NULL, 1)->row();
+		
+		$select_penjual = " `id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`";
 	    $id_penjual  =$data_usaha->id_pj;
 	    $where_penjual = "id_pj = '$id_penjual'";
-	    $data_penjual = $this->Penjual->get_where("*", $where_penjual, NULL, NULL, 1)->row();
+	    $data_penjual = $this->Penjual->get_where($select_penjual, $where_penjual, NULL, NULL, 1)->row();
 	    
 	    $data_pembeli = $this->Pembeli->get_where($where_pembeli)->row();
 
@@ -107,5 +119,6 @@ class Pemesanan extends CI_Controller
 	{
 		# code...
 	}
+	
 
 }
