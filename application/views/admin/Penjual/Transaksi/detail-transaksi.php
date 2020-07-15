@@ -174,7 +174,7 @@ $url_API = "http://localhost/backendikan/";
                           <td><?='Rp ' . number_format($data_pesanan->total_harga, 0, ",", ".")?>
                             <?php if ($STATUS_PEMBAYARAN=="Lunas"&&$STATUS_VERIFIKASI==0) {
                               ?>
-                              &nbsp;<span class="badge badge-warning" style="font-size: small;">Menunggu Verifikasi</span>
+                              &nbsp;<span class="badge badge-warning">Menunggu Verifikasi</span>
                               <?php
                             } ?>
                           </td>
@@ -185,7 +185,7 @@ $url_API = "http://localhost/backendikan/";
                             <tr>
                               <td>&nbsp;</td>
                               <td>
-                                <span class="badge badge-success" style="font-size: small;">Terbayar</span>
+                                <span class="badge badge-success" style="font-size: 100% !important; ">Terbayar</span>
                               </td>
                             </tr>
                             <?php
@@ -197,11 +197,11 @@ $url_API = "http://localhost/backendikan/";
                             <td><?='Rp ' . number_format($data_pesanan->total_harga*0.3, 0, ",", ".")?>
                             <?php if($STATUS_PEMBAYARAN=="DP"&&$STATUS_VERIFIKASI==1){
                               ?>
-                              <span class="badge badge-success" style="font-size: small;">Terbayar</span>
+                              <span class="badge badge-success">Terbayar</span>
                               <?php
                             }elseif ($STATUS_PEMBAYARAN=="DP"&&$STATUS_VERIFIKASI==0) {
                               ?>
-                              &nbsp;<span class="badge badge-warning" style="font-size: small;">Menunggu Verifikasi</span>
+                              &nbsp;<span class="badge badge-warning">Menunggu Verifikasi</span>
                               <?php
                             } ?></td>
                           </tr>
@@ -214,7 +214,7 @@ $url_API = "http://localhost/backendikan/";
                             ?>
                             <tr>
                               <td>&nbsp;</td>
-                              <td><span class="badge badge-success" style="font-size: small;">Terbayar</span></td>
+                              <td><span class="badge badge-success" style="font-size: 100% !important; ">Terbayar</span></td>
                             </tr>
                             <?php
                           }

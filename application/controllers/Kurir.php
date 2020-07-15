@@ -101,10 +101,10 @@ class Kurir extends CI_Controller
 	public function ubahKurir()
 	{
 		$nama_kurir = $this->input->post('nama_kurir');
-		$jk_kurir = $this->input->post('jk_kurir');
+		$jk_kurir = $this->input->post('jk_kurir2');
 		$telp_kurir = $this->input->post('telp_kurir');
 		$id_usaha = $this->input->post('id_usaha');
-		$id_kurir = $this->input->post('id');
+		$id_kurir = $this->input->post('id_kurir');
 		$foto_kurir = "";
 		// if (is_array($_FILES)) {
 		// 	if (is_uploaded_file($_FILES['foto_kurir']['tmp_name'])) {
@@ -125,7 +125,8 @@ class Kurir extends CI_Controller
 		$config['file_name']			= $file_name;
 		// var_dump($config);
 		// exit();
-		$array_insert = array('nama_kurir' => $nama_kurir,
+		$array_insert = array('nama_kurir' => $nama_kurir, 
+			'foto_kurir' => $foto_kurir, 
 			'jk_kurir' => $jk_kurir,
 			'telp_kurir' => $telp_kurir,);
 		$this->load->library('upload', $config);
@@ -135,7 +136,7 @@ class Kurir extends CI_Controller
 			// var_dump($dataFoto);
 			
 		}else{
-			unlink('foto_kurir/'.$data_kurir->foto_kurir);
+			unlink('./foto_kurir/'.$data_kurir->foto_kurir);
 			$dataFoto = array('upload_data' => $this->upload->data());
 			$config = array();
 			$config['image_library']='gd2';
@@ -155,8 +156,7 @@ class Kurir extends CI_Controller
 		}
 
 		
-		$update = $this->Model_kurir->update_kurir($array_insert, $id_kurir);
-		// echo $this->db->last_query();
+		$update = $this->Model_kurir->update_kurir($array_insert, $id_kurir, $id_usaha);
 		if($update){
 			$array = array('status' => "berhasil");
 			$this->output
@@ -176,45 +176,19 @@ class Kurir extends CI_Controller
 	{
 		$id_kurir = $this->input->post('id_kurir');
 		$id_usaha = $this->input->post('id_usaha');
-		$where = "id_usaha = '$id_usaha' AND id_kurir = '$id_kurir'";
-		try {
-			$data_kurir = $this->db->get_where("data_kurir", $where, 1);
-			if($data_kurir->num_rows() > 0){
-				$kurir = $data_kurir->row();
-				// CEK HAPUS FOTO
-				if(!empty($kurir->foto_kurir) || $kurir->foto_kurir!==""){
-					unlink("foto_kurir/" . $kurir->foto_kurir);
-				}
-				$delete = $this->Model_kurir->delete_kurir($id_kurir, $id_usaha);
-				if($delete){
-					$array = array('status' => "berhasil");
-					$this->output
-					->set_status_header(200)
-					->set_content_type('application/json', 'utf-8')
-					->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-				}else{
-					$array = array('status' => "gagal");
-					$this->output
-					->set_status_header(400)
-					->set_content_type('application/json', 'utf-8')
-					->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-				}
-			}else{
-				$array = array('status' => "gagal");
-					$this->output
-					->set_status_header(404)
-					->set_content_type('application/json', 'utf-8')
-					->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-			}
-		} catch (Exception $e) {
-			$array = array('status' => "Error" . $e->getMessage());
+		$delete = $this->Model_kurir->delete_kurir($id_kurir, $id_usaha);
+		if($delete){
+			$array = array('status' => "berhasil");
 			$this->output
-			->set_status_header(500)
+			->set_status_header(200)
+			->set_content_type('application/json', 'utf-8')
+			->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		}else{
+			$array = array('status' => "gagal");
+			$this->output
+			->set_status_header(404)
 			->set_content_type('application/json', 'utf-8')
 			->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 		}
-		
-		// echo $this->db->last_query();
-		
 	}
 }

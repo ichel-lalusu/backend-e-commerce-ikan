@@ -9,7 +9,7 @@ class Penjual extends CI_Controller {
       if(!$this->session->userdata("username")){
         redirect(base_url('admin/User/login'));
     }
-    $this->load->model("admin/Model_Penjual");
+    $this->load->model("admin/Model_penjual", "Model_penjual");
     $this->load->model("admin/Model_usaha", "usaha");
     $this->load->model("admin/Model_produk", "produk");
     $this->url_API = "http://localhost/backendikan/";
@@ -19,7 +19,7 @@ class Penjual extends CI_Controller {
 public function index()
 {
     $menu = "Penjual";
-    $data_penjual = $this->Model_Penjual->get_all();
+    $data_penjual = $this->Model_penjual->get_all();
     $data_page = array('title' => 'Data Penjual', 'data_penjual' => $data_penjual, 'menu' => 'penjual');
     $this->load->view('admin/'.$menu.'/index', $data_page);
 }
@@ -55,6 +55,12 @@ public function prosesadd(){
             $targetPath2 = "./foto_penjual/" . $foto_pj;
             move_uploaded_file($sourcePath2, $targetPath2);
             $data_add['foto_pj'] = $foto_pj;
+        }else{
+            if($jk_pj=="Laki-laki"):
+                $data_add['foto_pj'] = "maleAva.png";
+            else:
+                $data_add['foto_pj'] = "femaleAva.png";
+            endif;
         } if (is_uploaded_file($_FILES['fotoktp_pj']['tmp_name'])) {
             $sourcePath2 = $_FILES['fotoktp_pj']['tmp_name'];
             $fotoktp_pj = date('dmYHis') . $_FILES['fotoktp_pj']['name'];
@@ -63,46 +69,44 @@ public function prosesadd(){
             $data_add['fotoktp_pj'] = $fotoktp_pj;
         }
     }
-    $insert = $this->Model_Penjual->create($data_add);
-    /*if($insert) {
-        $last_id_pj = $this->db->insert_id();
-        $query2 = "INSERT INTO data_usaha VALUES (null, '$nama_toko', '$foto_toko', '$alamat_toko', '$jml_kapal', '$kapasitas_kapal', '$jml_kolam', '$kab_toko', '$kec_toko', '$kel_toko', '0', '0', '$last_id_pj')";
-        $insert2 = $this->db->query($query2);
-        if($insert2){
-            $query3 = "INSERT INTO data_pengguna VALUES (null, '$username', '$password', '$last_id_pj', 'penjual')";
-            $insert3 = $this->db->query($query3);
-            if($insert3){
-                $status = 'berhasil';
-            }else{
-                $status = 'gagal3 . ' . $this->db->_error_message();
-            }
-        }else{
-            $status = 'gagal2 . ' . $this->db->_error_message();
-        }
-    } else {
-        $status = 'gagal1';
-    }*/
 
-    // $response = array(
-    //     'status' => $status
-    // );
-
-    // echo json_encode($response);
+    
+    $insert = $this->Model_penjual->create($data_add);
+    $last_id_pj = $this->db->insert_id();
     if($insert){
-        $last_id_pj = $this->db->insert_id();
-        $this->session->set_flashdata('success', "Berhasil Tambah Data Penjual");
-        redirect(base_url('admin/'.$this->menu));
+        if($this->insert_pengguna_penjual($last_id_pj)):
+            $this->session->set_flashdata('success', "Berhasil Tambah Data Penjual");
+            redirect(base_url('admin/'.$this->menu));
+        else:
+            $this->delete($last_id_pj);
+            $this->session->set_flashdata('error', "Gagal Tambah Data Penjual");
+            redirect(base_url('admin/'.$this->menu.'/add'));
+        endif;
     }else{
         $this->session->set_flashdata('error', "Gagal Tambah Data Penjual");
         redirect(base_url('admin/'.$this->menu.'/add'));
     }
 }
 
+private function insert_pengguna_penjual($id_pj)
+{
+    $this->load->model("Model_user");
+    $username = $this->input->post('username');
+    $password = $this->input->post('password');
+    $level_user = $this->input->post('level_user');
+    $DATA['username'] = $username;
+    $DATA['password'] = $password;
+    $DATA['level_user'] = $level_user;
+    $DATA['id_akun']    = $id_pj;
+    $INSERT = $this->Model_user->insert_user_sign($DATA);
+    return $INSERT;
+}
+
 public function edit($id){
     $menu = "Penjual";
     $url_API = $this->url_API;
         // if($this->session->has_userdata('username')){
-    $data_penjual = $this->Model_Penjual->get_seller_by($id)->row();
+    $data_penjual = $this->Model_penjual->get_seller_by($id)->row();
             // echo $this->db->last_query();
             // var_dump($data_penjual);
             // exit();
@@ -270,7 +274,7 @@ public function update(){
 
     
     $where = array('id_pj' => $id);
-    $update = $this->Model_Penjual->update($data_update, $where);
+    $update = $this->Model_penjual->update($data_update, $where);
 
     if($update){
         $this->session->set_flashdata('success', "Berhasil Update Data Penjual");
@@ -284,12 +288,12 @@ public function update(){
 public function detail($id){
     $menu = "Penjual";
     // if($this->session->has_userdata('username')){
-    $data_penjual = $this->Model_Penjual->get_seller_by($id)->row();
+    $data_penjual = $this->Model_penjual->get_seller_by($id)->row();
     // var_dump($data_penjual);
     $data_usaha = $this->usaha->get_usaha_by_id_penjual($id)->row();
     // echo $this->db->last_query();
     // exit();
-    $data_page = array('data_penjual' => $data_penjual, 'data_usaha' => $data_usaha, 'title' => 'Detail Penjual ' . $data_penjual->nama_pj, 'menu' => 'penjual', 'url_API' => $this->url_API);
+    $data_page = array('data_penjual' => $data_penjual, 'id_pj' => $id, 'data_usaha' => $data_usaha, 'title' => 'Detail Penjual ' . $data_penjual->nama_pj, 'menu' => 'penjual', 'url_API' => $this->url_API);
     $this->load->view('admin/'.$menu."/detail", $data_page);
     
 }
@@ -304,19 +308,30 @@ public function GET_PRODUK_USAHA()
 
 public function delete($id)
 {
-    // $id_jampengiriman = $this->input->post('id_jampengiriman');
-    $delete_usaha = $this->usaha->delete($id);
+    // // $id_jampengiriman = $this->input->post('id_jampengiriman');
+    // $this->load->model("Model_penjual", '_PENJUAL_');
+    // $this->load->model("Model_user");
+    // $data_penjual = $this->_PENJUAL_->cek_penjual($id);
+    // $row_penjual = $data_penjual->row();
+    // if(!empty($row_penjual->foto_pj)):
+    //     unset("./foto_penjual/" . $row_penjual->foto_pj);
+    // endif;
+    // if(!empty($row_penjual->fotoktp_pj)):
+    //     unset("./foto_ktp_penjual/" . $row_penjual->fotoktp_pj);
+    // endif;
 
-    $proses = $this->Model_Penjual->delete($id);
-    if($proses){
-        //jika true
-        $this->session->set_flashdata('success', 'Berhasil Hapus Data Penjual');
-        redirect(base_url('admin/'.$this->menu));
-    }else{
-        //jika false
-        $this->session->set_flashdata('error', 'Gagal Hapus Data Penjual');
-        redirect(base_url('admin/'.$this->menu));
-    }
+    // $delete_usaha = $this->usaha->delete_by_penjual($id);
+    // $proses = $this->Model_penjual->delete_seller($id);
+    // $delete_user = $this->Model_user->delete_pengguna($id);
+    // if($delete_usaha&&$proses&&$delete_user){
+    //     //jika true
+    //     $this->session->set_flashdata('success', 'Berhasil Hapus Data Penjual');
+    //     redirect(base_url('admin/'.$this->menu));
+    // }else{
+    //     //jika false
+    //     $this->session->set_flashdata('error', 'Gagal Hapus Data Penjual');
+    //     redirect(base_url('admin/'.$this->menu));
+    // }
 
     // $respons = array('status' => $status);
     // header("Content-type: application/json");

@@ -6,6 +6,7 @@ class Modal_Penjual extends CI_Model
 {
 	public function get_all($order=NULL)
 	{
+		$this->db->select("`id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`");
 		if($order!==NULL){
 			$this->db->order_by($order);
 		}
@@ -14,7 +15,7 @@ class Modal_Penjual extends CI_Model
 
 	public function get_where($select="*", $where, $group=NULL, $order=NULL, $limit=NULL)
 	{
-		$this->db->select($select);
+		$this->db->select("`id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`");
 		$this->db->from("data_penjual");
 		$this->db->where($where);
 		if($group!==NULL){
