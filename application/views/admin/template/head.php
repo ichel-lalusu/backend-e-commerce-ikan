@@ -15,7 +15,7 @@
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <link rel="stylesheet" href="<?= base_url('assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') ?>">
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="<?= base_url('assets/') ?>dist/css/adminlte.min.css">
   <!-- DataTables -->
@@ -25,10 +25,11 @@
   <link rel="stylesheet" href="<?= base_url('assets/') ?>/plugins/daterangepicker/daterangepicker.css">
   <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.21/datatables.min.css"/> -->
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
-  
+
   <style>
-    th,td{
-      font-size: smaller;  
+    th,
+    td {
+      font-size: smaller;
     }
   </style>
 </head>

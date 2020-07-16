@@ -32,7 +32,7 @@ $url_API = "http://localhost/backendikan/";
       <section class="content">
 
         <!-- Default box -->
-        <div class="card card-info">
+        <div class="card card-primary">
           <div class="card-header">
             <h3 class="card-title">Data <?=$page?></h3>
           </div>
@@ -69,15 +69,14 @@ $url_API = "http://localhost/backendikan/";
                         $data_pembayaran = $this->Pemesanan->get_custom($selectP, $from, $where, '', '', $order, $limit)->row();
 
                         $wherePengiriman = "id_pemesanan = '$transaksi->id_pemesanan'";
-                        $data_pengiriman = $this->Pengiriman->get_detail_pengiriman($wherePengiriman);
-                        // echo $this->db->last_query();
+                        $data_pengiriman = $this->Pengiriman->get_where($wherePengiriman);
                     ?>
                       <tr>
                         <td id="no-pesanan-<?=$transaksi->id_pemesanan?>"><?= $id4; ?></td>
                         <td class="text-center" id="waktu-pemesanan-<?=$transaksi->id_pemesanan?>">
                           <p><?= $transaksi->waktu_pemesanan ?></p>
                         </td>
-                        <td style="text-align: center">
+                        <td>
                           <?php
                           $id_pb = $transaksi->id_pb;
                           $data_pembeli = $this->Pembeli->get_where("id_pb = '$id_pb'")->row();
@@ -87,7 +86,7 @@ $url_API = "http://localhost/backendikan/";
                         <td class="text-right">
                           <?php echo 'Rp ' . number_format($transaksi->biaya_kirim + $transaksi->total_harga, 0, ",", "."); ?>
                         </td>
-                        <td class="text-center" style="font-size: large;" id="status-pemesanan-<?=$transaksi->id_pemesanan?>">
+                        <td class="text-center" id="status-pemesanan-<?=$transaksi->id_pemesanan?>">
                           <?php
                           if(($transaksi->status_pemesanan == "Baru" || $transaksi->status_pemesanan == "Terbayar") && $data_pembayaran->verifikasi=="0"){
                           ?>

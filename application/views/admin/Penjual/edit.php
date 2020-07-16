@@ -14,7 +14,7 @@ $this->load->view('admin/template/head');
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1><a class="btn btn-secondary btn-sm" href="<?= base_url('penjual') ?>" title="Back" data-title="Back"><i class="fa fa-chevron-left"></i>
+              <h1><a class="btn btn-secondary btn-sm" href="<?= base_url('admin/Penjual') ?>" title="Back" data-title="Back"><i class="fa fa-chevron-left"></i>
                 </a> Edit Data Penjual</h1>
             </div>
           </div>
@@ -30,7 +30,7 @@ $this->load->view('admin/template/head');
               <div class="card-title">Edit Data Penjual
               </div>
             </div>
-            <form role="form" action="<?= base_url('admin/'.$menu . '/update') ?>" method="post" novalidate="" enctype="multipart/form-data">
+            <form role="form" action="<?= base_url('admin/' . $menu . '/update') ?>" method="post" novalidate="" enctype="multipart/form-data">
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6">
@@ -127,7 +127,7 @@ $this->load->view('admin/template/head');
                           <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-phone"></i></span>
                           </div>
-                          <input type="number" inputmode="tel" class="form-control" id="phoneMask" name="telp_pj" value="<?= $data_penjual->telp_pj ?>">
+                          <input type="text" class="form-control" id="phoneMask" name="telp_pj" value="<?= $data_penjual->telp_pj ?>">
                         </div>
                       </div>
                       <div class="form-group">
@@ -145,7 +145,10 @@ $this->load->view('admin/template/head');
                 </div>
               </div>
               <div class="card-footer">
-                <button class="btn btn-success float-right" type="submit">SIMPAN</button>
+                <div class="float-right">
+                  <a href="<?= base_url('admin/Penjual') ?>" class="btn btn-danger">BATAL</a>
+                  <button class="btn btn-success" type="submit">SIMPAN</button>
+                </div>
                 <!-- <button class="btn btn-outline-danger" type="button" onclick="window.history.back();">Batal</button> -->
             </form>
           </div>

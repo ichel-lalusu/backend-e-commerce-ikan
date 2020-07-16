@@ -106,12 +106,14 @@ $url_API = "http://localhost/backendikan/";
                       <td class="text-center">Air <?= $data_pj->jenis_petani ?>
                       </td>
                       <td class="text-center">
-                        <?php $data_usaha = $this->usaha->get_usaha_by_id_penjual($data_pj->id_pj); ?>
+                        <?php $data_usaha = $this->usaha->get_usaha_by_id_penjual($data_pj->id_pj)->row(); ?>
                         <a href="<?= base_url('admin/'.$menu . '/edit/' . $data_pj->id_pj); ?>" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
                         <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalDelete<?= $data_pj->id_pj ?>"><i class="fa fa-trash"></i></button>
                         <a href="<?= base_url('admin/'.$menu . '/detail/' . $data_pj->id_pj); ?>" class="btn btn-sm btn-primary">Detail</a>
-                        <?php if($data_usaha->num_rows() > 0): $data_row_usaha = $data_usaha->row(); ?>
-                        <a href="<?= base_url('admin/'.'usaha/transaksi/' . $data_row_usaha->id_usaha); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Transaksi</a>
+                        <?php
+                        if($data_usaha):
+                        ?>
+                          <a href="<?= base_url('admin/'.'usaha/transaksi/' . $data_usaha->id_usaha); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Transaksi</a>
                         <?php endif; ?>
                         <div class="modal fade" id="modalDelete<?= $data_pj->id_pj ?>">
                           <div class="modal-dialog">

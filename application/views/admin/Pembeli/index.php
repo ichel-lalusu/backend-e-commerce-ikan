@@ -30,8 +30,8 @@ $this->load->view('admin/template/head');
       <section class="content">
 
         <!-- Default box -->
-        <div class="card">
-          <div class="card-header" style="background-color: maroon; color: white">
+        <div class="card card-primary">
+          <div class="card-header">
             <h3 class="card-title">Data <?= ucwords($menu) ?></h3>
           </div>
           <div class="card-body">
@@ -88,7 +88,7 @@ $this->load->view('admin/template/head');
                       <td class="text-center">
                         <a href="<?= base_url('admin/'.$menu . '/edit/' . $pembeli->id_pb); ?>" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
                         <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalDelete<?= $pembeli->id_pb ?>"><i class="fa fa-trash"></i></button>
-                        <a href="<?= base_url('admin/Pembeli/detail_pesanan/' . $pembeli->id_pb); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Pesanan</a>
+                        <a href="<?= base_url('admin/Pembeli/pesanan_pembeli/' . $pembeli->id_pb); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Pesanan</a>
                         <div class="modal fade" id="modalDelete<?= $pembeli->id_pb ?>">
                           <div class="modal-dialog">
                             <div class="modal-content">

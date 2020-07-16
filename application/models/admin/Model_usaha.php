@@ -4,6 +4,7 @@
  */
 class Model_usaha extends CI_Model{
 	function get_all_usaha(){
+        $this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`");
         return $this->db->get('data_usaha');
     }
 
@@ -18,7 +19,7 @@ class Model_usaha extends CI_Model{
 
     public function get_where($select="*", $where, $group=NULL, $order=NULL, $limit=NULL)
     {
-        $this->db->select($select);
+        $this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`");
         $this->db->from("data_usaha");
         $this->db->where($where);
         if($group!==NULL){
@@ -42,13 +43,14 @@ class Model_usaha extends CI_Model{
 		return $this->db->insert('data_usaha', $data);
 	}
 
-	public function delete($id)
+	public function delete_by_penjual($id)
 	{
 		return $this->db->delete('data_usaha', array('id_pj' => $id));
 	}
 
     public function get_detail_shop_by($id)
     {
+        $this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`");
         return $this->db->get_where('data_usaha', array('id_usaha' => $id), 1);
     }
 
@@ -58,7 +60,7 @@ class Model_usaha extends CI_Model{
         return $this->db->select("*")->from("data_usaha a")->join("data_penjual b", "a.id_pj = b.id_pj")->get();
     }
 
-    public function update_shop($data_update, $where)
+    public function update_shop(Array $data_update, $where)
     {
         return $this->db->update('data_usaha', $data_update, $where, 1);
     }

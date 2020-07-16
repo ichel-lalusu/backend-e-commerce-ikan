@@ -1,8 +1,8 @@
 <?php
 $this->load->view('admin/template/head');
 ?>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js"></script>
-<!-- <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyAuoJ8tWSNs6owWkZsFI_Ssw4N_QOV__YM"></script> -->
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js"></script> -->
+<script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyAuoJ8tWSNs6owWkZsFI_Ssw4N_QOV__YM"></script>
 
 <style type="text/css">
     #map {
@@ -41,13 +41,13 @@ $this->load->view('admin/template/head');
                             <div class="card-title">Edit Data Usaha
                             </div>
                         </div>
-                        <form role="form" action="<?= base_url('admin/'.$menu . '/update') ?>" method="post" novalidate="" enctype="multipart/form-data">
+                        <form role="form" action="<?= base_url('admin/' . $menu . '/update') ?>" method="post" novalidate="" enctype="multipart/form-data">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <?php if($this->session->flashdata("error")): ?>
+                                        <?php if ($this->session->flashdata("error")) : ?>
                                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                                <strong>Gagal</strong> <?=$this->session->flashdata("error")?>
+                                                <strong>Gagal</strong> <?= $this->session->flashdata("error") ?>
                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
@@ -57,7 +57,6 @@ $this->load->view('admin/template/head');
                                     <div class="col-md-6">
                                         <div class="card" style="padding: 24px">
                                             <input type="hidden" name="id" value="<?= $data_usaha->id_usaha ?>">
-                                            <input type="hidden" name="hiddenfoto_pj" value="<?= $data_usaha->foto_usaha ?>">
                                             <div class="form-group">
                                                 <label for="nama_usaha" class="form-control-label">Nama Lengkap</label>
                                                 <div>
@@ -73,12 +72,12 @@ $this->load->view('admin/template/head');
                                                     <?php
                                                     if ($data_usaha->foto_usaha != "" || $data_usaha->foto_usaha != null) {
                                                     ?>
-                                                        <center><img height="210 !important" src="<?= $url_API . 'foto_usaha/' . $data_usaha->foto_usaha ?>" alt="Foto Usaha"></center>
+                                                        <center><img height="75%" width="100%" src="<?= $url_API . 'foto_usaha/' . $data_usaha->foto_usaha ?>" alt="Foto Usaha"></center>
                                                     <?php
                                                     }
                                                     ?>
                                                 </div>
-                                                <div class="input-group">
+                                                <div class="input-group mt-1">
                                                     <div class="custom-file">
                                                         <div class="custom-file form-control">
                                                             <input type="file" id="foto_usaha" class="custom-file-input" name="foto_usaha">
@@ -90,7 +89,7 @@ $this->load->view('admin/template/head');
                                             <div class="form-group">
                                                 <label class="form-control-label">Alamat Usaha</label>
                                                 <div>
-                                                    <textarea rows="6" required="" name="alamat_usaha" class="form-control" placeholder="Alamat Usaha"><?= $data_usaha->alamat_usaha ?></textarea>
+                                                    <textarea rows="2" required="" name="alamat_usaha" class="form-control" placeholder="Alamat Usaha"><?= $data_usaha->alamat_usaha ?></textarea>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -148,7 +147,7 @@ $this->load->view('admin/template/head');
                                                 </div>
                                             <?php endif; ?>
                                             <?php if ($data_usaha->jenis_petani == "Tawar") : ?>
-                                                <div class="row" style="margin-bottom: 5.4rem">
+                                                <div class="row" style="">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="jml_kolam" class="form-control-label">Jumlah Kolam</label>
@@ -226,7 +225,7 @@ $this->load->view('admin/template/head');
                             </div>
                             <div class="card-footer">
                                 <div class="float-right">
-                                    <a class="btn btn-danger" href="<?=base_url('admin/penjual/detail/'.$data_usaha->id_pj);?>">BATAL</a>
+                                    <a class="btn btn-danger" href="<?= base_url('admin/penjual/detail/' . $data_usaha->id_pj); ?>">BATAL</a>
                                     <button class="btn btn-success" type="submit">SIMPAN</button>
                                 </div>
                                 <!-- <button class="btn btn-outline-danger" type="button" onclick="window.history.back();">Batal</button> -->
@@ -238,38 +237,11 @@ $this->load->view('admin/template/head');
         </div>
         <!-- </div> -->
 
+        <!-- <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyAuoJ8tWSNs6owWkZsFI_Ssw4N_QOV__YM"> -->
+        </script>
         <?php
         $this->load->view('admin/template/footerjs');
         ?>
-        <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyAuoJ8tWSNs6owWkZsFI_Ssw4N_QOV__YM">
-        </script>
-        <script type="text/javascript">
-            var firstLt, firstLg;
-
-            function first() {
-                var onSuccess = function(position) {
-                    var element = document.getElementById('map');
-                    var marker;
-                    var posisilat;
-                    var posisilng;
-                    firstLt = parseFloat('<?= $data_usaha->latitude ?>');
-                    firstLg = parseFloat('<?= $data_usaha->longitude ?>');
-                    initMap(firstLt, firstLg);
-                    /*if(function_exists('initMap')){
-                      initMap(position.coords.latitude, position.coords.longitude);  
-                    }*/
-
-                };
-                navigator.geolocation.getCurrentPosition(onSuccess, onError);
-            }
-
-            // onError Callback receives a PositionError object
-            //
-            function onError(error) {
-                alert('code: ' + error.code + '\n' +
-                    'message: ' + error.message + '\n');
-            }
-        </script>
 
         <script type="text/javascript">
             function taruhMarker(peta, posisiTitik) {
@@ -312,10 +284,6 @@ $this->load->view('admin/template/head');
                     taruhMarker(this, event.latLng);
                 });
             }
-        </script>
-
-        <!-- CUSTOME JAVASCRIPT HERE -->
-        <script type="text/javascript">
             $(document).ready(function() {
                 var latitude = $("[name=latitude]").val();
                 var longitude = $("[name=longitude]").val();
