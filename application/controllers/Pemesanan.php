@@ -386,6 +386,8 @@ public function getAllTransaksiPenjual()
         $where = "id_usaha = '$idusaha' ";
         $where .= ($status!==null) ? " AND status_pemesanan = '$status'" : "";
         $where .= ($tipePengiriman!==null) ? " tipe_pengiriman = '$tipePengiriman'" : "";
+        if($status=="Terbayar"){
+                $where .= " AND tgl_pengiriman != date(now())";}
         $query = $this->Pemesanan->getWhereDataPemesananByIdUsaha($where,$limit, $orderBy);
             // echo $this->db->last_query();
             // exit();
@@ -494,7 +496,7 @@ public function get_transaksi_pengiriman()
     $status = (!empty($this->input->get('status')) ? $this->input->get('status') : null);
     $tipePengiriman = (!empty($this->input->get('tipePengiriman')) ? $this->input->get('tipePengiriman') : null);
     $where = "pemesanan.status_pemesanan = '$status' AND pemesanan.id_usaha = '$idusaha' AND pengiriman.status != 'terkirim' ";
-    $order = "pengiriman.urutan ASC";
+    $order = "pengiriman.urutan ASC ";
     $resultArray = array();
     $result = array();
     $statusHeader = 200;
@@ -531,7 +533,7 @@ public function get_transaksi_pengiriman()
                 }else{
                     $DataPembayaran = array();
                 }
-
+                $data_pengiriman = array('urutan' => $dataPemesanan->urutan, 'status_pengiriman_pesanan' => $dataPemesanan->status, 'penerima' => $dataPemesanan->penerima);
                 $queryDetailPesanan = $this->Pemesanan->getDetailPemesanan($idPemesanan);
                     // echo $this->db->last_query();
                 $DataDetailPesanan = $queryDetailPesanan->row();
@@ -576,7 +578,8 @@ public function get_transaksi_pengiriman()
                         'DataUsaha' => $DataUsaha,
                         'DataPembeli' => $DataPembeli,
                         'DataPembayaran' => $DataPembayaran,
-                        'statusPengiriman' => $statusPengiriman);
+                        'statusPengiriman' => $statusPengiriman,
+                        'data_pengiriman' => $data_pengiriman);
                 }
             }
             $resultArray = array('dataPesanan' => $result,
@@ -606,11 +609,10 @@ public function get_pesanan_siap_kirim()
     $response = array();
     $status_header = 500;
     try {
-        $NOW = " AND pemesanan.tgl_pengiriman = DATE(NOW())";
         $SELECT_PEMESANAN = "pemesanan.id_pemesanan, pemesanan.tipe_pengiriman, pembeli.nama_pb, pembeli.alamat_pb, pemesanan.waktu_pemesanan, pemesanan.tipe_pengiriman, pemesanan.total_harga";
         $SET_WHERE_LIST_PEMESANAN = "pemesanan.id_usaha = '$id_usaha' 
-        AND pemesanan.status_pemesanan = 'Terbayar' 
-        AND pembayaran.verifikasi = '1'" . $NOW;
+        AND pemesanan.status_pemesanan = 'Siap Dikirim' 
+        AND pembayaran.verifikasi = '1'";
         $JOIN[] = array('table' => 'data_pembayaran pembayaran', 'on' => 'pembayaran.id_pemesanan = pemesanan.id_pemesanan', 'join'=>'');
         $JOIN[] = array('table' => 'data_pembeli pembeli', 'on' => 'pembeli.id_pb = pemesanan.id_pb', 'join' => '');
         $order = "pemesanan.tipe_pengiriman DESC";
@@ -860,9 +862,11 @@ public function getTransaksiByIdPemesanan()
         $where .= ($id_usaha) ? " AND id_usaha = '$id_usaha'" : "";
         $where .= ($type) ? " AND tipe_pengiriman = '$type'" : "";
         $where .= ($status!==null) ? " AND status_pemesanan = '$status'" : "";
+        // $where .= " AND (tgl_pengiriman != date(now()) AND status_pembayaran!='Terbayar')";
 
         $query = $this->Pemesanan->getWhereDataPemesananByIdUsaha($where, $limit, $orderBy);
             // echo $this->db->last_query();
+            // exit();
         if($query->num_rows() > 0){
             $dataPemesanan = $query->row();
                 // foreach($query->result() as $dataPemesanan){
@@ -882,13 +886,14 @@ public function getTransaksiByIdPemesanan()
             $IdUsaha = $dataPemesanan->id_usaha;
             $IdPembeli = $dataPemesanan->id_pb;
             $statusPengiriman = $dataPemesanan->status_pemesanan;
+            $jarak = $dataPemesanan->jarak;
             $DataUsaha = $this->Usaha->ambil_usaha_by_id($IdUsaha)->row();
             $DataPembeli = $this->Pembeli->detail_pembeli($IdPembeli)->row();
             $DataPembayaran = $this->Pemesanan->getDataPembayaranByIdPemesanan($idPemesanan);
             if ($DataPembayaran->num_rows() > 0) {
                 $DataPembayaran = $DataPembayaran->row_array();
                 $datePembayaran = date_create($DataPembayaran['waktu_pembayaran']);
-                $newDatePembayaran = date_format($datePembayaran, 'd/m/y H:i');
+                $newDatePembayaran = date_format($datePembayaran, 'd/m/Y H:i');
                 $DataPembayaran['newDatePembayaran'] = $newDatePembayaran;
             }else{
                 $DataPembayaran = array();
@@ -938,7 +943,8 @@ public function getTransaksiByIdPemesanan()
                     'DataUsaha' => $DataUsaha,
                     'DataPembeli' => $DataPembeli,
                     'DataPembayaran' => $DataPembayaran,
-                    'statusPengiriman' => $statusPengiriman);
+                    'statusPengiriman' => $statusPengiriman,
+                    'jarak' => $jarak);
             }
                 // }
             $resultArray = array('dataPesanan' => $result,
