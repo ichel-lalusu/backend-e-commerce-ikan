@@ -196,11 +196,10 @@ public function getAllPemesananByAkun()
 
                 $IdUsaha = $dataPemesanan->id_usaha;
                 $IdPembeli = $dataPemesanan->id_pb;
+                $jarak = $dataPemesanan->jarak;
                 $DataUsaha = $this->Usaha->ambil_usaha_by_id($IdUsaha)->row();
                 $DataPembeli = $this->Pembeli->detail_pembeli($IdPembeli)->row();
                 $DataPembayaran = $this->Pemesanan->getDataPembayaranByIdPemesanan($idPemesanan)->row();
-                
-
                 $queryDetailPesanan = $this->Pemesanan->getDetailPemesanan($idPemesanan);
                     // echo $this->db->last_query();
                 $DataDetailPesanan = $queryDetailPesanan->row();
@@ -244,7 +243,8 @@ public function getAllPemesananByAkun()
                         'TotalProduk' => $TotalProduk,
                         'DataUsaha' => $DataUsaha,
                         'DataPembeli' => $DataPembeli,
-                        'DataPembayaran' => $DataPembayaran);
+                        'DataPembayaran' => $DataPembayaran,
+                        'jarak' => $jarak));
                 }
             }
             $resultArray = array('dataPesanan' => $result,
