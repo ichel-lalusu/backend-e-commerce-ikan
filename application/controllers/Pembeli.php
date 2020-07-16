@@ -10,6 +10,7 @@ class Pembeli extends CI_Controller
 		parent::__construct();
 		header("Access-Control-Allow-Origin: *");
 		$this->load->model("Model_pembeli", "Pembeli");
+		$this->load->model("Model_user", "user");
 		
 	}
 
