@@ -70,7 +70,7 @@ class Pembayaran extends CI_Controller
 				'verifikasi' => '0');
 			$UpdatePembayaran = $this->pemesanan->UpdatePembayaran($dataUpdatePembayaran, $idPemesanan);
 			if($UpdatePembayaran){
-				$dataPembayaran = $this->pemesanan->getDetailDataPembayaranByIdPemesanan($idPemesanan,);
+				$dataPembayaran = $this->pemesanan->getDetailDataPembayaranByIdPemesanan($idPemesanan);
 				$result = array('status' => 'berhasil', 'code' => '00');
 
 			}else{
