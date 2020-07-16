@@ -113,20 +113,21 @@ class Pembeli extends CI_Controller
 			}else{
 				
 				$dataFoto = array('upload_data' => $this->upload->data());
+				$foto_success = $dataFoto['upload_data']['file_name'];
 				$config = array();
 				$config['image_library']='gd2';
-	            $config['source_image']='./foto_pembeli/'.$file_name;
+	            $config['source_image']='./foto_pembeli/'.$foto_success;
 	            $config['create_thumb']= FALSE;
 	            $config['maintain_ratio']= FALSE;
 	            $config['quality']= '50%';
 	            $config['width']= 640;
 	            $config['height']= 640;
-	            $config['new_image']= './foto_pembeli/'.$file_name;
+	            $config['new_image']= './foto_pembeli/'.$foto_success;
 	            $this->load->library('image_lib', $config);
 	            $this->image_lib->resize();
 				// var_dump($dataFoto);
 				// exit();
-				$foto_pembeli		=   $file_name;
+				$foto_pembeli		=   $foto_success;
 				$data_pembeli_array['foto_pb'] = $foto_pembeli;
 			}
 
