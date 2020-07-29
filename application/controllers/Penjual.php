@@ -726,7 +726,9 @@ class Penjual extends CI_Controller
 
 	public function ambil_data_lokasi_penjual()
 	{
-		$data_penjual = $this->penjual->ambil_semua_usaha();
+		$data_penjual = $this->penjual->ambil_lokasi_usaha();
+		// echo $this->db->last_query();
+		// exit();
 		header("Content-type: application/json");
 		echo json_encode($data_penjual->result_array(),JSON_PRETTY_PRINT);
 	}

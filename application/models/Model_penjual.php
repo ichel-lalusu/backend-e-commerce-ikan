@@ -60,6 +60,13 @@ class Model_penjual extends CI_Model
 
 	public function ambil_semua_usaha()
 	{
+		$this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`");
+		return $this->db->get('data_usaha');
+	}
+
+	public function ambil_lokasi_usaha()
+	{
+		$this->db->select("`id_usaha`, `longitude`, `latitude`, `id_pj`");
 		return $this->db->get('data_usaha');
 	}
 
