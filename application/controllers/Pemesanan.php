@@ -1176,42 +1176,61 @@ public function getPemesananWithPembayaran($id_pemesanan)
 
 public function getPesananPriority()
 {
-    $pesanan = $this->input->get("pesanan");
+    $pesanan = $this->input->post("pesanan");
     $data_pesanan = array();
+    $data_pesanan_lain = array();
     $response = array();
     $status_header = 100;
     try {
         $data = $this->Pemesanan->getPesananPriority($pesanan);
-        if($data->num_rows() > 0){
-            $urutan = 0;
-            foreach ($data->result() as $key) {
-                $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
-                $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
-                $id1 = str_replace("-","",$key->waktu_pemesanan);
-                $id2 = str_replace(" ", "", $id1);
-                $id3 = str_replace(":", "", $id2);
-                $id4 = $id3 . $key->id_pemesanan;
-                $data_pesanan[$urutan]['no_pesanan'] = $id4;
-                $urutan++;
+        $data_lain= $this->Pemesanan->getPesananNonPriority($pesanan);
+        // echo $this->db->last_query();
+        if($data->num_rows() > 0 || $data_lain->num_rows() > 0){
+            // PROSES LOAD PRIORITY PESANAN
+            if($data->num_rows() > 0)
+            {
+                $urutan = 0;
+                foreach ($data->result() as $key) {
+                    $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
+                    $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
+                    $id1 = str_replace("-","",$key->waktu_pemesanan);
+                    $id2 = str_replace(" ", "", $id1);
+                    $id3 = str_replace(":", "", $id2);
+                    $id4 = $id3 . $key->id_pemesanan;
+                    $data_pesanan[$urutan]['no_pesanan'] = $id4;
+                    $urutan++;
+                }
             }
-        }else{
-            $status_header = 404;
-            $response['statusMessage'] = 'failed';
-            $response['data_pesanan'] = $data_pesanan;
-        }
-        if(count($data_pesanan) > 0){
+            // PROSES LOAD NON PRIORITY PESANAN
+            if($data_lain->num_rows() > 0)
+            {
+                $urutan = 0;
+                foreach ($data_lain->result() as $key) {
+                    $data_pesanan_lain[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
+                    $data_pesanan_lain[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
+                    $id1 = str_replace("-","",$key->waktu_pemesanan);
+                    $id2 = str_replace(" ", "", $id1);
+                    $id3 = str_replace(":", "", $id2);
+                    $id4 = $id3 . $key->id_pemesanan;
+                    $data_pesanan_lain[$urutan]['no_pesanan'] = $id4;
+                    $urutan++;
+                }
+            }
+
             $status_header = 200;
             $response['statusMessage'] = 'success';
-            $response['data_pesanan'] = $data_pesanan;
+            $response['data_pesanan_priority'] = $data_pesanan;
+            $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }else{
             $status_header = 404;
             $response['statusMessage'] = 'failed';
-            $response['data_pesanan'] = $data_pesanan;
+            $response['data_pesanan_priority'] = $data_pesanan;
+            $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }
     } catch (Exception $e) {
        $status_header = 500;
        $response['statusMessage'] = 'error';
-       $response['data_pesanan'] = $data_pesanan;
+       $response['data_pesanan_priority'] = $data_pesanan;
    }
    $this->output
    ->set_status_header($status_header)
@@ -1221,7 +1240,7 @@ public function getPesananPriority()
 
 public function getPesananNonPriority()
 {
-    $pesanan = $this->input->get("pesanan");
+    $pesanan = $this->input->post("pesanan");
         // var_dump($pesanan);
         // echo count($pesanan);
     $data_pesanan = array();
