@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 
  */
@@ -19,6 +20,15 @@ class Model_penjual extends CI_Model
 		$this->db->select('*');
 		$this->db->from('data_penjual');
 		return $this->db->get();
+	}
+
+	public function get_all($order = NULL)
+	{
+		$this->db->select("`id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`");
+		if ($order !== NULL) {
+			$this->db->order_by($order);
+		}
+		return $this->db->get("data_penjual");
 	}
 
 	public function data_profile($id_pj)
@@ -65,7 +75,7 @@ class Model_penjual extends CI_Model
 
 	public function ambil_data_usaha($id_akun)
 	{
-		$this->db->where('id_pj',$id_akun);
+		$this->db->where('id_pj', $id_akun);
 		return $this->db->get('data_usaha');
 	}
 
@@ -74,14 +84,14 @@ class Model_penjual extends CI_Model
 		$this->db->select('*');
 		$this->db->from('data_usaha a');
 		$this->db->join('data_penjual b', 'a.id_pj = b.id_pj');
-		$this->db->where('a.id_pj',$id_akun);
+		$this->db->where('a.id_pj', $id_akun);
 		return $this->db->get();
 	}
 
 	public function ambil_usaha_by_id($id_usaha)
 	{
 		$this->db->select('`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`');
-		$this->db->where('id_usaha',$id_usaha);
+		$this->db->where('id_usaha', $id_usaha);
 		return $this->db->get('data_usaha');
 	}
 
@@ -178,9 +188,7 @@ class Model_penjual extends CI_Model
 
 	public function delete_penjual($id)
 	{
-		$this->db->where("id_pj", $id);
-		$this->db->limit(1);
-		return $this->db->delete("data_penjual");
+		return $this->db->delete("data_penjual", array('id_pj' => $id), 1);
 	}
 
 	public function update_usaha($data, $id_usaha)
@@ -200,5 +208,5 @@ class Model_penjual extends CI_Model
 	// 	return $this->db->delete('data_jam_pengiriman');
 	// }
 
-	
+
 }

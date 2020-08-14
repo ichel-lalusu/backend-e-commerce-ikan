@@ -12,14 +12,7 @@ class Model_penjual extends CI_Model{
         return $this->db->get();
     }
     
-    public function get_all($order=NULL)
-    {
-        $this->db->select("`id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`");
-        if($order!==NULL){
-            $this->db->order_by($order);
-        }
-        return $this->db->get("data_penjual");
-    }
+    
 
     public function get_where($select="*", $where, $group=NULL, $order=NULL, $limit=NULL)
     {

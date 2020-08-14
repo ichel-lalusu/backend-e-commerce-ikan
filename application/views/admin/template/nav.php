@@ -35,7 +35,7 @@
         <a href="#" class="dropdown-item">
           <i class="fas fa-user mr-2"></i> Edit Profile
         </a>
-        <a href="<?=base_url('admin/User/logout')?>" class="dropdown-item">
+        <a href="#" onclick="logout()" class="dropdown-item">
           <i class="fas fa-power-off mr-2"></i> Logout
         </a>
       </div>
