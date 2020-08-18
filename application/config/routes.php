@@ -69,7 +69,7 @@ $route['api/produk/all-variasi']['get']						= "Produk/getAllVariasi";
 
 // USER API's ROUTE
 $route['api/user/signup/penjual']['post'] 					= "Penjual/prosessignuppenjual";
-$route['api/user/signup/penjual/usaha/completing']['post'] 	= "Penjual/prosessignupusaha";
+$route['api/user/signup/usaha']['post'] 					= "Penjual/prosessignupusaha";
 $route['api/user/signup/pembeli']['post'] 					= "Pembeli/prosessignuppembeli";
 $route['api/user/signup/rollback']['post'] 					= "Penjual/rollback";
 $route['api/user/login']['post'] 							= "User/proseslogin";

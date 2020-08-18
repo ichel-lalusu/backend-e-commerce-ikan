@@ -38,7 +38,6 @@ class Model_user extends CI_Model
 		$this->db->select("`id_pengguna`, `username`, `password`, `id_akun`, `level_user`");
 		return $this->db->get("data_pengguna");
 	}
-
 	public function insert_usaha($data)
 	{
 		return $this->db->insert("data_usaha", $data);
@@ -51,10 +50,13 @@ class Model_user extends CI_Model
 		return $this->db->get('data_pengguna');
 	}
 
-	
-
 	public function delete_pengguna($id)
 	{
 		return $this->db->delete("data_pengguna", array('id_akun' => $id), 1);
+	}
+
+	public function delete_penjual($id)
+	{
+
 	}
 }
