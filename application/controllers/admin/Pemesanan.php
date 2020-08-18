@@ -120,5 +120,25 @@ class Pemesanan extends CI_Controller
 		# code...
 	}
 	
+	public function pesanan(String $type='')
+	{
+		if($type=="selesai"){
+			return $this->pesanan_selesai();
+		}elseif ($type=="on_delivery") {
+			return $this->pesanan_on_delivery();
+		}else{
+			redirect(base_url('admin'));
+		}
+	}
+
+	protected function pesanan_selesai()
+	{
+		# code...
+	}
+
+	protected function pesanan_on_delivery()
+	{
+		# code...
+	}
 
 }
