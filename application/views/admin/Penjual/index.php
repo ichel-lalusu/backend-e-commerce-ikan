@@ -1,5 +1,5 @@
 <?php
-$this->load->view('admin/'.'template/head');
+$this->load->view('admin/' . 'template/head');
 $url_API = "http://localhost/backendikan/";
 ?>
 
@@ -7,7 +7,7 @@ $url_API = "http://localhost/backendikan/";
   <!-- Site wrapper -->
   <div class="wrapper">
     <?php
-    $this->load->view('admin/'.'template/nav');
+    $this->load->view('admin/' . 'template/nav');
     ?>
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -42,7 +42,7 @@ $url_API = "http://localhost/backendikan/";
             </div>
           </div>
           <div class="card-body">
-            <a href="<?= base_url('admin/'.'penjual/add') ?>" class="btn btn-sm btn-info m-l-10 mb-3 float-right"><i class="fa fa-plus"></i> TAMBAH DATA PENJUAL</a>
+            <a href="<?= base_url('admin/' . 'penjual/add') ?>" class="btn btn-sm btn-info m-l-10 mb-3 float-right"><i class="fa fa-plus"></i> TAMBAH DATA PENJUAL</a>
             <div class="table-responsive">
               <table class="table table-hover table-bordered table-striped dataTable dtr-inline">
                 <thead class="thead-colored thead-teal" style="text-align: center">
@@ -60,94 +60,12 @@ $url_API = "http://localhost/backendikan/";
                     <th width="12%">Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <?php
-                  $no = 1;
-                  foreach ($data_penjual->result() as $data_pj) {
-                  ?>
-                    <tr>
-                      <td><?= $no; ?></td>
-                      <td>
-                        <p><?= $data_pj->nama_pj ?></p>
-                      </td>
-                      <td class="text-center">
-                        <?php
-                        if ($data_pj->foto_pj != "" || $data_pj->foto_pj != null) {
-                        ?>
-                          <img width="100" src="<?= base_url() . 'foto_penjual/' . $data_pj->foto_pj ?>" alt="Foto Penjual <?= ucwords($data_pj->foto_pj) ?>" class="img-circle">
-                        <?php
-                        }
-                        ?>
-                      </td>
-                      <td>
-                        <p><?= $data_pj->noktp_pj ?></p>
-                      </td>
-                      <td class="text-center">
-                        <?php
-                        if ($data_pj->fotoktp_pj != "" || $data_pj->fotoktp_pj != null) {
-                        ?>
-                          <img height="100" src="<?= base_url() . 'foto_ktp_penjual/' . $data_pj->fotoktp_pj ?>" alt="Foto KTPenjual <?= ucwords($data_pj->fotoktp_pj) ?>">
-                        <?php
-                        }
-                        ?>
-                      </td>
-                      <td class="text-center">
-                        <p><?= $data_pj->jk_pj ?></p>
-                      </td>
-                      <td class="text-center">
-                        <p><?= $data_pj->tgllahir_pj ?></p>
-                      </td>
-                      <td>
-                        <p><?= $data_pj->alamat_pj ?></p>
-                      </td>
-                      <td class="text-center">
-                        <p><?= $data_pj->telp_pj ?></p>
-                      </td>
-                      <td class="text-center">Air <?= $data_pj->jenis_petani ?>
-                      </td>
-                      <td class="text-center">
-                        <?php $data_usaha = $this->usaha->get_usaha_by_id_penjual($data_pj->id_pj)->row(); ?>
-                        <a href="<?= base_url('admin/'.$menu . '/edit/' . $data_pj->id_pj); ?>" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
-                        <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalDelete<?= $data_pj->id_pj ?>"><i class="fa fa-trash"></i></button>
-                        <a href="<?= base_url('admin/'.$menu . '/detail/' . $data_pj->id_pj); ?>" class="btn btn-sm btn-primary">Detail</a>
-                        <?php
-                        if($data_usaha):
-                        ?>
-                          <a href="<?= base_url('admin/'.'usaha/transaksi/' . $data_usaha->id_usaha); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Transaksi</a>
-                        <?php endif; ?>
-                        <div class="modal fade" id="modalDelete<?= $data_pj->id_pj ?>">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h4 class="modal-title">Konfirmasi Hapus </h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-                              <div class="modal-body">
-                                <p>Apakah Anda yakin menghapus Penjual <?= $data_pj->nama_pj ?>?</p>
-                              </div>
-                              <div class="modal-footer justify-content-between">
-                                <button type="button" class="btn btn-default float-right" data-dismiss="modal">Tidak</button>
-                                <a href="<?= base_url('admin/'.'penjual/delete/' . $data_pj->id_pj) ?>" type="button" class="btn btn-primary float-left">Hapus</a>
-                              </div>
-                            </div>
-                            <!-- /.modal-content -->
-                          </div>
-                          <!-- /.modal-dialog -->
-                        </div>
-                        <!-- /.modal -->
-                      </td>
-
-                    </tr>
-                  <?php
-                    $no++;
-                  }
-                  ?>
+                <tbody id="data-penjual">
+                  
                 </tbody>
               </table>
             </div>
-            
+
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
@@ -163,19 +81,83 @@ $url_API = "http://localhost/backendikan/";
     <!-- /.content-wrapper -->
 
     <?php
-    $this->load->view('admin/'.'template/footerjs');
+    $this->load->view('admin/' . 'template/footerjs');
     ?>
     <script>
-      $(document).ready(()=>{
+      $(document).ready(() => {
         $(".dataTable").DataTable();
+        var data_user = JSON.parse(localStorage.data_user);
+        $.post('<?= base_url('Penjual/all_penjual') ?>', {
+          data_user
+        }).then(on_success_load_penjual);
       });
+
+      function on_success_load_penjual(result, status) {
+        if (status == "success") {
+          console.log(result.data);
+          var tr = "";
+          var no = 1;
+          var data_tabel = result.data;
+          $.each(data_tabel, function(key, data_pj) {
+            tr += `<tr>` +
+              `<td>${no}</td>` +
+              `<td><p> ${data_pj.nama_pj}</p> </td>` +
+              `<td class = "text-center" >`;
+            if (data_pj.foto_pj != "" || $data_pj.foto_pj != null) {
+              tr += `<img width = "100" src = "<?= base_url() . 'foto_penjual/' ?>${data_pj.foto_pj}" alt = "Foto Penjual ${data_pj.foto_pj}" class = "img-circle" >`;
+            }
+            tr += `</td>` +
+              `<td><p>${data_pj.noktp_pj}</p></td>` +
+              `<td class = "text-center" >`;
+            if (data_pj.fotoktp_pj != "" || data_pj.fotoktp_pj != null) {
+              tr += `<img height = "100" src = "<?= base_url() . 'foto_ktp_penjual/' ?>${data_pj.fotoktp_pj}" alt = "Foto KTPenjual ${data_pj.fotoktp_pj}" >`;
+            }
+            tr += `</td>`+ 
+              `<td class = "text-center"><p>${data_pj.jk_pj}</p></td>`+
+              `<td class = "text-center" ><p >${data_pj.tgllahir_pj}</p></td >`+
+              `<td ><p>${data_pj.alamat_pj}</p></td>`+
+              `<td class = "text-center"><p>${data_pj.telp_pj}</p></td >`+
+              `<td class = "text-center" > Air ${data_pj.jenis_petani}</td>`+
+              `<td class = "text-center" >`;
+              tr += `<a href = "<?= base_url('admin/' . $menu . '/edit/'); ?>${data_pj.id_pj}" class = "btn btn-sm btn-success"><i class = "fa fa-edit" ></i></a >
+              <button class = "btn btn-sm btn-danger" data - toggle = "modal" data - target = "#modalDelete${data_pj.id_pj}"><i class = "fa fa-trash"></i></button >
+              <a href = "<?= base_url('admin/' . $menu . '/detail/'); ?>${data_pj.id_pj}" class = "btn btn-sm btn-primary">Detail</a>`;
+              if(data_pj.data_usaha!=null)
+                {tr += `<a href = "<?= base_url('admin/' . 'usaha/transaksi/'); ?>${data_pj.data_usaha.id_usaha}" class = "btn btn-sm mt-2 btn-sm" style = "background-color: orange;">Data Transaksi</a>`;
+                tr += `<div class = "modal fade" id = "modalDelete${data_pj.id_pj}">
+                        <div class = "modal-dialog">
+                          <div class = "modal-content">
+                            <div class = "modal-header">
+                              <h4 class = "modal-title">Konfirmasi Hapus</h4>
+                              <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
+                                <span aria-hidden = "true">&times;</span>
+                              </button>
+                            </div>
+                            <div class = "modal-body" >
+                              <p> Apakah Anda yakin menghapus Penjual ${data_pj.nama_pj} ? <div /p>
+                            </div>
+                            <div class = "modal-footer justify-content-between" >
+                              <button type = "button" class = "btn btn-default float-right" data - dismiss = "modal">Tidak</button>
+                              <a href = "<?= base_url('admin/' . 'penjual/delete/') ?>${data_pj.id_pj}" type = "button" class = "btn btn-primary float-left">Hapus</a>
+                            </div > 
+                          </div>
+                        </div >
+                      </div >`;}
+                tr += `</td >`;
+                tr += `</tr>`;
+            no++;
+          });
+          $("#data-penjual").html(tr);
+        }
+      }
+
       function deletePenjual(id) {
         var confirmation = confirm(
           'Apakah Anda Yakin Menghapus data dari "' + id + '"?'
         );
         if (confirmation) {
           return window.location.href =
-            "<?= base_url('admin/'.$menu . '/delete/'); ?>" + id;
+            "<?= base_url('admin/' . $menu . '/delete/'); ?>" + id;
         }
       }
     </script>

@@ -133,6 +133,7 @@ class Produk extends CI_Controller
 		$berat_produk = $this->input->post('berat_produk');
 		$min_pemesanan = $this->input->post('min_pemesanan');
 		$id_usaha = $this->input->post('id_usaha');
+		$total_ekor_per_kg = $this->input->post('total_ekor_per_kg');	// Maksimal Ekor Dalam 1 Kg
 		// SETTING UPLOAD FOTO
 		$file_name						= date('dmYHis') . $_FILES['foto_produk']['name'];
 		// var_dump($_FILES);
@@ -144,17 +145,22 @@ class Produk extends CI_Controller
 		$config['file_name']			= $file_name;
 		// var_dump($config);
 		// exit();
+		$status = 100;
+		$responseMessage = '';
+		$response = array();
+		
 		$array_produk = array(
 			'nama_produk' =>$nama_produk,
 			'kategori' => $kategori,
 			'berat_produk' => $berat_produk,
 			'min_pemesanan' => $min_pemesanan,
-			'id_usaha' => $id_usaha);
+			'id_usaha' => $id_usaha,
+			'ekor_per_kg' => $total_ekor_per_kg);
 		$this->load->library('upload', $config);
 
 		if ( ! $this->upload->do_upload('foto_produk')){
 			$dataFoto = array('error' => $this->upload->display_errors());
-			var_dump($dataFoto);
+			// var_dump($dataFoto);
 			
 		}else{
 			$dataFoto = array('upload_data' => $this->upload->data());
@@ -177,9 +183,6 @@ class Produk extends CI_Controller
 		
 		// END UPLOAD FOTO
 		
-		$status = 500;
-		$responseMessage = '';
-		$response = array();
 		
 		$insert_produk = $this->produk->insert_produk($array_produk);
 		if($insert_produk){
@@ -260,11 +263,12 @@ class Produk extends CI_Controller
 
 	public function prosesupdate_produk()
 	{
-		$id_produk			= $this->input->post('id_produk');
+		$id_produk			= intval($this->input->post('id_produk'));
 		$nama_produk		= $this->input->post('nama_produk');
-		$berat_produk		= $this->input->post('berat_produk');
-		$id_toko			= $this->input->post('id_toko');
-		$min_pemesanan		= $this->input->post('minOrder');
+		$berat_produk		= intval($this->input->post('berat_produk'));
+		$id_toko			= intval($this->input->post('id_toko'));
+		$min_pemesanan		= intval($this->input->post('minOrder'));
+		$ekor_per_kg 		= intval($this->input->post('total_ekor_per_kg'));
 		// $variasi			= ($_POST['variasi']) ? $_POST['variasi'] : [];
 		// $variasi			= ($this->input->post('variasi')!==null) ? $this->input->post('variasi') : null;
 
@@ -313,7 +317,8 @@ class Produk extends CI_Controller
 			'nama_produk' => $nama_produk,
 			'foto_produk' => $foto_produk,
 			'berat_produk' => $berat_produk,
-			'min_pemesanan' => $min_pemesanan
+			'min_pemesanan' => $min_pemesanan,
+			'ekor_per_kg' => $ekor_per_kg
 		);
 		try {
 			$update = $this->produk->ubah_produk($data_update, $id_produk);

@@ -40,13 +40,13 @@ $this->load->view('admin/template/head');
           <div class="col-md-3">
             <div class="small-box bg-info">
               <div class="inner">
-                <h3><?=$data_pesanan_selesai->total?></h3>
+                <h3 id="data-pesanan-selesai"></h3>
                 <p>Pesanan Selesai</p>
               </div>
               <div class="icon">
                 <i class="ion ion-android-drafts"></i>
               </div>
-              <a href="#" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
+              <a href="#" id="url-pesanan-selesai" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
             </div>
           </div>
 
@@ -54,39 +54,39 @@ $this->load->view('admin/template/head');
           <div class="col-md-3">
             <div class="small-box bg-success">
               <div class="inner">
-                <h3><?=$data_penjual->num_rows()?></h3>
+                <h3 id="data-penjual"></h3>
                 <p>Total Penjual Saat Ini</p>
               </div>
               <div class="icon">
                 <i class="ion ion-android-person"></i>
               </div>
-              <a href="#" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
+              <a href="#" id="url-penjual" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
             </div>
           </div>
 
           <div class="col-md-3">
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3><?=$data_pembeli->num_rows()?></h3>
+                <h3 id="data-pembeli"></h3>
                 <p>Total Pembeli Saat Ini</p>
               </div>
               <div class="icon">
                 <i class="ion ion-android-person"></i>
               </div>
-              <a href="#" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
+              <a href="#" id="url-pembeli" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
             </div>
           </div>
 
           <div class="col-md-3">
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3><?=(isset($data_pesanan_on_delivery->total)) ? $data_pesanan_on_delivery->total : 0;?></h3>
+                <h3 id="data-pesanan-on-delivery"></h3>
                 <p>Pesanan Dalam Pengiriman</p>
               </div>
               <div class="icon">
                 <i class="ion ion-log-out"></i>
               </div>
-              <a href="#" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
+              <a href="#" id="url-pesanan-on-delivery" class="small-box-footer">Lihat Detail <i class="fas fa-angle-right"></i></a>
             </div>
           </div>
         </div>
@@ -123,9 +123,48 @@ $this->load->view('admin/template/head');
     $this->load->view('admin/template/footerjs');
     ?>
     <script type="text/javascript">
-      $(document).ready(()=>{
+      $(document).ready(() => {
         $(".alert").fadeOut(1000);
+        var data_user = {
+          data_user: JSON.parse(localStorage.data_user)
+        };
+        $.post('<?= base_url('admin/admin/data_dashborad_admin') ?>', data_user).then(success_load_data_dashboard);
       });
+
+      function success_load_data_dashboard(data, status) {
+        if (status == "success") {
+          var data_dashboard = data.data;
+          $("title").text(data_dashboard.title);
+          var data_pesanan_selesai = data_dashboard.data_pesanan_selesai.total;
+          var data_pembeli = data_dashboard.data_pembeli;
+          var data_penjual = data_dashboard.data_penjual;
+          var data_pesanan_on_delivery = data_dashboard.data_pesanan_on_delivery;
+          $("#data-pesanan-selesai").text(data_pesanan_selesai);
+          $("#data-penjual").text(data_penjual.length);
+          $("#data-pembeli").text(data_pembeli.length);
+          $("#data-pesanan-on-delivery").text(data_pesanan_on_delivery);
+          if (data_pesanan_selesai.total > 0) {
+            $("#url-pesanan-selesai").click(() => {
+              location.href = data_dashboard.url_pesanan_selesai;
+            });
+          }
+          if(data_pesanan_on_delivery > 0) {
+            $("#url-pesanan-on-delivery").click(() => {
+              location.href = data_dashboard.url_pesanan_on_delivery;
+            });
+          }
+          if(data_penjual.length > 0){
+            $("#url-penjual").click(() => {
+              location.href = data_dashboard.url_penjual;
+            });
+          }
+          if(data_pembeli.length > 0){
+            $("#url-pembeli").click(() => {
+              location.href = data_dashboard.url_pembeli;
+            });
+          }
+        }
+      }
     </script>
     <!-- CUSTOME JAVASCRIPT HERE -->
   </div>

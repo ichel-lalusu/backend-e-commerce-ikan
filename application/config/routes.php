@@ -131,11 +131,17 @@ $route['api/pesanan/detail-pesanan-by-id']['get'] = "Pemesanan/getDataPemesananB
 $route['api/pesanan/detail-in-html']['post'] = "Pemesanan/getDetailPemesanan_HTML";
 $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPembayaran/$1";
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
-$route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
-$route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
+$route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
+$route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+
+$route['api/keranjang']['get']					= "Keranjang";
+$route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
+$route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
+$route['api/keranjang/delete']['post']			= "Keranjang/hapus";
 
 
 
 $route['admin'] = "admin/Admin";
 $route['admin/Usaha/detail_transaksi/(:num)'] = 'admin/Pemesanan/detail/Usaha/$1';
 $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/$1';
+$route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';

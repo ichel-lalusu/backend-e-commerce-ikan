@@ -239,7 +239,7 @@ class Model_pemesanan extends CI_Model
     public function getPesananPriority($array)
     {
         $this->db->where_in('pemesanan.id_pemesanan', $array);
-        $this->db->where('pemesanan.status_pemesanan', 'Terbayar');
+        $this->db->where('pemesanan.status_pemesanan', 'Siap Dikirim');
         $this->db->where("pembayaran.verifikasi", "1");
         $this->db->where("DATE(tgl_pengiriman) = DATE(NOW())");
         $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha");
