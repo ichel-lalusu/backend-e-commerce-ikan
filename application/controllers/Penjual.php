@@ -420,38 +420,40 @@ class Penjual extends CI_Controller
 
 				// CEK foto_usaha
 				// UPLOAD FOTO USAHA
-				$file_name						= date('dmYHis') . $_FILES['foto_usaha']['name'];
-				// var_dump($_FILES);
-				$config['upload_path']          = './foto_usaha/';
-				$config['allowed_types']        = 'gif|jpg|jpeg|png';
-				$config['max_size']             = 20480;
-				$config['max_width']            = 5000;
-				$config['max_height']           = 5000;
-				$config['file_name']			= $file_name;
+				if(isset($_FILES['foto_usaha'])){
+					$file_name						= date('dmYHis') . $_FILES['foto_usaha']['name'];
+					// var_dump($_FILES);
+					$config['upload_path']          = './foto_usaha/';
+					$config['allowed_types']        = 'gif|jpg|jpeg|png';
+					$config['max_size']             = 20480;
+					$config['max_width']            = 5000;
+					$config['max_height']           = 5000;
+					$config['file_name']			= $file_name;
 
-				$this->load->library('upload', $config);
-				if (!$this->upload->do_upload('foto_usaha')) {
-					$dataFoto = array('error' => $this->upload->display_errors());
-				} else {
+					$this->load->library('upload', $config);
+					if (!$this->upload->do_upload('foto_usaha')) {
+						$dataFoto = array('error' => $this->upload->display_errors());
+					} else {
 
-					$dataFoto = array('upload_data' => $this->upload->data());
-					$config = array();
-					$config['image_library'] = 'gd2';
-					$config['source_image'] = './foto_usaha/' . $file_name;
-					$config['create_thumb'] = FALSE;
-					$config['maintain_ratio'] = FALSE;
-					$config['quality'] = '50%';
-					$config['width'] = 640;
-					$config['height'] = 640;
-					$config['new_image'] = './foto_usaha/' . $file_name;
-					$this->load->library('image_lib', $config);
-					$this->image_lib->resize();
-					// var_dump($dataFoto);
-					// exit();
-					$foto_pembeli		=   $file_name;
-					$data_insert_usaha['foto_usaha'] = $foto_pembeli;
+						$dataFoto = array('upload_data' => $this->upload->data());
+						$config = array();
+						$config['image_library'] = 'gd2';
+						$config['source_image'] = './foto_usaha/' . $file_name;
+						$config['create_thumb'] = FALSE;
+						$config['maintain_ratio'] = FALSE;
+						$config['quality'] = '50%';
+						$config['width'] = 640;
+						$config['height'] = 640;
+						$config['new_image'] = './foto_usaha/' . $file_name;
+						$this->load->library('image_lib', $config);
+						$this->image_lib->resize();
+						// var_dump($dataFoto);
+						// exit();
+						$foto_pembeli		=   $file_name;
+						$data_insert_usaha['foto_usaha'] = $foto_pembeli;
+					}
 				}
-				$INSERT_USAHA = $this->user->insert_usaha($data_insert_usaha);
+				$INSERT_USAHA = $this->Model_user->insert_usaha($data_insert_usaha);
 				if ($INSERT_USAHA) {
 					$status_header = 200;
 					$response = array('status' => 'success', 'message' => "Berhasil Lengkapi Detail Usaha");
