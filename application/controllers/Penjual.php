@@ -10,7 +10,7 @@ class Penjual extends CI_Controller
 	{
 		parent::__construct();
 		header("Access-Control-Allow-Origin: *");
-		$this->load->model('Model_penjual', 'penjual', TRUE);
+		$this->load->model('Model_penjual', 'penjual');
 		$this->load->model('Model_rekening', 'rekening');
 		$this->load->model('Model_kendaraan', 'kendaraan');
 		$this->load->model("Model_user");
@@ -324,10 +324,11 @@ class Penjual extends CI_Controller
 		$status_header = 500;
 		try {
 			$cek_penjual = $this->penjual->cek_penjual($id_pj);
-			if ($cek_penjual->num_rows() > 0) {
-				$rolling_back_pengguna = $this->Model_user->delete_pengguna($id_pj);
+			if($cek_penjual->num_rows() > 0){
+				$this->load->model("Model_user", "user");
+				$rolling_back_pengguna = $this->user->delete_pengguna($id_pj);
 				$rolling_back_penjual = $this->penjual->delete_penjual($id_pj);
-				if ($rolling_back_penjual && $rolling_back_pengguna) {
+				if($rolling_back_penjual && $rolling_back_pengguna){
 					$status_header = 200;
 					$response = array('status' => 'berhasil', 'message' => 'Berhasil');
 				} else {
@@ -394,8 +395,8 @@ class Penjual extends CI_Controller
 		$kel_usaha 		= $this->input->post('kel_usaha');
 		$longitude 		= $this->input->post('longitude');
 		$latitude 		= $this->input->post('latitude');
-		print_r($this->input->post());
-		exit();
+		// print_r($this->input->post());
+		// exit();
 		$response 		= array();
 		$status_header 	= 500;
 		try {
