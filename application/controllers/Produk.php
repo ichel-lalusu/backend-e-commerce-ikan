@@ -50,19 +50,37 @@ class Produk extends CI_Controller
 	public function getProdukDashboard()
 	{
 		$id_usaha = $this->input->get('id_usaha');
+		$distance = $this->input->get('distance_text');
 		// var_dump($id_usaha);
 		// exit();
 		try {
-			$where = "u.id_usaha = '$id_usaha'";
-			$data_produk_by_id_usaha = $this->produk->get_detail_produk_where($where);
+			$data_produk = array();
+			foreach ($id_usaha as $key => $value) {
+				$where = "u.id_usaha = '$value'";
+				$data_produk_by_id_usaha = $this->produk->get_detail_produk_where($where);
+				if($data_produk_by_id_usaha->num_rows() > 0){
+					foreach ($data_produk_by_id_usaha->result() as $each_produk) {
+						$data_produk[$value][] = array(
+							'nama_produk' => $each_produk->nama_produk,
+							'id_produk' => $each_produk->id_produk,
+							'minprice' => $each_produk->minprice,
+							'maxprice' => $each_produk->maxprice,
+							'distance' => $distance[$value]['text'],
+							'foto_produk' => $each_produk->foto_produk,
+							'nama_usaha' => $each_produk->nama_usaha,
+							'id_usaha' => $value);
+					}				
+				}
+			}
+			// $where = "u.id_usaha = '$id_usaha'";
+			// $data_produk_by_id_usaha = $this->produk->get_detail_produk_where($where);
 			// echo $this->db->last_query();
 			// exit();
-			if($data_produk_by_id_usaha->num_rows() > 0){
-				$data = $data_produk_by_id_usaha->result_array();
+			if(count($data_produk) > 0){
 				$this->output
 		            ->set_status_header(200)
 		            ->set_content_type('application/json', 'utf-8')
-		            ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		            ->set_output(json_encode($data_produk, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 			}else{
 				$this->output
 		            ->set_status_header(404)

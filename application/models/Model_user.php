@@ -27,9 +27,7 @@ class Model_user extends CI_Model
 	{
 		return $this->db->insert("data_pembeli", $data);
 	}
-
 	
-
 	public function insert_usaha($data)
 	{
 		return $this->db->insert("data_usaha", $data);
@@ -42,12 +40,15 @@ class Model_user extends CI_Model
 		return $this->db->get('data_pengguna');
 	}
 
-	
-
 	public function delete_pengguna($id)
 	{
 		$this->db->where("id_akun", $id);
 		$this->db->limit(1);
 		return $this->db->delete("data_pengguna");
+	}
+
+	public function delete_penjual($id)
+	{
+
 	}
 }

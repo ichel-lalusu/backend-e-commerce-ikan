@@ -64,6 +64,8 @@ class Penjual extends CI_Controller
 		$alamat_pj		= (!empty($this->input->post('alamat_pj'))) ? $this->input->post('alamat_pj') : $this->failed_sign_up("Alamat Lengkap");
 		$telp_pj		= (!empty($this->input->post('telp_pj'))) ? $this->input->post('telp_pj') : $this->failed_sign_up("No. Telp");
 		$jenis_petani	= (!empty($this->input->post('jenis_petani'))) ? $this->input->post('jenis_petani') : $this->failed_sign_up("Jenis Petani");
+		// print_r($this->input->post());
+		// exit();
 		$response = array();
 		$status_header = 100;
 
@@ -94,6 +96,7 @@ class Penjual extends CI_Controller
 			$config['file_name']			= $file_name;
 
 			$this->load->library('upload', $config);
+
 			if ( ! $this->upload->do_upload('foto_pj')){
 				$dataFoto = array('error' => $this->upload->display_errors());
 			}else{
@@ -201,7 +204,6 @@ class Penjual extends CI_Controller
 				'status' => $status,
 				'message' => $message);
 		}
-
 		$this->response($status_header, $response);
 	}
 
@@ -373,9 +375,6 @@ class Penjual extends CI_Controller
 		->set_content_type('application/json', 'utf-8')
 		->set_output(json_encode($data_usaha, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 	}
-
-
-
 	public function prosessignupusaha()
 	{
 		$id_pj 			= $this->input->post('id_pj');
@@ -391,6 +390,8 @@ class Penjual extends CI_Controller
 		$kel_usaha 		= $this->input->post('kel_usaha');
 		$longitude 		= $this->input->post('longitude');
 		$latitude 		= $this->input->post('latitude');
+		print_r($this->input->post());
+		exit();
 		$response 		= array();
 		$status_header 	= 500;
 		try {
