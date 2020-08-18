@@ -82,6 +82,8 @@ class Pembeli extends CI_Controller
 		$longitude_pb 	= $this->input->post('longitude');
 		$latitude_pb 	= $this->input->post('latitude');
 		$foto_pb 		= '';
+		// print_r($this->input->post());
+		// exit();
 
 
 		try {

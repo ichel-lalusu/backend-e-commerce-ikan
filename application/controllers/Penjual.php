@@ -400,7 +400,7 @@ class Penjual extends CI_Controller
 		$response 		= array();
 		$status_header 	= 500;
 		try {
-			$cek_penjual = $this->user->cek_penjual($id_pj);
+			$cek_penjual = $this->penjual->cek_penjual($id_pj);
 			if ($cek_penjual->num_rows() > 0) {
 				$data_insert_usaha = array(
 					'nama_usaha' => $nama_usaha,
