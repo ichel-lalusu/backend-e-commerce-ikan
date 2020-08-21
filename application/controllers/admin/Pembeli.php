@@ -42,8 +42,7 @@ class Pembeli extends CI_Controller
 	public function edit($id_pembeli)
 	{
 		$menu = "Pembeli";
-		$data_pembeli = $this->Model_pembeli->get_where("id_pb = '$id_pembeli'");
-		$data_page = array('title' => 'Ubah Data Pembeli', 'data_pembeli' => $data_pembeli, 'menu' => 'pembeli');
+		$data_page = array('title' => 'Ubah Data Pembeli', 'menu' => 'pembeli', 'id' => $id_pembeli);
 		$this->load->view('admin/' . $menu . '/edit', $data_page);
 	}
 
@@ -55,6 +54,13 @@ class Pembeli extends CI_Controller
 	public function delete($id)
 	{
 		# code...
+	}
+
+	public function detail($id)
+	{
+		$menu = "Pembeli";
+		$data_page = array('title' => 'Detail Data Pembeli', 'menu' => 'pembeli', 'id' => $id);
+		$this->load->view('admin/' . $menu . '/detail', $data_page);
 	}
 
 	public function pesanan_pembeli(Int $id_pembeli)

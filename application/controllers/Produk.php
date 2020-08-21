@@ -49,6 +49,7 @@ class Produk extends CI_Controller
 
 	public function getProdukDashboard()
 	{
+		// "http://localhost/produk/getProdukDashboard/1"
 		$id_usaha = $this->input->get('id_usaha');
 		// var_dump($id_usaha);
 		// exit();

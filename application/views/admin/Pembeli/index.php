@@ -86,6 +86,7 @@ $this->load->view('admin/template/head');
                         <?= $pembeli->longitude_pb . ',&nbsp;' . $pembeli->latitude_pb; ?>
                       </td>
                       <td class="text-center">
+                        <a href="<?=base_url('admin/' . $menu . '/detail/'.$pembeli->id_pb);?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info">Detail</a>
                         <a href="<?= base_url('admin/'.$menu . '/edit/' . $pembeli->id_pb); ?>" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
                         <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalDelete<?= $pembeli->id_pb ?>"><i class="fa fa-trash"></i></button>
                         <a href="<?= base_url('admin/Pembeli/pesanan_pembeli/' . $pembeli->id_pb); ?>" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Pesanan</a>

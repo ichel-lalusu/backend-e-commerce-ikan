@@ -4,7 +4,7 @@
  */
 class Model_pemesanan extends CI_Model
 {
-	
+	public $nama_pemesan;
 	public function createPemesanan($data)
     {
         return $this->db->insert('data_pemesanan', $data);
@@ -65,6 +65,16 @@ class Model_pemesanan extends CI_Model
         }
         $this->db->from('data_pemesanan');
         return $this->db->get();
+    }
+
+    public function detail_pemesan($id_pemesanan)
+    {
+        $where = "id_pemesanan = $id_pemesanan";
+        $data = $this->getWhereDataPemesananByIdUsaha($where)->row();
+        $id_pb = $data->id_pb;
+        $query_pembeli = $this->db->select("`nama_pb`")->where('id_pb', $id_pb)->get("data_pembeli");
+        $data_pembeli = $query_pembeli->row();
+        $this->nama_pemesan = $data_pembeli->nama_pb;
     }
 
     public function get_pemesanan_pengiriman($where, $order)
@@ -241,7 +251,7 @@ class Model_pemesanan extends CI_Model
         $this->db->where_in('pemesanan.id_pemesanan', $array);
         $this->db->where('pemesanan.status_pemesanan', 'Siap Dikirim');
         $this->db->where("pembayaran.verifikasi", "1");
-        $this->db->where("DATE(tgl_pengiriman) = DATE(NOW())");
+        // $this->db->where("DATE(tgl_pengiriman) = DATE(NOW())");
         $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha");
         $this->db->from('data_pemesanan pemesanan');
         $this->db->join("data_pembayaran pembayaran", 'pembayaran.id_pemesanan = pemesanan.id_pemesanan');
