@@ -28,6 +28,28 @@ class Pembeli extends CI_Controller
 			->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 	}
 
+	public function detail($id_akun)
+	{
+		try {
+			$data_pembeli = $this->Pembeli->detail_pembeli($id_akun);
+			// echo $this->db->last_query();
+			$data['detail_pembeli'] = $data_pembeli->row_array();
+			$data['message']		= "success";
+			// header("Content-type: application/json");
+			// echo json_encode($data, JSON_PRETTY_PRINT);
+			$this->output
+				->set_status_header(200)
+				->set_content_type('application/json', 'utf-8')
+				->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		} catch (Exception $e) {
+			$this->output
+				->set_status_header(500)
+				->set_content_type('application/json', 'utf-8')
+				->set_output(json_encode(array('message' => 'server error'), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		}
+		
+	}
+
 	public function updateAlamat()
 	{
 		$id_akun = $this->input->post('id_akun');
@@ -82,6 +104,8 @@ class Pembeli extends CI_Controller
 		$longitude_pb 	= $this->input->post('longitude');
 		$latitude_pb 	= $this->input->post('latitude');
 		$foto_pb 		= '';
+		// print_r($this->input->post());
+		// exit();
 
 
 		try {

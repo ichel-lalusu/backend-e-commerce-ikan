@@ -69,7 +69,7 @@ $route['api/produk/all-variasi']['get']						= "Produk/getAllVariasi";
 
 // USER API's ROUTE
 $route['api/user/signup/penjual']['post'] 					= "Penjual/prosessignuppenjual";
-$route['api/user/signup/penjual/usaha/completing']['post'] 	= "Penjual/prosessignupusaha";
+$route['api/user/signup/usaha']['post'] 					= "Penjual/prosessignupusaha";
 $route['api/user/signup/pembeli']['post'] 					= "Pembeli/prosessignuppembeli";
 $route['api/user/signup/rollback']['post'] 					= "Penjual/rollback";
 $route['api/user/login']['post'] 							= "User/proseslogin";
@@ -84,6 +84,7 @@ $route['api/user/penjual/jam-pengiriman/detail']['get'] 	= "Penjual/ambil_jam_pe
 $route['api/user/penjual/jam-pengiriman/update']['post'] 	= "Penjual/ubah_jam_pengiriman_usaha";
 $route['api/user/penjual/jam-pengiriman/delete']['post'] 	= "Penjual/hapus_jam_pengiriman_usaha";
 $route['api/user/penjual/detail']['get'] 					= "Penjual/ambil_data_profile";
+$route['api/user/penjual/$id']['get']						= "Penjual/detail/$1";
 $route['api/user/penjual/usaha/detail']['get']	 			= "Penjual/detail_usaha";
 $route['api/user/penjual/usaha/detail-by-akun']['get']		= "Penjual/ambil_data_usaha_with_pj";
 $route['api/user/penjual/update']['post']					= "Penjual/prosesUpdatePenjual";
@@ -94,6 +95,7 @@ $route['api/user/kurir/create']['post']						= "Kurir/simpanKurir";
 $route['api/user/kurir/update']['post']						= "Kurir/ubahKurir";
 $route['api/user/kurir/delete']['post']						= "Kurir/hapusKurir";
 $route['api/user/pembeli']['get'] 							= "Pembeli/detail_pembeli";
+$route['api/user/pembeli/(:num)']['get']						= "Pembeli/detail/$1";
 $route['api/user/pembeli/update-alamat']['post'] 			= "Pembeli/updateAlamat";
 $route['api/user/pembeli/update']['post']					= "Pembeli/prosesupdatepembeli";
 $route['api/user/penjual/kendaraan']['get']					= "Penjual/getKendaraanUsaha";
@@ -131,11 +133,17 @@ $route['api/pesanan/detail-pesanan-by-id']['get'] = "Pemesanan/getDataPemesananB
 $route['api/pesanan/detail-in-html']['post'] = "Pemesanan/getDetailPemesanan_HTML";
 $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPembayaran/$1";
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
-$route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
-$route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
+$route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
+$route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+
+$route['api/keranjang']['get']					= "Keranjang";
+$route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
+$route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
+$route['api/keranjang/delete']['post']			= "Keranjang/hapus";
 
 
 
 $route['admin'] = "admin/Admin";
 $route['admin/Usaha/detail_transaksi/(:num)'] = 'admin/Pemesanan/detail/Usaha/$1';
 $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/$1';
+$route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';

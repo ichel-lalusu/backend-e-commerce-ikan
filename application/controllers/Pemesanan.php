@@ -14,11 +14,16 @@ class Pemesanan extends CI_Controller
         $this->load->model("Model_produk", "Produk");
         $this->load->model("Model_penjual", "Usaha");
         $this->load->model("Model_pembeli", "Pembeli");
+        $this->load->model("Model_pengiriman");
         $this->StatusPemesananBaru = "Baru";
         $this->load->library('encryption');
         $this->encryption->initialize(array('driver' => 'mcrypt'));
         date_default_timezone_set("Asia/Bangkok");
+        $this->load->helper("Response_helper");
     }
+
+    protected $urutan_pemesanan = 0;
+    protected $urutan_pengiriman = 1;
 
     public function pesanan_user()
     {
@@ -1176,42 +1181,61 @@ public function getPemesananWithPembayaran($id_pemesanan)
 
 public function getPesananPriority()
 {
-    $pesanan = $this->input->get("pesanan");
+    $pesanan = $this->input->post("pesanan");
     $data_pesanan = array();
+    $data_pesanan_lain = array();
     $response = array();
     $status_header = 100;
     try {
         $data = $this->Pemesanan->getPesananPriority($pesanan);
-        if($data->num_rows() > 0){
-            $urutan = 0;
-            foreach ($data->result() as $key) {
-                $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
-                $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
-                $id1 = str_replace("-","",$key->waktu_pemesanan);
-                $id2 = str_replace(" ", "", $id1);
-                $id3 = str_replace(":", "", $id2);
-                $id4 = $id3 . $key->id_pemesanan;
-                $data_pesanan[$urutan]['no_pesanan'] = $id4;
-                $urutan++;
+        // echo $this->db->last_query();
+        $data_lain= $this->Pemesanan->getPesananNonPriority($pesanan);
+        if($data->num_rows() > 0 || $data_lain->num_rows() > 0){
+            // PROSES LOAD PRIORITY PESANAN
+            if($data->num_rows() > 0)
+            {
+                $urutan = 0;
+                foreach ($data->result() as $key) {
+                    $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
+                    $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
+                    $id1 = str_replace("-","",$key->waktu_pemesanan);
+                    $id2 = str_replace(" ", "", $id1);
+                    $id3 = str_replace(":", "", $id2);
+                    $id4 = $id3 . $key->id_pemesanan;
+                    $data_pesanan[$urutan]['no_pesanan'] = $id4;
+                    $urutan++;
+                }
             }
-        }else{
-            $status_header = 404;
-            $response['statusMessage'] = 'failed';
-            $response['data_pesanan'] = $data_pesanan;
-        }
-        if(count($data_pesanan) > 0){
+            // PROSES LOAD NON PRIORITY PESANAN
+            if($data_lain->num_rows() > 0)
+            {
+                $urutan = 0;
+                foreach ($data_lain->result() as $key) {
+                    $data_pesanan_lain[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
+                    $data_pesanan_lain[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
+                    $id1 = str_replace("-","",$key->waktu_pemesanan);
+                    $id2 = str_replace(" ", "", $id1);
+                    $id3 = str_replace(":", "", $id2);
+                    $id4 = $id3 . $key->id_pemesanan;
+                    $data_pesanan_lain[$urutan]['no_pesanan'] = $id4;
+                    $urutan++;
+                }
+            }
+
             $status_header = 200;
             $response['statusMessage'] = 'success';
-            $response['data_pesanan'] = $data_pesanan;
+            $response['data_pesanan_priority'] = $data_pesanan;
+            $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }else{
             $status_header = 404;
             $response['statusMessage'] = 'failed';
-            $response['data_pesanan'] = $data_pesanan;
+            $response['data_pesanan_priority'] = $data_pesanan;
+            $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }
     } catch (Exception $e) {
        $status_header = 500;
        $response['statusMessage'] = 'error';
-       $response['data_pesanan'] = $data_pesanan;
+       $response['data_pesanan_priority'] = $data_pesanan;
    }
    $this->output
    ->set_status_header($status_header)
@@ -1221,7 +1245,7 @@ public function getPesananPriority()
 
 public function getPesananNonPriority()
 {
-    $pesanan = $this->input->get("pesanan");
+    $pesanan = $this->input->post("pesanan");
         // var_dump($pesanan);
         // echo count($pesanan);
     $data_pesanan = array();
@@ -1256,10 +1280,7 @@ public function getPesananNonPriority()
        $response['statusMessage'] = 'error';
        $response['data_pesanan'] = $data_pesanan;
    }
-   $this->output
-   ->set_status_header($status_header)
-   ->set_content_type('application/json', 'utf-8')
-   ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+   response($status_header, $response);
 }
 
 private function GET_PESANAN($ID_PESANAN)
@@ -1277,52 +1298,44 @@ private function GET_PESANAN($ID_PESANAN)
 public function procced_order_to_delivery()
 {
     // var_dump($this->input->post());
-    $kurir = $this->input->post('kurir');
-    $kendaraan = $this->input->post('kendaraan');
-    $jam_pengiriman = $this->input->post('jam_pengiriman');
-    $pesanan = $this->input->post('priority_pesanan');
+    $kurir = $this->input->post('kurir', TRUE);
+    $kendaraan = $this->input->post('kendaraan', TRUE);
+    $pesanan = $this->input->post('priority_pesanan', TRUE);
+    $id_penjual = $this->input->get_request_header('id_pj', TRUE);
     $pesanan = json_decode($pesanan);
     try {
+        $data_penjual = $this->Usaha->data_profile($id_penjual);
+        if($data_penjual->num_rows() > 0){
+            response(401, array('statusMessage' => "authentication is needed"));
+        }
         $data = $this->Pemesanan->getPesananPriority($pesanan);
         $data2 = $this->Pemesanan->getPesananNonPriority($pesanan);
-        if($data->num_rows() > 0){
-            $urutan = 0;
-            foreach ($data->result() as $key) {
-                $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
-                $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
-                $id1 = str_replace("-","",$key->waktu_pemesanan);
-                $id2 = str_replace(" ", "", $id1);
-                $id3 = str_replace(":", "", $id2);
-                $id4 = $id3 . $key->id_pemesanan;
-                $data_pesanan[$urutan]['no_pesanan'] = $id4;
-                $urutan++;
+        $data_pengiriman = array('waktu_pengiriman' => date('Y-m-d H:i:s'), 
+                                    'id_kurir' => $kurir, 
+                                    'id_kendaraan' => $kendaraan);
+        $insert_pengiriman = $this->Model_pengiriman->insert_pengiriman($data_pengiriman);
+        if($insert_pengiriman){
+            $id_pengiriman = $this->db->insert_id();
+            if($data->num_rows() > 0){
+                $response['data_pengiriman'] = $this->save_detail_pengiriman($data, $id_pengiriman);
+                if(count($response) > 0){
+                    $status_header = 200;
+                    $response['statusMessage'] = 'success';
+                    // $response['data_pesanan'] = $data_pesanan;
+                }else{
+                    $status_header = 404;
+                    $response['statusMessage'] = 'failed';
+                // $response['data_pesanan'] = $data_pesanan;
+                }
             }
-            if(count($data_pesanan) > 0){
-                $status_header = 200;
-                $response['statusMessage'] = 'success';
-                $response['data_pesanan'] = $data_pesanan;
-            }else{
-                $status_header = 404;
-                $response['statusMessage'] = 'failed';
-            // $response['data_pesanan'] = $data_pesanan;
-            }
-        }
 
-        if($data2->num_rows() > 0){
-        // $urutan = 0;
-            foreach ($data2->result() as $key) {
-                $data_pesanan[$urutan] = $this->GET_PESANAN($key->id_pemesanan);
-                $data_pesanan[$urutan]['detail_pembeli'] = $this->Pembeli->detail_pembeli($key->id_pb)->row_array();
-                $id1 = str_replace("-","",$key->waktu_pemesanan);
-                $id2 = str_replace(" ", "", $id1);
-                $id3 = str_replace(":", "", $id2);
-                $id4 = $id3 . $key->id_pemesanan;
-                $data_pesanan[$urutan]['no_pesanan'] = $id4;
-                $response['data_pesanan'][] = $data_pesanan[$urutan];
-                $urutan++;
+            if($data2->num_rows() > 0){
+            // $urutan = 0;
+                $response['data_pengiriman'] = $this->save_detail_pengiriman($data2, $id_pengiriman);
             }
+            $response['id_pengiriman'] = intval($id_pengiriman);
         }
-        if(count($data_pesanan) > 0){
+        if(count($response) > 0){
             $status_header = 200;
             $response['statusMessage'] = 'success';
         }else{
@@ -1335,10 +1348,29 @@ public function procced_order_to_delivery()
         $response['statusMessage'] = 'failed';
         $response['data_pesanan'] = array();
     }
-    $this->output
-    ->set_status_header($status_header)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($status_header, $response);
+}
+
+protected function save_detail_pengiriman($data=array(), $id_pengiriman)
+{
+    $data_pesanan = array();
+    foreach ($data->result() as $key) {
+        $status_pengiriman = ($this->urutan_pengiriman==1) ? "pengantaran" : "menunggu";
+        $this->Pemesanan->detail_pemesan($key->id_pemesanan);
+        $nama_penerima = $this->Pemesanan->nama_pemesan;
+        $detail_pengiriman = array('id_pengiriman' => $id_pengiriman, 
+                                    'id_pemesanan' => $key->id_pemesanan, 
+                                    'urutan' => $this->urutan_pengiriman, 
+                                    'status' => $status_pengiriman, 
+                                    'penerima' => $nama_penerima);
+        $insert_detail_pengiriman = $this->Model_pengiriman->insert_detail_pengiriman($detail_pengiriman);
+        if($insert_detail_pengiriman){
+            $data_pesanan[$this->urutan_pemesanan] = array('data_pemesanan' => $this->GET_PESANAN($key->id_pemesanan), 'detail_pengiriman' => $detail_pengiriman);
+            $this->urutan_pemesanan++;
+            $this->urutan_pengiriman++;
+        }
+    }
+    return $data_pesanan;
 }
 
 }

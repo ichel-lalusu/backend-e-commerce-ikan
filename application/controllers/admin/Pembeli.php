@@ -9,8 +9,11 @@ class Pembeli extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
-		if (!$this->session->userdata("username")) {
-			redirect(base_url('admin/User/login'));
+		if (!$this->session->userdata("data")) {
+			$data_session = $this->session->userdata('data');
+			if ($data_session['usergroup'] !== "admin") {
+				redirect(base_url('admin/User/login'));
+			}
 		}
 		$this->load->model("admin/Model_pembeli");
 	}
@@ -39,8 +42,7 @@ class Pembeli extends CI_Controller
 	public function edit($id_pembeli)
 	{
 		$menu = "Pembeli";
-		$data_pembeli = $this->Model_pembeli->get_where("id_pb = '$id_pembeli'");
-		$data_page = array('title' => 'Ubah Data Pembeli', 'data_pembeli' => $data_pembeli, 'menu' => 'pembeli');
+		$data_page = array('title' => 'Ubah Data Pembeli', 'menu' => 'pembeli', 'id' => $id_pembeli);
 		$this->load->view('admin/' . $menu . '/edit', $data_page);
 	}
 
@@ -54,9 +56,16 @@ class Pembeli extends CI_Controller
 		# code...
 	}
 
+	public function detail($id)
+	{
+		$menu = "Pembeli";
+		$data_page = array('title' => 'Detail Data Pembeli', 'menu' => 'pembeli', 'id' => $id);
+		$this->load->view('admin/' . $menu . '/detail', $data_page);
+	}
+
 	public function pesanan_pembeli(Int $id_pembeli)
 	{
-		
+
 		try {
 			$this->load->model("admin/Model_pemesanan", "Pemesanan");
 			$this->load->model("admin/Model_pengiriman", "Pengiriman");
@@ -69,7 +78,7 @@ class Pembeli extends CI_Controller
 			$dataPemesanan = $this->Pemesanan->get_where($select_pemesanan, $where, NULL, $order, NULL);
 			$page = "Pesanan";
 			$data = array('title' => 'Ikanku - Data Pesanan ' . $Pembeli->nama_pb, 'menu' => 'pembeli', 'page' => $page . "&nbsp;" . $Pembeli->nama_pb, 'id_pembeli' => $id_pembeli, 'data_transaksi' => $dataPemesanan, 'data_pembeli' => $Pembeli);
-			$this->load->view("admin/Pembeli/".$page."/index", $data);
+			$this->load->view("admin/Pembeli/" . $page . "/index", $data);
 		} catch (Exception $e) {
 			$this->session->set_flashdata("error", "Data Pembeli Error");
 			redirect(base_url('admin/Pembeli'));

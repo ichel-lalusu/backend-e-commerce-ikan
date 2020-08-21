@@ -5,6 +5,7 @@
   <strong>Copyright &copy; 2019-Now <a href="http://instagram.com/ichel.lalusu">Riselda Lalusu </a>.</strong> All rights
   reserved.
 </footer>
+</div>
 <!-- jQuery -->
 <script src="<?= base_url('assets') ?>/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -26,14 +27,41 @@
 <!-- AdminLTE App -->
 <script src="<?= base_url('assets') ?>/dist/js/adminlte.min.js"></script>
 <script src="<?= base_url('assets/plugins/sweetalert2/sweetalert2.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/toastr/toastr.min.js') ?>"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="<?= base_url('assets') ?>/dist/js/demo.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.21/datatables.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript">
+  var data_user = JSON.parse(localStorage.data_user);
+  if (data_user.usergroup != "admin" && data_user.username != "") {
+    location.replace("<?= base_url('admin/user/login') ?>");
+  }
   var API_URL = location.origin + "/backendikan/";
   // $('[data-toggle="tooltip"]').tooltip();
   function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
   }
+
+  function logout() {
+    let data = {
+      username: data_user.username,
+      id_akun: data_user.id_akun,
+      usergroup: data_user.usergroup
+    };
+    let URL_LOGOUT = '<?= base_url('User/logout') ?>';
+    $.post(URL_LOGOUT, data).then(success_logout);
+  }
+
+  var success_logout = function(data) {
+    var response = data;
+    localStorage.clear();
+    location.reload();
+  }
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+  });
 </script>

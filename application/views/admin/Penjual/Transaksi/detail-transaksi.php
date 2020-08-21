@@ -16,7 +16,7 @@ $url_API = "http://localhost/backendikan/";
           <div class="row mb-2">
             <div class="col-sm-6">
 
-              <h1 style="text-transform: uppercase"><a class="btn btn-secondary btn-sm text-white" href="<?=base_url('Usaha/transaksi/').$id_usaha?>"><i class="fas fa-chevron-left"></i></a> <?= ucwords($page) ?></h1>
+              <h1 style="text-transform: uppercase"><?= ucwords($page) ?></h1>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
@@ -37,30 +37,35 @@ $url_API = "http://localhost/backendikan/";
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">
+              <?php
+                $TIPE_PENGIRIMAN = $data_pesanan->tipe_pengiriman;
+                $METODE_PEMBAYARAN = $data_pembayaran->metode_pembayaran;
+
+                $badge_type="";
+                $STATUS_PEMBAYARAN = $data_pembayaran->status_pembayaran;
+                $STATUS_VERIFIKASI = $data_pembayaran->verifikasi;
+                $STATUS_PEMESANAN = $data_pesanan->status_pemesanan;
+                if($STATUS_PEMESANAN=="Baru"&&$STATUS_VERIFIKASI==0){
+                  $badge_type = "badge-danger";
+                }elseif ($STATUS_PEMESANAN=="Terbayar"&&$STATUS_VERIFIKASI==0) {
+                  $badge_type = "badge-warning";
+                }elseif($STATUS_PEMESANAN=="Terbayar"&&$STATUS_VERIFIKASI==1){
+                  $badge_type = "badge-primary";
+                }elseif($STATUS_PEMESANAN=="Terkirim"){
+                  $badge_type = "badge-success";
+                }
+              ?>
+              <div class="callout callout-info">
+                <h5><i class="fas fa-info"></i> Note:</h5>
+                Pesanan: <?=$STATUS_PEMESANAN;?>
+              </div>
               <div class="invoice p-3 mb-3">
                 <!-- title row -->
                 <div class="row">
                   <div class="col-12">
                     <h4>
-                      <?php
-                      $TIPE_PENGIRIMAN = $data_pesanan->tipe_pengiriman;
-                      $METODE_PEMBAYARAN = $data_pembayaran->metode_pembayaran;
-
-                      $badge_type="";
-                      $STATUS_PEMBAYARAN = $data_pembayaran->status_pembayaran;
-                      $STATUS_VERIFIKASI = $data_pembayaran->verifikasi;
-                      $STATUS_PEMESANAN = $data_pesanan->status_pemesanan;
-                      if($STATUS_PEMESANAN=="Baru"&&$STATUS_VERIFIKASI==0){
-                        $badge_type = "badge-danger";
-                      }elseif ($STATUS_PEMESANAN=="Terbayar"&&$STATUS_VERIFIKASI==0) {
-                        $badge_type = "badge-warning";
-                      }elseif($STATUS_PEMESANAN=="Terbayar"&&$STATUS_VERIFIKASI==1){
-                        $badge_type = "badge-primary";
-                      }elseif($STATUS_PEMESANAN=="Terkirim"){
-                        $badge_type = "badge-success";
-                      }
-                      ?>
-                      <span class="badge <?=$badge_type?>"><?=$STATUS_PEMESANAN;?></span>
+                      <i class="fas fa-fish"></i>
+                      Ikan Commerce
                       <small class="float-right">Tanggal: <?=str_replace("-", "/", $TANGGAL)?></small>
                     </h4>
                   </div>
@@ -69,27 +74,33 @@ $url_API = "http://localhost/backendikan/";
                 <!-- info row -->
                 <div class="row invoice-info">
                   <div class="col-sm-4 invoice-col">
-                    From
+                    Dari
                     <address>
                       <strong id="nama_usaha"><?=$data_usaha->nama_usaha?></strong><br>
                       <?=$data_usaha->alamat_usaha?>,<br>
                       <?=$data_usaha->kel . ",&nbsp;" . $data_usaha->kec . ",&nbsp;" . $data_usaha->kab . ",&nbsp" . "Yogyakarta"?><br>
-                      Nomor: <?=$data_penjual->telp_pj?><br>
+                      <?=$data_penjual->telp_pj?><br>
                     </address>
                   </div>
                   <!-- /.col -->
                   <div class="col-sm-4 invoice-col">
-                    To
+                    Kepada
                     <address>
                       <strong id="nama_pembeli"><?=$data_pembeli->nama_pb?></strong><br>
                       <?=$data_pembeli->alamat_pb;?><br>
                       <?=$data_pembeli->kel_pb . ',&nbsp;' . $data_pembeli->kec_pb . ',&nbsp;' . $data_pembeli->kab_pb . ',&nbsp;' . 'Yogyakarta'?><br>
-                      Nomor: <?=$data_pembeli->telp_pb;?><br>
+                      <?=$data_pembeli->telp_pb;?><br>
                     </address>
                   </div>
                   <!-- /.col -->
                   <div class="col-sm-4 invoice-col">
-                    <b>Invoice #<?=$no_pesanan?></b><br>
+                    <b>Invoice #<?=$no_pesanan?></b>
+                    <br>
+                    <br>
+                    <?php
+                    $date_pembayaran = date_create($data_pembayaran->waktu_pembayaran);
+                    ?>
+                    <b>Terbayar Pada Tanggal:</b> <?=date_format($date_pembayaran, 'd/m/Y H:i:s')?>
                     <br>
                     <!-- <b>Pemesanan:</b> <?=str_replace("-", "/", $TANGGAL)?><br> -->
                   </div>
@@ -102,12 +113,12 @@ $url_API = "http://localhost/backendikan/";
                   <div class="col-12 table-responsive">
                     <table class="table table-striped">
                       <thead>
-                      <tr>
-                        <th width="20%">Total Produk</th>
-                        <th>Produk</th>
-                        <th>Variasi Produk</th>
-                        <th>Subtotal</th>
-                      </tr>
+                        <tr>
+                          <th width="20%">Total Produk</th>
+                          <th>Produk</th>
+                          <th>Variasi Produk</th>
+                          <th>Subtotal</th>
+                        </tr>
                       </thead>
                       <tbody>
                         <?php
@@ -120,13 +131,18 @@ $url_API = "http://localhost/backendikan/";
                             // echo $this->db->last_query();
                             if($get_detail_variation->num_rows() > 0){
                               $detail_produk = $get_detail_variation->row();
-                              $SUBTOTAL = $detail_produk->harga * ($key->jml_produk/10);
+                              $jumlah_produk_in_kg = intval($key->jml_produk/10);
+                              $SUBTOTAL = $detail_produk->harga * ($jumlah_produk_in_kg);
+                              $str_total_produk = $jumlah_produk_in_kg . " Kg";
+                              $nama_produk = $detail_produk->nama_produk;
+                              $nama_variasi_produk = $detail_produk->nama_variasi;
+                              $str_subtotal = 'Rp ' . number_format($SUBTOTAL,0, ",", ".");
                             ?>
                             <tr>
-                              <td><?=$key->jml_produk/10 . ' Kg'?></td>
-                              <td><?=$detail_produk->nama_produk?></td>
-                              <td><?=$detail_produk->nama_variasi;?></td>
-                              <td><?='Rp ' . number_format($SUBTOTAL,0, ",", ".")?></td>
+                              <td><?=$str_total_produk;?></td>
+                              <td><?=$nama_produk?></td>
+                              <td><?=$nama_variasi_produk?></td>
+                              <td><?=$str_subtotal?></td>
                             </tr>
                             <?php
                             }
@@ -141,12 +157,12 @@ $url_API = "http://localhost/backendikan/";
                 <!-- /.row -->
 
                 <div class="row">
-                  <!-- accepted payments column -->
+                  <!-- kolom informasi pembayaran -->
                   <div class="col-6">
-                    <p class="lead">Metode Pembayaran:</p>
-                    <h5 id="metode_pembayaran"><?=$data_pembayaran->metode_pembayaran?></h5>
-                    <p class="lead">Tipe Pengiriman:</p>
-                    <h5 id="metode_pengiriman"><?=$TIPE_PENGIRIMAN?></h5>
+                    <b>Metode Pembayaran:</b>
+                    <p id="metode_pembayaran"><?=$data_pembayaran->metode_pembayaran?></p>
+                    <b>Tipe Pengiriman:</b>
+                    <p id="metode_pengiriman"><?=$TIPE_PENGIRIMAN?></p>
                   </div>
                   <!-- /.col -->
                   <div class="col-6">
@@ -232,6 +248,7 @@ $url_API = "http://localhost/backendikan/";
                 <div class="row ">
                   <div class="col-12">
                     <a href="<?=base_url('admin/Pemesanan/lacak')?>?id_pesanan=<?=$id_pemesanan?>&menu=penjual" target="_blank" class="btn btn-primary float-right">Lacak</a>
+                    <a class="btn btn-outline-dark float-right mr-1" href="<?=base_url('admin/Usaha/transaksi/').$id_usaha?>">Kembali</a>
                     <!-- <button type="button" class="btn btn-success float-right"><i class="far fa-credit-card"></i> Submit
                       Payment
                     </button>

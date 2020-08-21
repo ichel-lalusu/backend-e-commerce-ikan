@@ -89,7 +89,7 @@ class Model_produk extends CI_Model
 
 	public function ambil_data_by_id($id_produk)
 	{
-		$this->db->select('*, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice');
+		$this->db->select('*, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice, ekor_per_kg');
 		$this->db->where('p.id_produk', $id_produk);
 		$this->db->from('data_produk p');
 		return $this->db->get();

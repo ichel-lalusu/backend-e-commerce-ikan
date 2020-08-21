@@ -8,9 +8,12 @@ class Pemesanan extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
-		if(!$this->session->userdata("username")){
-			redirect(base_url('admin/User/login'));
-		}
+		if (!$this->session->userdata("data")) {
+            $data_session = $this->session->userdata('data');
+            if ($data_session['usergroup'] !== "admin") {
+                redirect(base_url('admin/User/login'));
+            }
+        }
 		$this->load->model("admin/Model_pemesanan");
 		$this->load->model("admin/Model_usaha", "usaha");
 	    $this->load->model("admin/Model_pembeli", "Pembeli");
@@ -53,19 +56,24 @@ class Pemesanan extends CI_Controller
 
 	private function detail_pesanan($menu, $id_pemesanan)
 	{
+		// AMBIL PESANAN
 		$where = "id_pemesanan = '$id_pemesanan'";
 		$select_pesanan = "`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`";
 		$data_pesanan = $this->Model_pemesanan->get_where($select_pesanan, $where, NULL, NULL, 1)->row();
 
+		// AMBIL DETAIL PESANAN
 		$select_detail_pesanan = "`id_dp`, `harga`, `jml_produk`, `sub_total`, `id_pemesanan`, `id_produk`, `berat_akhir`";
 		$data_detail_pesanan = $this->Model_pemesanan->get_detail_where($select_detail_pesanan, $where);
 
+		// AMBIL PEMBAYARAN
 		$select_pembayaran = "`id_pembayaran`, `metode_pembayaran`, `expiredDate`, `waktu_pembayaran`, `kode_bank`, `no_rekening_pb`, `nama_rekening_pb`, `struk_pembayaran`, `status_pembayaran`, `id_pemesanan`, `verifikasi`";
 		$data_pembayaran = $this->Pembayaran->get_where($select_pembayaran, $where, NULL, NULL, 1)->row();
 		
+		// SUB TOTAL PRODUK ALL
 	    $select_sub_total_produk_all= "SUM(harga*(jml_produk/10)) AS TOTAL_HARGA_PRODUK";
 	    $TOTAL_HARGA_PESANAN = $this->Model_pemesanan->get_detail_where($select_sub_total_produk_all, $where)->row()->TOTAL_HARGA_PRODUK;
 
+	    // TANGGAL
 	    $select_tanggal = "DATE(waktu_pemesanan) as tanggal";
 		$data_tanggal = $this->Model_pemesanan->get_where($select_tanggal, $where, NULL, NULL, 1);
 		if($data_tanggal->num_rows() > 0){
@@ -77,15 +85,18 @@ class Pemesanan extends CI_Controller
 	    $id_pb = $data_pesanan->id_pb;
 	    $where_pembeli = "id_pb = '$id_pb'";
 
+	    // AMBIL USAHA
 		// $data_penjual = $this->Penjual->get_where("*", $where_penjual, NULL, NULL, 1)->row();
 		$select_usaha = " `id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`";
 		$data_usaha = $this->usaha->get_where($select_usaha, $where_usaha, NULL, NULL, 1)->row();
 		
+		// AMBIL PENJUAL
 		$select_penjual = " `id_pj`, `nama_pj`, `foto_pj`, `noktp_pj`, `fotoktp_pj`, `jk_pj`, `tgllahir_pj`, `alamat_pj`, `telp_pj`, `jenis_petani`";
 	    $id_penjual  =$data_usaha->id_pj;
 	    $where_penjual = "id_pj = '$id_penjual'";
 	    $data_penjual = $this->Penjual->get_where($select_penjual, $where_penjual, NULL, NULL, 1)->row();
 	    
+	    // AMBIL PEMBELI DARI PENJUAL
 	    $data_pembeli = $this->Pembeli->get_where($where_pembeli)->row();
 
 	    $id1 = str_replace("-","",$data_pesanan->waktu_pemesanan);
@@ -120,5 +131,25 @@ class Pemesanan extends CI_Controller
 		# code...
 	}
 	
+	public function pesanan(String $type='')
+	{
+		if($type=="selesai"){
+			return $this->pesanan_selesai();
+		}elseif ($type=="on_delivery") {
+			return $this->pesanan_on_delivery();
+		}else{
+			redirect(base_url('admin'));
+		}
+	}
+
+	protected function pesanan_selesai()
+	{
+		# code...
+	}
+
+	protected function pesanan_on_delivery()
+	{
+		# code...
+	}
 
 }
