@@ -368,6 +368,15 @@ class Penjual extends CI_Controller
 		echo json_encode($data_profile, JSON_PRETTY_PRINT);
 	}
 
+	public function detail(int $id_pj)
+	{
+		$data = $this->penjual->data_profile($id_pj);
+		$data_profile = $data->row();
+
+		header("Content-type: application/json");
+		echo json_encode($data_profile, JSON_PRETTY_PRINT);
+	}
+
 	public function detail_usaha()
 	{
 		$id_usaha = $this->input->get('id_usaha');

@@ -7,8 +7,11 @@ class Usaha extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    if (!$this->session->userdata("username")) {
-      redirect(base_url('admin/User/login'));
+    if (!$this->session->userdata("data")) {
+        $data_session = $this->session->userdata('data');
+        if ($data_session['usergroup'] !== "admin") {
+            redirect(base_url('admin/User/login'));
+        }
     }
     $this->load->model("admin/Model_usaha", "usaha");
     $this->load->model("admin/Model_pembeli", "Pembeli");
@@ -83,7 +86,7 @@ class Usaha extends CI_Controller
   public function transaksi($id_usaha)
   {
     $where = " id_usaha = '$id_usaha'";
-    $order = " id_pemesanan DESC, waktu_pemesanan DESC ";
+    $order = " id_pemesanan DESC, waktu_pemesanan DESC";
     $select_pemesanan = "`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`";
     $dataPemesanan = $this->Pemesanan->get_where($select_pemesanan, $where, NULL, $order, NULL);
     $page = "Transaksi";

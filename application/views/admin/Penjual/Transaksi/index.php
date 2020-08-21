@@ -15,7 +15,7 @@ $url_API = "http://localhost/backendikan/";
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 style="text-transform: uppercase"><a class="btn btn-secondary btn-sm" href="<?=base_url('Penjual')?>"><span class="fas fa-chevron-left"></span></a> DATA <?= ucwords($page) ?></h1>
+              <h1 style="text-transform: uppercase">DATA <?= ucwords($page) ?></h1>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
@@ -69,7 +69,7 @@ $url_API = "http://localhost/backendikan/";
                         $data_pembayaran = $this->Pemesanan->get_custom($selectP, $from, $where, '', '', $order, $limit)->row();
 
                         $wherePengiriman = "id_pemesanan = '$transaksi->id_pemesanan'";
-                        $data_pengiriman = $this->Pengiriman->get_where($wherePengiriman);
+                        $data_pengiriman = $this->Pengiriman->get_detail_pengiriman($wherePengiriman);
                     ?>
                       <tr>
                         <td id="no-pesanan-<?=$transaksi->id_pemesanan?>"><?= $id4; ?></td>
@@ -92,7 +92,7 @@ $url_API = "http://localhost/backendikan/";
                           ?>
                           <span class="badge badge-danger">Baru</span>
                           <?php
-                          }elseif($transaksi->status_pemesanan == "Terbayar" && $data_pembayaran->verifikasi=="1"){
+                          }elseif(($transaksi->status_pemesanan == "Terbayar"||$transaksi->status_pemesanan == "Siap Dikirim") && $data_pembayaran->verifikasi=="1"){
                           ?>
                           <span class="badge badge-warning">Terbayar</span>
                           <?php
@@ -110,7 +110,6 @@ $url_API = "http://localhost/backendikan/";
                           }else{
                             echo $data_pembayaran->status_pembayaran;
                           }
-                          
                           ?>
                         </td>
                         <td class="text-center">
@@ -118,7 +117,7 @@ $url_API = "http://localhost/backendikan/";
                           
                           if($data_pengiriman->num_rows() > 0){
                             $pengiriman = $data_pengiriman->row();
-                            echo $pengiriman->status_pengiriman;
+                            echo ucwords($pengiriman->status);
                           }else{
                             echo "-";
                           }
@@ -130,13 +129,13 @@ $url_API = "http://localhost/backendikan/";
                           <?php
                           if($data_pengiriman->num_rows() > 0){
                             $pengiriman = $data_pengiriman->row();
-                            if($pengiriman->status_pengiriman == "proses"){
+                            if($pengiriman->status == "proses"){
                             ?>
                             <a class="btn btn-primary btn-sm" href="<?=base_url('admin/Pengiriman/track/'.$pengiriman->id_pengiriman)?>">Lacak Pengiriman</a>
                             <?php
                             }else{
                             ?>
-                            <a class="btn btn-secondary btn-sm disabled" href="#!">Pengiriman Selesai</a>
+                            <a class="btn btn-secondary btn-sm disabled" href="#!" style="margin: 8px auto">Pengiriman Selesai</a>
                             <?php
                             }
                           }
@@ -161,7 +160,7 @@ $url_API = "http://localhost/backendikan/";
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            Footer
+            <a class="btn btn-outline-secondary btn-sm float-right" href="<?=base_url('admin/Penjual')?>">Kembali</a> 
           </div>
           <!-- /.card-footer-->
         </div>

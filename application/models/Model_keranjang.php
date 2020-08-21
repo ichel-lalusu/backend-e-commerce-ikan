@@ -18,7 +18,7 @@ class Model_keranjang extends CI_Model
 	{
 		$this->db->where("k.id_pb", $id_akun);
 		$this->db->where("k.id_usaha", $id_usaha);
-		$this->db->select("k.`id_keranjang`, p.nama_produk, v.nama_variasi, k.`id_produk`, k.`id_variasi_produk`, k.`id_pb`, k.`id_usaha`, k.`harga_produk`, k.`jml_produk`, k.`created_date`, k.`sub_total`");
+		$this->db->select("k.`id_keranjang`, p.nama_produk, v.nama_variasi, k.`id_produk`, k.`id_variasi_produk`, k.`id_pb`, k.`id_usaha`, k.`harga_produk`, k.`jml_produk`, k.`created_date`, k.`sub_total`, p.foto_produk, k.estimasi_ongkir, k.distance");
 		$this->db->from("data_keranjang k");
 		$this->db->join("data_variasi_produk vp", "vp.id_variasiproduk = k.id_variasi_produk");
 		$this->db->join("data_variasi v", "v.id_variasi = vp.id_variasi");
@@ -35,7 +35,10 @@ class Model_keranjang extends CI_Model
 		$id_produk = $this->input->post('id_produk');
 		$jml_produk = intval($_POST['qty']);
 		$harga_produk = $this->input->post('harga_produk');
-		$catatan = $this->input->post('catatan');
+		$ikan_per_kg = $this->input->post('ikan_per_kg');
+		$potong_per_ekor = $this->input->post('potong_per_ekor');
+		$distance = floatval($this->input->post('distance'));
+		$estimasi_ongkir = intval($this->input->post('estimasi_ongkir'));
 		$sub_total = ($jml_produk * $harga_produk);
 		$status_do = TRUE;
 		if($status_do){
@@ -45,7 +48,10 @@ class Model_keranjang extends CI_Model
 				$this->db->reset_query();
 				$data_update = array('jml_produk' => ($jml_produk + $data_keranjang->jml_produk), 
 							'sub_total' => ($sub_total + $data_keranjang->sub_total), 
-							'catatan' => $catatan);
+							'ikan_per_kg' => $ikan_per_kg,
+							'potong_per_ekor' => $potong_per_ekor,
+							'distance' => $distance,
+							'estimasi_ongkir' => $estimasi_ongkir);
 				$where_update = "id_pb = '$id_akun' AND id_variasi_produk = '$id_variasi_produk'";
 				return $this->update_keranjang_akun_yang_sudah_ada($where_update, $data_update);
 			}else{
@@ -57,7 +63,10 @@ class Model_keranjang extends CI_Model
 					'id_pb' => $id_akun, 
 					'id_variasi_produk' => $id_variasi_produk,
 					'harga_produk' => $harga_produk,
-					'catatan' => $catatan,
+					'ikan_per_kg' => $ikan_per_kg,
+					'potong_per_ekor' => $potong_per_ekor,
+					'distance' => $distance,
+					'estimasi_ongkir' => $estimasi_ongkir,
 					'created_date' => date('Y-m-d H:i:s'));
 				return $this->create_data_keranjang_variasi_produk($data);
 			}

@@ -11,6 +11,7 @@ class Keranjang extends CI_Controller
 		$this->load->model("Model_keranjang");
 		$this->load->model("Model_produk");
 		$this->load->model("Model_penjual");
+		$this->load->model('Model_penjual');
 	}
 
 	public function index()
@@ -66,7 +67,11 @@ class Keranjang extends CI_Controller
 			foreach ($data_keranjang->result() as $key) {
 				$data_produk = $this->Model_keranjang->get_keranjang_pembeli_by_usaha($id_akun, $key->id_usaha);
 				if($data_produk->num_rows() > 0){
-					$keranjang[$key->id_usaha] = $data_produk->result_array();
+					$data_usaha = $this->Model_penjual->ambil_usaha_by_id($key->id_usaha)->row_array();
+					$keranjang[] = array('id_usaha' => $key->id_usaha,
+										'nama_usaha' => $data_usaha['nama_usaha'],
+										'data_produk' => $data_produk->result_array(),
+										'detail_usaha' => $data_usaha);
 				}
 			}
 			if(count($keranjang) > 0){
