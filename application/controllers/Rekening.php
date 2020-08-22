@@ -164,7 +164,7 @@ class Rekening extends CI_Controller
 	public function ubah_rekening()
 	{
 		$id_rekening = $this->input->post('id_rekening');
-		$kode_bank = $this->input->post('bank_edit');
+		$kode_bank = $this->input->post('kode_bank');
 		$no_rekening = $this->input->post('no_rekening');
 		$nama_rekening = $this->input->post('nama_rekening');
 

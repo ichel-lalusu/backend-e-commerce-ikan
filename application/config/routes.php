@@ -102,7 +102,7 @@ $route['api/user/penjual/kendaraan']['get']					= "Penjual/getKendaraanUsaha";
 $route['api/user/penjual/kendaraan/create']['post']			= "Penjual/simpanKendaraanUsaha";
 $route['api/user/penjual/kendaraan/detail']['get']			= "Penjual/get_detail_kendaraan_usaha";
 $route['api/user/penjual/kendaraan/update']['post']			= "Penjual/UpdateKendaraanUsaha";
-$route['api/user/penjual/kendaraan/delete']['post']			= "kendaraan/hapusKendaraan";
+$route['api/user/penjual/kendaraan/delete']['post']			= "Penjual/hapusKendaraan";
 
 
 // REKENING API's ROUTE
