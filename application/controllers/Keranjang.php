@@ -63,9 +63,6 @@ class Keranjang extends CI_Controller
 		$result_data = array();
 		$data_keranjang = $this->Model_keranjang->get_id_usaha_in_keranjang_pembeli($id_akun);
 		if($data_keranjang->num_rows() > 0){
-			// var_dump($data_keranjang->result());
-			echo json_encode($data_keranjang->result());
-			exit();
 			foreach ($data_keranjang->result() as $key) {
 				$data_produk = $this->Model_keranjang->get_keranjang_pembeli_by_usaha($id_akun, $key->id_usaha);
 				if($data_produk->num_rows() > 0){
