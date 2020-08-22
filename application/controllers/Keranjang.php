@@ -80,7 +80,7 @@ class Keranjang extends CI_Controller
 				$result_data['status_code'] = 200;
 			}
 		}else{
-			$result_data['keranjang'] = $keranjang;
+			$result_data['keranjang'] = array();
 			$result_data['response_status'] = "not found";
 			$result_data['status_code'] = 404;
 		}
