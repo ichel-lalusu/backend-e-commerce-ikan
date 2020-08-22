@@ -58,7 +58,7 @@ class Keranjang extends CI_Controller
 			->set_output(json_encode($result_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 	}
 
-	private function keranjang_init($id_akun)
+	protected function keranjang_init($id_akun)
 	{
 		$result_data = array();
 		$data_keranjang = $this->Model_keranjang->get_pembeli_keranjang($id_akun);
@@ -85,5 +85,15 @@ class Keranjang extends CI_Controller
 			$result_data['status_code'] = 404;
 		}
 		return $result_data;
+	}
+
+	public function delete_keranjang_by_id_usaha($id_usaha)
+	{
+		$delete = $this->Model_keranjang->delete_keranjang_by_id_usaha($id_usaha);
+		if($delete){
+			return response(200, array('message' => "Success"));
+		}else{
+			return response(404, array('message' => "Failed"));
+		}
 	}
 }
