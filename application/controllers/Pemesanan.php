@@ -61,6 +61,7 @@ class Pemesanan extends CI_Controller
 
 public function simpanPemesanan()
 {
+    $this->load->model("Model_keranjang");
     $result = array();
     $id_akun = $this->input->post('id_akun');
     $id_usaha = $this->input->post('id_usaha');
@@ -99,13 +100,17 @@ public function simpanPemesanan()
             $totalProduk = count($produk);
             for($i=0; $i<$totalProduk; $i++){
                 $arrayProduk = $produk[$i];
-                $idVariasi = $arrayProduk['variasi'];
-                $data[] = array('harga' => $arrayProduk['harga_produk'],
-                    'jml_produk' => $arrayProduk['qty'],
-                    'sub_total' => $arrayProduk['total_harga'],
+                $harga_produk = intval($arrayProduk['harga_produk']);
+                $jml_produk = intval($arrayProduk['jml_produk']);
+                $subtotal = intval($harga_produk*$jml_produk);
+                $id_produk = $arrayProduk['id_variasi_produk'];
+                $data[] = array('harga' => $harga_produk,
+                    'jml_produk' => $jml_produk,
+                    'sub_total' => $subtotal,
                     'id_pemesanan' => $id_pemesanan,
-                    'id_produk' => $idVariasi);
+                    'id_produk' => $id_produk);
             }
+            // echo json_encode($data);
             $isDetailPemesanan = $this->Pemesanan->createDetailPemesanan_batch($data);
             if($isDetailPemesanan){
                     //PEMBAYARAN
@@ -113,7 +118,8 @@ public function simpanPemesanan()
                     'expiredDate' => $expiredDate,
                     'id_pemesanan' => $id_pemesanan);
                 $isPembayaran = $this->Pembayaran->createPembayaran($dataPembayaran);
-                if($isPembayaran){
+                $delete_keranjang = $this->Model_keranjang->delete_keranjang_by_id_usaha($id_usaha);
+                if($isPembayaran && $delete_keranjang){
                     $result = array('responseMessage' => 'success', 'listPemesanan' => $produk, 'responseCode' => '00', 'id_pemesanan' => $id_pemesanan);
                 }else{
                     $statusHeader = 401;
@@ -133,12 +139,7 @@ public function simpanPemesanan()
         $result = array('responseMessage' => 'failed ' . $errorMessage, 'listPemesanan' => null, 'responseCode' => '01');
         $statusHeader = 500;
     }
-        // header("Content-type: application/json");
-		// echo json_encode($result, JSON_PRETTY_PRINT);
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $result);
 }
 
 public function getHargaPesananById()
