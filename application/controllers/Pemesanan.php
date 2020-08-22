@@ -19,7 +19,7 @@ class Pemesanan extends CI_Controller
         $this->load->library('encryption');
         $this->encryption->initialize(array('driver' => 'mcrypt'));
         date_default_timezone_set("Asia/Bangkok");
-        $this->load->helper("Response_helper");
+        $this->load->helper("Response");
     }
 
     protected $urutan_pemesanan = 0;
