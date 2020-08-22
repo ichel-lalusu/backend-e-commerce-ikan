@@ -5,12 +5,11 @@
 class Model_keranjang extends CI_Model
 {
 
-	public function get_pembeli_keranjang($id_akun)
+	public function get_id_usaha_in_keranjang_pembeli($id_akun)
 	{
-		$this->db->where("id_pb", $id_akun);
-		$this->db->select("`id_keranjang`, `id_produk`, `id_variasi_produk`, `id_pb`, `id_usaha`, `harga_produk`, `jml_produk`, `created_date`, `sub_total`");
-		$this->db->order_by("created_date DESC, id_usaha");
-		$this->db->group_by("id_usaha");
+		$this->db->distinct("id_usaha")
+				->where("id_pb", $id_akun)
+				->order_by("id_usaha ASC");
 		return $this->db->get("data_keranjang");
 	}
 
