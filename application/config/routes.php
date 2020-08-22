@@ -102,10 +102,12 @@ $route['api/user/penjual/kendaraan']['get']					= "Penjual/getKendaraanUsaha";
 $route['api/user/penjual/kendaraan/create']['post']			= "Penjual/simpanKendaraanUsaha";
 $route['api/user/penjual/kendaraan/detail']['get']			= "Penjual/get_detail_kendaraan_usaha";
 $route['api/user/penjual/kendaraan/update']['post']			= "Penjual/UpdateKendaraanUsaha";
+$route['api/user/penjual/kendaraan/delete']['post']			= "kendaraan/hapusKendaraan";
+
 
 // REKENING API's ROUTE
 $route['api/rekening']['get']	 							= "Rekening/ambil_rekening";
-$route['api/rekening-usaha']['get']						= "Rekening/ambil_rekening_usaha";
+$route['api/rekening-usaha']['get']							= "Rekening/ambil_rekening_usaha";
 $route['api/rekening/detail']['get'] 						= "Rekening/ambil_rekening_by_id";
 $route['api/rekening/add']['post'] 							= "Rekening/simpan_rekening";
 $route['api/rekening/update']['post'] 						= "Rekening/ubah_rekening";

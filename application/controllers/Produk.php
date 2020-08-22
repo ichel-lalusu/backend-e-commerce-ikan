@@ -359,8 +359,8 @@ class Produk extends CI_Controller
 
 	public function hapus_data_produk()
 	{
-		$id_produk = $this->input->post('produk');
-		$data = array('status_p' => 'tidak_aktif');
+		$id_produk = $this->input->post('id_produk');
+		$data = array('status_p' => "tidak aktif");
 		
 		$status_code = 0;
 		$status = '';
