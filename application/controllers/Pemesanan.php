@@ -19,7 +19,7 @@ class Pemesanan extends CI_Controller
         $this->load->library('encryption');
         $this->encryption->initialize(array('driver' => 'mcrypt'));
         date_default_timezone_set("Asia/Bangkok");
-        $this->load->helper("Response_helper");
+        // $this->load->helper("Response");
     }
 
     protected $urutan_pemesanan = 0;
@@ -29,8 +29,11 @@ class Pemesanan extends CI_Controller
     {
       $id_akun = $this->input->post('id_akun');
       $data_pembeli = $this->Pembeli->detail_pembeli($id_akun);
-      header("Content-type: application/json");
-      echo json_encode($data_pembeli->row());
+      if($data_pembeli->num_rows() > 0){
+        response(200, $data_pembeli->row_array());
+      }else{
+        response(400, array());
+      }
   }
 
   public function updatePemesanan()
@@ -50,13 +53,13 @@ class Pemesanan extends CI_Controller
        'latitude_pb'=>$latitude);
       try {
        $updateAlamat = $this->Pembeli->updateAlamat($array_update, $id_akun);
-       $result = null;
+       $result = array();
        $result['responseMessage'] = "success";
+       response(200, $result);
    } catch (Exception $e) {
        $result['responseMessage'] = "failed with " . $e->getMessage();
+       response(500, $result);
    }
-   header("Content-type: application/json");
-   echo json_encode($result);
 }
 
 public function simpanPemesanan()
@@ -133,12 +136,7 @@ public function simpanPemesanan()
         $result = array('responseMessage' => 'failed ' . $errorMessage, 'listPemesanan' => null, 'responseCode' => '01');
         $statusHeader = 500;
     }
-        // header("Content-type: application/json");
-		// echo json_encode($result, JSON_PRETTY_PRINT);
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $result);
 }
 
 public function getHargaPesananById()
@@ -165,10 +163,7 @@ public function StatusPemesanan()
         $statusHeader = 500;
         $result = array('responseMessage' => 'failed', 'responseCode' => '01', 'status' => null);
     }
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $result);
 }
 
 public function getAllPemesananByAkun()
@@ -267,10 +262,7 @@ public function getAllPemesananByAkun()
             'responseMessage' => 'failed ' + $e->getMessage(),
             'responseCode' => "01");
     }
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('Application/json')
-    ->set_output(json_encode($resultArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $resultArray);
 }
 
 public function getDataPemesananByID()
@@ -367,10 +359,7 @@ public function getDataPemesananByID()
             'responseMessage' => 'failed ' + $e->getMessage(),
             'responseCode' => "01");
     }
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('Application/json')
-    ->set_output(json_encode($resultArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $resultArray);
 }
 
 public function getAllTransaksiPenjual()
@@ -488,11 +477,7 @@ public function getAllTransaksiPenjual()
             'responseCode' => "99");
         $statusHeader = 500;
     }
-
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($resultArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $resultArray);
 }
 
 public function get_transaksi_pengiriman()
@@ -602,10 +587,7 @@ public function get_transaksi_pengiriman()
             'responseCode' => "99");
         $statusHeader = 500;
     }
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($resultArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $resultArray);
 }
 
 public function get_pesanan_siap_kirim()
@@ -640,11 +622,7 @@ public function get_pesanan_siap_kirim()
     } catch (Exception $e) {
         $response['status'] = 'gagal';
     }
-        // echo json_encode($response);
-    $this->output
-    ->set_status_header($status_header)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($status_header, $response);
 }
 
 
@@ -757,11 +735,7 @@ public function get_transaksi_today()
         $response['status'] = 'gagal';
         $response['responseMessage'] = $e->getMessage();
     }
-        // echo json_encode($response);
-    $this->output
-    ->set_status_header($status_header)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($status_header, $response);
 }
 
 private function GET_DETAIL_PEMESANAN_WITH_ID($ID_PESANAN)
@@ -794,10 +768,7 @@ public function get_produk_to_varify(){
         $response['detail_pemesanan'] = array();
         $response['status'] = 'gagal ' . $e->getMessage();
     }
-    $this->output
-    ->set_status_header($status_header)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($status_header, $response);
 }
 
 public function simpan_verifikasi_berat_produk()
@@ -843,10 +814,7 @@ public function simpan_verifikasi_berat_produk()
         $response['status'] = 'error';
         $response['message'] = 'Gagal Ubah Berat Akhir Karena Kesalahan Server ' . $e->getMessage();
     }
-    $this->output
-    ->set_status_header($status_header)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($status_header, $response);
 }
 
 public function getTransaksiByIdPemesanan()
@@ -967,11 +935,7 @@ public function getTransaksiByIdPemesanan()
             'responseCode' => "01");
         $statusHeader = 500;
     }
-
-    $this->output
-    ->set_status_header($statusHeader)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($resultArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    response($statusHeader, $resultArray);
 }
 
 public function PemesananSelesai()
@@ -983,23 +947,14 @@ public function PemesananSelesai()
         $updateAffected  = $this->db->affected_rows();
         if($updateAffected > 0){
             $response = array('id' => $id, 'message' => 'success', 'statusCode' => '00');
-            $this->output
-            ->set_status_header(200)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            response(200, $response);
         }else{
             $response = array('message' => 'failed. Pesanan Tidak Ada', 'statusCode' => '01');
-            $this->output
-            ->set_status_header(404)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            response(400, $response);
         }
     } catch (Exception $e) {
         $response = array('message' => 'failed.' . $e->getMessage(), 'statusCode' => '99');
-        $this->output
-        ->set_status_header(500)
-        ->set_content_type('application/json', 'utf-8')
-        ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        response(500, $response);
     }
 
 
@@ -1021,44 +976,27 @@ public function HapusPemesananByIdPemesanan()
                     // echo $this->db->last_query();
                 if($DeletePemesanan){
                     $result = array('responseMessage' => "success", "responseCode" => "00");
-                    return $this->output
-                    ->set_status_header($statusHeader)
-                    ->set_content_type('application/json', 'utf-8')
-                    ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                    response($statusHeader, $result);
                 }else{
                     $statusHeader = 400;
                     $result = array('responseMessage' => "failed", "responseCode" => "01");
-                    return $this->output
-                    ->set_status_header($statusHeader)
-                    ->set_content_type('application/json', 'utf-8')
-                    ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                    response($statusHeader, $result);
                 }
             }else{
                 $statusHeader = 400;
                 $result = array('responseMessage' => "failed", "responseCode" => "02");
-                return $this->output
-                ->set_status_header($statusHeader)
-                ->set_content_type('application/json', 'utf-8')
-                ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                response($statusHeader, $result);
             }
         }else{
             $statusHeader = 404;
             $result = array('responseMessage' => "failed", "responseCode" => "03");
-            return $this->output
-            ->set_status_header($statusHeader)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            response($statusHeader, $result);
         }
     } catch (Exception $e) {
-        return $this->output
-        ->set_status_header(500)
-        ->set_content_type('application/json', 'utf-8')
-        ->set_output(json_encode(array("responseMessage"=>"Error"), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        $statusHeader=500;
+        $result=array("responseMessage"=>"Error");
+        response($statusHeader, $result);
     }
-
-
-        // echo json_encode($result, JSON_PRETTY_PRINT);
-
 }
 
 public function verifikasiPembayaranByPenjual()
@@ -1100,10 +1038,7 @@ public function verifikasiPembayaranByPenjual()
      $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
      $status_header = 500;
  }
- $this->output
- ->set_status_header($status_header)
- ->set_content_type('application/json', 'utf-8')
- ->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+ response($statusHeader, $array);
 }
 
 public function getDetailPemesanan_HTML()
@@ -1167,15 +1102,9 @@ public function getPemesananWithPembayaran($id_pemesanan)
         $where_pembayaran = "id_pemesanan = '$id_pemesanan'";
         $dataPembayaran = $this->Pembayaran->getPembayaran($where_pembayaran);
         $result = array('data_pembayaran' => $dataPembayaran->row_array(), 'data_pemesanan' => $dataPemesanan->row_array());
-        $this->output
-        ->set_status_header(200)
-        ->set_content_type('application/json', 'utf-8')
-        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        response(200, $result);
     }else{
-        $this->output
-        ->set_status_header(400)
-        ->set_content_type('application/json', 'utf-8')
-        ->set_output(json_encode(array('data' => []), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        response(404, array('data' => []));
     }
 }
 
@@ -1237,10 +1166,7 @@ public function getPesananPriority()
        $response['statusMessage'] = 'error';
        $response['data_pesanan_priority'] = $data_pesanan;
    }
-   $this->output
-   ->set_status_header($status_header)
-   ->set_content_type('application/json', 'utf-8')
-   ->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+   response($status_header, $response);
 }
 
 public function getPesananNonPriority()
