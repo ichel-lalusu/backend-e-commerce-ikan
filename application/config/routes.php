@@ -148,4 +148,8 @@ $route['api/keranjang/delete']['post']			= "Keranjang/hapus";
 $route['admin'] = "admin/Admin";
 $route['admin/Usaha/detail_transaksi/(:num)'] = 'admin/Pemesanan/detail/Usaha/$1';
 $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/$1';
+
 $route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';
+
+$route['api/kendaraan']		= "Kendaraan/index";
+$route['api/penjual']['get']		= "Penjual/all_penjual";
