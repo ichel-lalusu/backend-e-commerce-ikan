@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 
 class Model_user extends CI_Model{
     public function cek_login($username, $password)
