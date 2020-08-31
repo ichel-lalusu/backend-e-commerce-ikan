@@ -1,4 +1,4 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * 
@@ -82,8 +82,10 @@ class Model_penjual extends CI_Model
 
 	public function ambil_data_usaha($id_akun)
 	{
-		$this->db->where('id_pj', $id_akun);
-		return $this->db->get('data_usaha');
+		$this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`")
+			->where('id_pj', $id_akun)
+			->from("data_usaha");
+		return $this->db->get();
 	}
 
 	public function ambil_data_usaha_with_pj($id_akun)
@@ -95,7 +97,7 @@ class Model_penjual extends CI_Model
 		return $this->db->get();
 	}
 
-	public function ambil_usaha_by_id($id_usaha)
+	public function ambil_usaha_by_id($id_usaha="")
 	{
 		$this->db->select('`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`');
 		$this->db->where('id_usaha', $id_usaha);
