@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 /**
  * 
  */
@@ -1259,7 +1259,7 @@ public function procced_order_to_delivery()
                                     'id_kendaraan' => $kendaraan);
         $insert_pengiriman = $this->Model_pengiriman->insert_pengiriman($data_pengiriman);
         if($insert_pengiriman){
-            $id_pengiriman = intval($this->db->insert_id());
+            $id_pengiriman = $this->db->insert_id();
             if($data->num_rows() > 0){
                 $response['data_pengiriman'] = $this->save_detail_pengiriman($data, $id_pengiriman);
                 if(count($response) > 0){
@@ -1295,10 +1295,9 @@ public function procced_order_to_delivery()
     response($status_header, $response);
 }
 
-protected function save_detail_pengiriman($data=array(), int $id_pengiriman)
+protected function save_detail_pengiriman($data=array(), $id_pengiriman)
 {
     $data_pesanan = array();
-    $data_detail_pengiriman = array();
     foreach ($data->result() as $key) {
         $status_pengiriman = ($this->urutan_pengiriman==1) ? "pengantaran" : "menunggu";
         $this->Pemesanan->detail_pemesan($key->id_pemesanan);
@@ -1314,9 +1313,6 @@ protected function save_detail_pengiriman($data=array(), int $id_pengiriman)
             $this->urutan_pemesanan++;
             $this->urutan_pengiriman++;
         }
-        $data_pemesanan = array('status_pemesanan' => 'Pengiriman');
-        $where = "id_pemesanan = $key->id_pemesanan";
-        $this->Pemesanan->updatePemesanan($data_pemesanan, $where);
     }
     return $data_pesanan;
 }
