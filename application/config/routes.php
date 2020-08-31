@@ -137,6 +137,8 @@ $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPe
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
 $route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
 $route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+$route['api/pengiriman/(:num)/(:num)']['get']				= "Pengiriman/get_pengiriman/$1/$2";
+$route['api/lacak-pesanan/(:num)/(:num)']['get']			= "Pengiriman/track_pengiriman_pesanan/$1/$2";
 
 $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
@@ -149,3 +151,5 @@ $route['admin'] = "admin/Admin";
 $route['admin/Usaha/detail_transaksi/(:num)'] = 'admin/Pemesanan/detail/Usaha/$1';
 $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/$1';
 $route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';
+
+$route['api/kendaraan']		= "Kendaraan/index";

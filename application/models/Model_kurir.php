@@ -1,4 +1,4 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * 
  */
@@ -18,6 +18,14 @@ class Model_kurir extends CI_Model
 		$this->db->where("id_kurir", $id_kurir);
 		$this->db->where("id_usaha", $id_usaha);
 		$this->db->from("data_kurir");
+		return $this->db->get();
+	}
+
+	public function get_where($where="")
+	{
+		$this->db->select("id_kurir, nama_kurir, foto_kurir, jk_kurir, telp_kurir, id_usaha")
+				 ->where($where)
+				 ->from("data_kurir");
 		return $this->db->get();
 	}
 
