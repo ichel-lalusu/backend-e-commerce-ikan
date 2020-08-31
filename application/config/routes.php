@@ -153,3 +153,4 @@ $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/
 $route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';
 
 $route['api/kendaraan']		= "Kendaraan/index";
+$route['api/penjual']['get']		= "Penjual/all_penjual";

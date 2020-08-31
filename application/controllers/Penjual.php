@@ -1,5 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-
+<?php 
 /**
  * 
  */
@@ -870,62 +869,46 @@ class Penjual extends CI_Controller
 
 	public function all_penjual()
 	{
-		$this->load->model("admin/Model_usaha", "usaha");
-		$data_user = $this->input->post('data_user');
-		$response = array();
-		if ($data_user['usergroup'] == "admin") {
-			$id_akun = $data_user['id_akun'];
-			$username = $data_user['username'];
-			$cek_pengguna = $this->Model_user->cek_pengguna_by_id_akun_username($id_akun, $username);
-			if ($cek_pengguna->num_rows() > 0 && $cek_pengguna->row()->level_user=="admin") {
-				$result_data_pj = array();
-				$data_penjual = $this->penjual->get_all();
-				foreach ($data_penjual->result() as $data_pj) {
-					$result_data_pj[] = array(
-						'id_pj' => $data_pj->id_pj,
-						'nama_pj' => $data_pj->nama_pj,
-						'foto_pj' => $data_pj->foto_pj,
-						'noktp_pj' => $data_pj->noktp_pj,
-						'fotoktp_pj' => $data_pj->fotoktp_pj,
-						'jk_pj' => $data_pj->jk_pj,
-						'tgllahir_pj' => $data_pj->tgllahir_pj,
-						'alamat_pj' => $data_pj->alamat_pj,
-						'telp_pj' => $data_pj->telp_pj,
-						'jenis_petani' => $data_pj->jenis_petani,
-						'data_usaha' => $this->usaha->get_usaha_by_id_penjual($data_pj->id_pj)->row()
-					);
-				}
-				if ($data_penjual->num_rows() > 0) {
-					$response = array(
-						'data' => $result_data_pj,
-						'status' => 'success',
-						'code' => 200,
-						'message' => "data penjual success"
-					);
-					return $this->output
-						->set_status_header(200)
-						->set_content_type('application/json', 'utf-8')
-						->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-				} else {
-					$response = array(
-						'data' => array(),
-						'status' => 'failed',
-						'code' => 404,
-						'message' => "data penjual not found"
-					);
-				}
+		try {
+			$data_penjual = $this->penjual->get_all();
+			foreach ($data_penjual->result() as $data_pj) {
+				$query_usaha = 
+				$result_data_pj[] = array(
+					'id_pj' => $data_pj->id_pj,
+					'nama_pj' => $data_pj->nama_pj,
+					'foto_pj' => $data_pj->foto_pj,
+					'noktp_pj' => $data_pj->noktp_pj,
+					'fotoktp_pj' => $data_pj->fotoktp_pj,
+					'jk_pj' => $data_pj->jk_pj,
+					'tgllahir_pj' => $data_pj->tgllahir_pj,
+					'alamat_pj' => $data_pj->alamat_pj,
+					'telp_pj' => $data_pj->telp_pj,
+					'jenis_petani' => $data_pj->jenis_petani,
+					'data_usaha' => $this->penjual->ambil_data_usaha($data_pj->id_pj)->row()
+				);
+			}
+			if ($data_penjual->num_rows() > 0) {
+				$response = array(
+					'data' => $result_data_pj,
+					'status' => 'success',
+					'code' => 200,
+					'message' => "data penjual success"
+				);
+				response(200, $response);
 			} else {
 				$response = array(
 					'data' => array(),
 					'status' => 'failed',
-					'code' => 402,
-					'message' => "Error"
+					'code' => 404,
+					'message' => "data penjual not found"
 				);
 			}
+		} catch (Exception $e) {
+			$response = array('data' => array(),
+						'status' => 'failed',
+						'code' => 500,
+						'message' => "Error " . $e->getMessage());
 		}
-		$this->output
-			->set_status_header($response['code'])
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		response($response['code'], $response);
 	}
 }

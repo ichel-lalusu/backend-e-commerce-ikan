@@ -113,7 +113,6 @@ class Model_kendaraan extends CI_Model
 
 	public function createKendaraan($data)
     {
-        $this->
         return $this->db->insert('data_kendaraan', $data);
     }
 
