@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 /**
  * 
  */
@@ -61,9 +61,8 @@ class Keranjang extends CI_Controller
 	protected function keranjang_init($id_akun)
 	{
 		$result_data = array();
-		$data_keranjang = $this->Model_keranjang->get_pembeli_keranjang($id_akun);
+		$data_keranjang = $this->Model_keranjang->get_id_usaha_in_keranjang_pembeli($id_akun);
 		if($data_keranjang->num_rows() > 0){
-			// var_dump($data_keranjang->result());
 			foreach ($data_keranjang->result() as $key) {
 				$data_produk = $this->Model_keranjang->get_keranjang_pembeli_by_usaha($id_akun, $key->id_usaha);
 				if($data_produk->num_rows() > 0){
@@ -80,7 +79,7 @@ class Keranjang extends CI_Controller
 				$result_data['status_code'] = 200;
 			}
 		}else{
-			$result_data['keranjang'] = $keranjang;
+			$result_data['keranjang'] = array();
 			$result_data['response_status'] = "not found";
 			$result_data['status_code'] = 404;
 		}

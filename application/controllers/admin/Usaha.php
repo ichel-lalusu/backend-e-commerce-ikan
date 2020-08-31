@@ -40,7 +40,7 @@ class Usaha extends CI_Controller
     $menu = "Penjual";
     $data_usaha = $this->usaha->get_all_usaha();
     $data_page = array('title' => 'Tambah Data Usaha', 'menu' => 'penjual', 'id_pj' => $id_pj);
-    $this->load->view('admin/' . $menu . '/Usaha/add', $data_page);
+    $this->load->view('admin/' . $menu . '/usaha/add', $data_page);
   }
 
   public function edit($id)

@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 /**
  * 
  */
@@ -1093,12 +1093,24 @@ public function getDetailPemesanan_HTML()
 public function getStrukImage()
 {
     $idPemesanan = $this->input->get('idPemesanan');
-    $data = $this->db->get_where("data_pembayaran", array('id_pemesanan' => $idPemesanan))->row_array();
-    $data['response'] = "success";
-    return $this->output
-    ->set_status_header(200)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    try {
+        $data_pembayaran = $this->db->get_where("data_pembayaran", array('id_pemesanan' => $idPemesanan), 1);
+        if($data_pembayaran->num_rows() > 0){
+            $data = $data_pembayaran->row();
+            $image = base_url("foto_struk/" . $data->struk_pembayaran);
+            $result['struk_pembayaran'] = $image;
+            $result['response'] = "success";
+            if($data->struk_pembayaran!==""||!empty($data->struk_pembayaran)){
+                response(200, $result);
+            }else{
+                response(404, array('response' => "failed", 'struk_pembayaran' => null));
+            }
+        }else{
+            response(404, array('response' => "failed. data pemesanan not found", 'struk_pembayaran' => null));
+        }
+    } catch (Exception $e) {
+        response(500, array('response' => "error " . $e->getMessage(), 'struk_pembayaran' => null));
+    }
 }
 
 public function getPemesananWithPembayaran($id_pemesanan)
@@ -1247,7 +1259,7 @@ public function procced_order_to_delivery()
                                     'id_kendaraan' => $kendaraan);
         $insert_pengiriman = $this->Model_pengiriman->insert_pengiriman($data_pengiriman);
         if($insert_pengiriman){
-            $id_pengiriman = intval($this->db->insert_id());
+            $id_pengiriman = $this->db->insert_id();
             if($data->num_rows() > 0){
                 $response['data_pengiriman'] = $this->save_detail_pengiriman($data, $id_pengiriman);
                 if(count($response) > 0){
@@ -1283,10 +1295,9 @@ public function procced_order_to_delivery()
     response($status_header, $response);
 }
 
-protected function save_detail_pengiriman($data=array(), int $id_pengiriman)
+protected function save_detail_pengiriman($data=array(), $id_pengiriman)
 {
     $data_pesanan = array();
-    $data_detail_pengiriman = array();
     foreach ($data->result() as $key) {
         $status_pengiriman = ($this->urutan_pengiriman==1) ? "pengantaran" : "menunggu";
         $this->Pemesanan->detail_pemesan($key->id_pemesanan);
@@ -1302,9 +1313,6 @@ protected function save_detail_pengiriman($data=array(), int $id_pengiriman)
             $this->urutan_pemesanan++;
             $this->urutan_pengiriman++;
         }
-        $data_pemesanan = array('status_pemesanan' => 'Pengiriman');
-        $where = "id_pemesanan = $key->id_pemesanan";
-        $this->Pemesanan->updatePemesanan($data_pemesanan, $where);
     }
     return $data_pesanan;
 }
