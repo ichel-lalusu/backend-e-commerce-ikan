@@ -138,7 +138,6 @@ class Keranjang extends CI_Controller
 				response(200, $keranjang);
 			}
 		}else{
-<<<<<<< HEAD
 			response(404, array('message' => "Not found"));
 		}
 		// return $result_data;
@@ -156,11 +155,9 @@ class Keranjang extends CI_Controller
 			}
 		} catch (Exception $e) {
 			response(500, array('message' => 'error ' . $e->getMessage()));
-=======
 			$result_data['keranjang'] = array();
 			$result_data['response_status'] = "not found";
 			$result_data['status_code'] = 404;
->>>>>>> 2c415fe24ff216654d6caff6252fd7fc40e9f5d5
 		}
 	}
 
