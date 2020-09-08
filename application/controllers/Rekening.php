@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 /**
  * 
  */
@@ -146,27 +146,25 @@ class Rekening extends CI_Controller
 
 	public function simpan_rekening()
 	{
-		$bank = $this->input->post('bank');
-		$norek = $this->input->post('norek');
-		$namarek = $this->input->post('namarek');
+		$bank = $this->input->post('kode_bank');
+		$norek = $this->input->post('no_rekening');
+		$namarek = $this->input->post('nama_rekening');
 		$id_akun = $this->input->post('id_akun');
 		$data_ins = array('kode_bank' => $bank, 'id_akun' => $id_akun, 'no_rekening' => $norek, 'nama_rekening' => $namarek);
 		$insert = $this->rekening->simpan_rekening($data_ins);
 		if($insert){
 			$status = "berhasil";
+			response(200, array('status'=>$status));
 		}else{
 			$status = "gagal";
+			response(400, array('status' => $status));
 		}
-
-		$respons = array('status' => $status);
-		header("Content-type: application/json");
-		echo json_encode($respons);
 	}
 
 	public function ubah_rekening()
 	{
 		$id_rekening = $this->input->post('id_rekening');
-		$kode_bank = $this->input->post('bank_edit');
+		$kode_bank = $this->input->post('kode_bank');
 		$no_rekening = $this->input->post('no_rekening');
 		$nama_rekening = $this->input->post('nama_rekening');
 
