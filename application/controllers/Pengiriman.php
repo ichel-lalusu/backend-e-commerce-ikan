@@ -33,10 +33,10 @@ class Pengiriman extends CI_Controller
 		# code...
 	}
 
-	public function get_pengiriman($id_pengiriman, $id_pj)
+	public function get_pengiriman()
 	{
-		$this->id_pengiriman = $id_pengiriman;
-		$this->id_penjual = $id_pj;
+		$this->id_pengiriman = $this->input->get('id_pengiriman', TRUE);
+		$this->id_penjual = $this->input->get('akun', TRUE);
 		$result = array();
 		try {
 			// $id_pj = $this->input->post("id_akun", TRUE);
