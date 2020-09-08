@@ -28,53 +28,7 @@ class Model_keranjang extends CI_Model
 		return $this->db->get();
 	}
 
-	public function simpan_keranjang_pembeli()
-	{
-		$id_usaha = $this->input->post('id_usaha');
-		$id_akun = $this->input->post('id_akun');
-		$id_variasi_produk = $this->input->post('variasi');
-		$id_produk = $this->input->post('id_produk');
-		$jml_produk = intval($_POST['qty']);
-		$harga_produk = $this->input->post('harga_produk');
-		$ikan_per_kg = $this->input->post('ikan_per_kg');
-		$potong_per_ekor = $this->input->post('potong_per_ekor');
-		$distance = floatval($this->input->post('distance'));
-		$estimasi_ongkir = intval($this->input->post('estimasi_ongkir'));
-		$sub_total = ($jml_produk * $harga_produk);
-		$status_do = TRUE;
-		if($status_do){
-			$cek_di_keranjang = $this->get_detail_produk_keranjang_pembeli($id_variasi_produk, $id_akun);
-			if($cek_di_keranjang->num_rows() > 0){
-				$data_keranjang = $cek_di_keranjang->row();
-				$this->db->reset_query();
-				$data_update = array('jml_produk' => ($jml_produk + $data_keranjang->jml_produk), 
-							'sub_total' => ($sub_total + $data_keranjang->sub_total), 
-							'ikan_per_kg' => $ikan_per_kg,
-							'potong_per_ekor' => $potong_per_ekor,
-							'distance' => $distance,
-							'estimasi_ongkir' => $estimasi_ongkir);
-				$where_update = "id_pb = '$id_akun' AND id_variasi_produk = '$id_variasi_produk'";
-				return $this->update_keranjang_akun_yang_sudah_ada($where_update, $data_update);
-			}else{
-				$data = array(
-					'id_produk' => $id_produk,
-					'jml_produk' => $jml_produk, 
-					'sub_total' => $sub_total, 
-					'id_usaha' => $id_usaha, 
-					'id_pb' => $id_akun, 
-					'id_variasi_produk' => $id_variasi_produk,
-					'harga_produk' => $harga_produk,
-					'ikan_per_kg' => $ikan_per_kg,
-					'potong_per_ekor' => $potong_per_ekor,
-					'distance' => $distance,
-					'estimasi_ongkir' => $estimasi_ongkir,
-					'created_date' => date('Y-m-d H:i:s'));
-				return $this->create_data_keranjang_variasi_produk($data);
-			}
-		}
-	}
-
-	private function get_detail_produk_keranjang_pembeli($id_variasi_produk, $id_akun)
+	public function get_detail_produk_keranjang_pembeli($id_variasi_produk, $id_akun)
 	{
 		$this->db->where("k.id_pb", $id_akun);
 		$this->db->where("k.id_variasi_produk", $id_variasi_produk);
@@ -88,7 +42,7 @@ class Model_keranjang extends CI_Model
 		return $this->db->get();
 	}
 
-	private function update_keranjang_akun_yang_sudah_ada($where, $data)
+	public function update_keranjang_akun_yang_sudah_ada($where, $data)
 	{
 		$this->db->where($where);
 		$this->db->limit(1);
@@ -112,13 +66,22 @@ class Model_keranjang extends CI_Model
 		return $this->db->get("data_keranjang");
 	}
 
-	private function create_data_keranjang_variasi_produk($data)
+	public function create_data_keranjang_variasi_produk($data)
 	{
 		return $this->db->insert("data_keranjang", $data);
 	}
 
-	public function delete_keranjang_by_id_usaha($id_usaha)
+	public function delete_keranjang_by_id_usaha($id_usaha="", $id_pb="")
 	{
-		return $this->db->delete("data_keranjang", array('id_usaha' => $id_usaha));
+		if($id_usaha!=="" && $id_id_pb!==""){
+			return $this->db->delete("data_keranjang", array('id_usaha' => $id_usaha, 'id_pb' => $id_pb));
+		}else{
+			return FALSE;
+		}
+	}
+
+	public function delete_keranjang_by_id_keranjang($id_keranjang)
+	{
+		return $this->db->delete("data_keranjang", array('id_keranjang' => intval($id_keranjang)));
 	}
 }

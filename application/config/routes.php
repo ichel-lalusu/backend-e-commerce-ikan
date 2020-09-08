@@ -137,11 +137,16 @@ $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPe
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
 $route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
 $route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+<<<<<<< HEAD
+$route['api/pengiriman']['get']				= "Pengiriman/get_pengiriman";
+$route['api/track']['get']			= "Pengiriman/track_pengiriman_pesanan";
+=======
+>>>>>>> 2c415fe24ff216654d6caff6252fd7fc40e9f5d5
 
 $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
 $route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
-$route['api/keranjang/delete']['post']			= "Keranjang/hapus";
+$route['api/keranjang/delete']['get']			= "Keranjang/delete_keranjang";
 
 
 
