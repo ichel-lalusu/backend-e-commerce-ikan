@@ -39,15 +39,9 @@ class Rekening extends CI_Controller
 			// echo $this->db->last_query();
 			$this->id_akun = $detail_penjual->id_pj;
 			$data_rekening = $this->response_rekening();
-			echo $data_rekening->num_rows();
-			if($data_rekening->num_rows() > 0){
-				$respons['data'] = $data_rekening->result_array();
-				$respons['status'] = "success";
-				response(200, $respons);
-			}else{
-				$respons['status'] = "Not Found";
-				response(404, $respons);
-			}
+			$respons['data'] = $data_rekening->result_array();
+			$respons['status'] = "success";
+			response(200, $respons);
 		} catch (Exception $e) {
 			$respons['status'] = "Error " .$e->getMessage() ;
 			response(500, $respons);
