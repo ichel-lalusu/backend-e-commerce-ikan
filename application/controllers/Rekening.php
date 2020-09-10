@@ -36,9 +36,10 @@ class Rekening extends CI_Controller
 		$id_usaha = $this->input->get("id_usaha");
 		try {
 			$detail_penjual = $this->penjual->data_usaha_penjual_by_idusaha($id_usaha)->row();
+			// echo $this->db->last_query();
 			$this->id_akun = $detail_penjual->id_pj;
 			$data_rekening = $this->response_rekening();
-			// echo $this->db->last_query();
+			echo $data_rekening->num_rows();
 			if($data_rekening->num_rows() > 0){
 				$respons['data'] = $data_rekening->result_array();
 				$respons['status'] = "success";
