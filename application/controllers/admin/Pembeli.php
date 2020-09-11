@@ -21,16 +21,16 @@ class Pembeli extends CI_Controller
 	public function index()
 	{
 		$menu = "Pembeli";
-		$data_pembeli = $this->Model_pembeli->get_all();
-		$data_page = array('title' => 'Data Pembeli', 'data_pembeli' => $data_pembeli, 'menu' => 'pembeli');
+		// $data_pembeli = $this->Model_pembeli->get_all();
+		$data_page = array('title' => 'Data Pembeli', 'menu' => 'pembeli');
 		$this->load->view('admin/' . $menu . '/index', $data_page);
 	}
 
 	public function add()
 	{
 		$menu = "Pembeli";
-		$data_pembeli = $this->Model_pembeli->get_all();
-		$data_page = array('title' => 'Data Pembeli', 'data_pembeli' => $data_pembeli, 'menu' => 'pembeli');
+		// $data_pembeli = $this->Model_pembeli->get_all();
+		$data_page = array('title' => 'Data Pembeli', 'menu' => 'pembeli');
 		$this->load->view('admin/' . $menu . '/add', $data_page);
 	}
 

@@ -23,4 +23,12 @@ class Model_pembeli extends CI_Model
 		$this->db->where("id_pb", $id_akun);
 		return $this->db->update("data_pembeli", $data);
 	}
+
+	public function get()
+	{
+		$this->db->select("`id_pb`, `nama_pb`, `foto_pb`, `jk_pb`, `tgllahir_pb`, `telp_pb`, `alamat_pb`, `kab_pb`, `kec_pb`, `kel_pb`, `longitude_pb`, `latitude_pb`")
+		->from("data_pembeli")
+		->order_by("id_pb", 'DESC');
+		return $this->db->get();
+	}
 }
