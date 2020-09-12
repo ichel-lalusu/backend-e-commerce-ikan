@@ -71,9 +71,9 @@ class Model_keranjang extends CI_Model
 		return $this->db->insert("data_keranjang", $data);
 	}
 
-	public function delete_keranjang_by_id_usaha($id_usaha="", $id_pb="")
+	public function delete_keranjang_by_id_usaha($id_usaha=0, $id_pb=0)
 	{
-		if($id_usaha!=="" && $id_pb!==""){
+		if($id_usaha!=="" && $id_pb!=="" || ($id_usaha!==0 && $id_pb!==0)){
 			return $this->db->delete("data_keranjang", array('id_usaha' => $id_usaha, 'id_pb' => $id_pb));
 		}else{
 			return FALSE;
