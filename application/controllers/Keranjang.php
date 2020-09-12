@@ -52,6 +52,7 @@ class Keranjang extends CI_Controller
 		$keranjang = array();
 		try {
 			$id_akun = $this->input->post('id_akun', TRUE);
+			// echo $id_akun;
 			if(cek_pb($id_akun)){
 				$id_usaha = $this->input->post('id_usaha', TRUE);
 				$id_akun = $this->input->post('id_akun', TRUE);

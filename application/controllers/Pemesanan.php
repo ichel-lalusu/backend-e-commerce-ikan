@@ -121,11 +121,11 @@ public function simpanPemesanan()
                     'expiredDate' => $expiredDate,
                     'id_pemesanan' => $id_pemesanan);
                 $isPembayaran = $this->Pembayaran->createPembayaran($dataPembayaran);
-                $delete_keranjang = $this->Model_keranjang->delete_keranjang_by_id_usaha($id_usaha);
+                $delete_keranjang = $this->Model_keranjang->delete_keranjang_by_id_usaha($id_usaha, $id_akun);
                 if($isPembayaran && $delete_keranjang){
                     $result = array('responseMessage' => 'success', 'listPemesanan' => $produk, 'responseCode' => '00', 'id_pemesanan' => $id_pemesanan);
                 }else{
-                    $statusHeader = 401;
+                    $statusHeader = 404;
                     $result = array('responseMessage' => 'failed ', 'listPemesanan' => null, 'responseCode' => '03');
                 }
             }else{
