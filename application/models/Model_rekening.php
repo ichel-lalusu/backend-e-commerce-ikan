@@ -2,7 +2,7 @@
 /**
  * 
  */
-class Model_rekening extends CI_Model
+class Model_rekening extends 
 {
 	public function ambil_semua()
 	{
