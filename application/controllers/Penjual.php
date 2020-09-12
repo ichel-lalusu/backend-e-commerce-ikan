@@ -764,7 +764,7 @@ class Penjual extends CI_Controller
 		if ($data->num_rows() > 0) {
 			$response['data_kendaraan'] = $data->result();
 			$response['status'] = 'sukses';
-			response(200, $respons);
+			response(200, $response);
 			// $this->load->view('penjual/DataKendaraanPenjual', array('data' => $data));
 			// $result = array('dataKendaraan' => $data->result_array(),
 			// 				'responseMessage' => 'success',
@@ -773,7 +773,7 @@ class Penjual extends CI_Controller
 		} else {
 			$response['data_kendaraan'] = array();
 			$response['status'] = 'kosong';
-			response(404, $respons);
+			response(404, $response);
 		}
 	}
 
