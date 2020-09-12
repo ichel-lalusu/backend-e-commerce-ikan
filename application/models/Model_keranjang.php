@@ -73,7 +73,7 @@ class Model_keranjang extends CI_Model
 
 	public function delete_keranjang_by_id_usaha($id_usaha="", $id_pb="")
 	{
-		if($id_usaha!=="" && $id_id_pb!==""){
+		if($id_usaha!=="" && $id_pb!==""){
 			return $this->db->delete("data_keranjang", array('id_usaha' => $id_usaha, 'id_pb' => $id_pb));
 		}else{
 			return FALSE;

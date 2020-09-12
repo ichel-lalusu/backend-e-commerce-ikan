@@ -20,23 +20,14 @@ class Kurir extends CI_Controller
 			// echo $this->db->last_query();
 			if($data->num_rows() > 0){
 				$array = array('status' => "berhasil", 'data' => $data->result_array());
-				$this->output
-				->set_status_header(200)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(200, $array);
 			}else{
 				$array = array('status' => "kosong");
-				$this->output
-				->set_status_header(404)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(404, $array);
 			}
 		} catch (Exception $e) {
 			$array = array('status' => "Gagal");
-				$this->output
-				->set_status_header(500)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(500, $array);
 		}
 	}
 
