@@ -383,11 +383,9 @@ class Penjual extends CI_Controller
 		$data_usaha = $data->row_array();
 		// header("Content-type: application/json");
 		// echo json_encode($data_usaha);
-		$this->output
-			->set_status_header(200)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($data_usaha, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		response(200, $data_usaha);
 	}
+
 	public function prosessignupusaha()
 	{
 		$id_pj 			= $this->input->post('id_pj');
@@ -766,10 +764,7 @@ class Penjual extends CI_Controller
 		if ($data->num_rows() > 0) {
 			$response['data_kendaraan'] = $data->result();
 			$response['status'] = 'sukses';
-			$this->output
-				->set_status_header(200)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(200, $respons);
 			// $this->load->view('penjual/DataKendaraanPenjual', array('data' => $data));
 			// $result = array('dataKendaraan' => $data->result_array(),
 			// 				'responseMessage' => 'success',
@@ -778,10 +773,7 @@ class Penjual extends CI_Controller
 		} else {
 			$response['data_kendaraan'] = array();
 			$response['status'] = 'kosong';
-			$this->output
-				->set_status_header(404)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(404, $respons);
 		}
 	}
 
