@@ -250,7 +250,7 @@ public function getAllPemesananByAkun()
                         'DataUsaha' => $DataUsaha,
                         'DataPembeli' => $DataPembeli,
                         'DataPembayaran' => $DataPembayaran,
-                        'jarak' => $jarak)
+                        'jarak' => $jarak);
                 }
             }
             $resultArray = array('dataPesanan' => $result,
