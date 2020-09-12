@@ -15,7 +15,6 @@ class Pemesanan extends CI_Controller
         $this->load->model("Model_penjual", "Usaha");
         $this->load->model("Model_pembeli", "Pembeli");
         $this->load->model("Model_pengiriman");
-        $this->StatusPemesananBaru = "Baru";
         $this->load->library('encryption');
         $this->encryption->initialize(array('driver' => 'mcrypt'));
         date_default_timezone_set("Asia/Bangkok");
@@ -24,6 +23,7 @@ class Pemesanan extends CI_Controller
 
     protected $urutan_pemesanan = 0;
     protected $urutan_pengiriman = 1;
+    protected $StatusPemesananBaru = "Baru";
 
     public function pesanan_user()
     {
@@ -88,8 +88,8 @@ public function simpanPemesanan()
         $dataPemesanan = array('waktu_pemesanan' => $tglPemesanan,
             'tipe_pengiriman' => $tipePengiriman,
             'tgl_pengiriman' => $tglPengiriman,
-            'biaya_kirim' => $totalBiayaPengiriman,
-            'total_harga' => $totalPembayaran,
+            'biaya_kirim' => intval($totalBiayaPengiriman),
+            'total_harga' => intval($totalPembayaran),
             'status_pemesanan' => $this->StatusPemesananBaru,
             'id_pb' => $id_akun,
             'id_usaha' => $id_usaha,
