@@ -12,6 +12,7 @@ class Produk extends CI_Controller
 		// header("'Access-Control-Allow-Credentials' : true");
 		$this->load->model("Model_produk", "produk");
 		$this->load->model("Model_penjual", "penjual");
+		$this->load->helper("Response_helper");
 	}
 
 	public function index()
@@ -59,6 +60,7 @@ class Produk extends CI_Controller
 			foreach ($id_usaha as $key => $value) {
 				$where = "u.id_usaha = '$value'";
 				$data_produk_by_id_usaha = $this->produk->get_detail_produk_where($where);
+				// var_dump($data_produk_by_id_usaha);
 				if($data_produk_by_id_usaha->num_rows() > 0){
 					foreach ($data_produk_by_id_usaha->result() as $each_produk) {
 						$data_produk[$value][] = array(

@@ -87,9 +87,7 @@ $url_API = "http://localhost/backendikan/";
       $(document).ready(() => {
         $(".dataTable").DataTable();
         var data_user = JSON.parse(localStorage.data_user);
-        $.post('<?= base_url('Penjual/all_penjual') ?>', {
-          data_user
-        }).then(on_success_load_penjual);
+        $.getJSON('<?= base_url('api/penjual') ?>').then(on_success_load_penjual);
       });
 
       function on_success_load_penjual(result, status) {

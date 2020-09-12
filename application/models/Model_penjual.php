@@ -203,6 +203,17 @@ class Model_penjual extends CI_Model
 		return $this->db->update("data_usaha", $data, array('id_usaha' => $id_usaha));
 	}
 
+	public function data_usaha_penjual_by_idusaha($id_usaha=null)
+	{
+		if($id_usaha!==null){
+			return $this->db->query("select usaha.nama_usaha, usaha.id_usaha, usaha.id_pj, usaha.foto_usaha, usaha.jamBuka, usaha.jamTutup, penjual.id_pj, penjual.nama_pj, penjual.foto_pj, penjual.noktp_pj, penjual.fotoktp_pj, penjual.jk_pj
+									FROM data_usaha usaha
+									join data_penjual penjual
+									ON usaha.id_pj = penjual.id_pj
+									where usaha.id_usaha = " . $id_usaha);		
+		}
+	}
+
 	// public function ubah_jam_pengiriman_usaha($data, $id_jampengiriman)
 	// {
 	// 	$this->db->where('id_jampengiriman', $id_jampengiriman);

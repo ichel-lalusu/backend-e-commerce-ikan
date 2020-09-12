@@ -102,7 +102,7 @@ $route['api/user/penjual/kendaraan']['get']					= "Penjual/getKendaraanUsaha";
 $route['api/user/penjual/kendaraan/create']['post']			= "Penjual/simpanKendaraanUsaha";
 $route['api/user/penjual/kendaraan/detail']['get']			= "Penjual/get_detail_kendaraan_usaha";
 $route['api/user/penjual/kendaraan/update']['post']			= "Penjual/UpdateKendaraanUsaha";
-$route['api/user/penjual/kendaraan/delete']['post']			= "kendaraan/hapusKendaraan";
+$route['api/user/penjual/kendaraan/delete']['post']			= "Penjual/hapusKendaraan";
 
 
 // REKENING API's ROUTE
@@ -138,14 +138,22 @@ $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
 $route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
 $route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
 
+$route['api/pengiriman']['get']				= "Pengiriman/get_pengiriman";
+$route['api/track']['get']			= "Pengiriman/track_pengiriman_pesanan";
+
 $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
 $route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
-$route['api/keranjang/delete']['post']			= "Keranjang/hapus";
+$route['api/keranjang/delete']['get']			= "Keranjang/delete_keranjang";
 
 
 
 $route['admin'] = "admin/Admin";
 $route['admin/Usaha/detail_transaksi/(:num)'] = 'admin/Pemesanan/detail/Usaha/$1';
 $route['admin/Pembeli/detail_pesanan/(:num)'] = 'admin/Pemesanan/detail/Pembeli/$1';
+
 $route['admin/Pemesanan/(:any)'] = 'admin/Pemesanan/$1';
+
+$route['api/kendaraan']		= "Kendaraan/index";
+$route['api/penjual']['get']		= "Penjual/all_penjual";
+$route['api/pembeli']['get']		= "Pembeli/index";

@@ -10,27 +10,24 @@ class Rekening extends CI_Controller
 		parent::__construct();
 		header("Access-Control-Allow-Origin: *");
 		$this->load->model('Model_rekening', 'rekening');
+		$this->load->model("Model_penjual", "penjual");
 	}
+
+	protected $id_akun;
 
 		// PROSES BAGIAN REKENING
 	public function ambil_rekening()
 	{
-		$id_akun = $this->input->get('id_akun');
-		$data = $this->rekening->ambil_rekening_by_user($id_akun);
+		$this->id_akun = $this->input->get('id_akun');
+		$data = $this->response_rekening();
 		$respons = array();
 		if($data->num_rows() > 0){
 			$respons['data'] = $data->result_array();
 			$respons['status'] = "success";
-			$this->output
-			->set_status_header(200)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(200, $respons);
 		}else{
 			$respons['status'] = "Not Found";
-			$this->output
-			->set_status_header(404)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(404, $respons);
 		}
 	}
 
@@ -38,28 +35,28 @@ class Rekening extends CI_Controller
 	{
 		$id_usaha = $this->input->get("id_usaha");
 		try {
-			$data_rekening = $this->rekening->ambil_rekening_usaha($id_usaha);
+			$detail_penjual = $this->penjual->data_usaha_penjual_by_idusaha($id_usaha)->row();
+			// echo $this->db->last_query();
+			$this->id_akun = $detail_penjual->id_pj;
+			$data_rekening = $this->response_rekening();
+			// echo $this->db->last_query();
 			if($data_rekening->num_rows() > 0){
 				$respons['data'] = $data_rekening->result_array();
 				$respons['status'] = "success";
-				$this->output
-				->set_status_header(200)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(200, $respons);
 			}else{
 				$respons['status'] = "Not Found";
-				$this->output
-				->set_status_header(404)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(404, $respons);
 			}
 		} catch (Exception $e) {
 			$respons['status'] = "Error " .$e->getMessage() ;
-			$this->output
-			->set_status_header(404)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(500, $respons);
 		}
+	}
+
+	protected function response_rekening()
+	{
+		return $this->rekening->ambil_rekening_by_user($this->id_akun);
 	}
 
 	public function ambil_rekening_by_id()
@@ -71,11 +68,11 @@ class Rekening extends CI_Controller
 		if($data->num_rows() > 0){
 			$respons['data'] = $data->row_array();
 			$respons['status'] = "success";
+			response(200, $respons);
 		}else{
 			$respons['status'] = "failed";
+			response(404, $respons);
 		}
-		header("Content-type: application/json");
-		echo json_encode($respons);
 	}
 
 	public function ambil_data_bank()
@@ -85,23 +82,14 @@ class Rekening extends CI_Controller
 			if($data->num_rows() > 0){
 				$respons['data'] = $data->result_array();
 				$respons['status'] = "success";
-				$this->output
-				->set_status_header(200)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(200, $respons);
 			}else{
 				$respons['status'] = "Not Found";
-				$this->output
-				->set_status_header(404)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(404, $respons);
 			}
 		} catch (Exception $e) {
-			$respons['status'] = "Error " . $e->getMessage();
-			$this->output
-			->set_status_header(404)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			$respons['status'] = "Error " . $e->getMessage();\
+			response(500, $respons);
 		}
 	}
 
@@ -114,23 +102,14 @@ class Rekening extends CI_Controller
 			if($data->num_rows() > 0){
 				$respons['data'] = $data->result_array();
 				$respons['status'] = "success";
-				$this->output
-				->set_status_header(200)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(200, $respons);
 			}else{
 				$respons['status'] = "Not Found";
-				$this->output
-				->set_status_header(404)
-				->set_content_type('application/json', 'utf-8')
-				->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(404, $respons);
 			}
 		} catch (Exception $e) {
 			$respons['status'] = "Error " . $e->getMessage();
-			$this->output
-			->set_status_header(404)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($respons, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(500, $respons);
 		}
 	}
 
@@ -146,27 +125,25 @@ class Rekening extends CI_Controller
 
 	public function simpan_rekening()
 	{
-		$bank = $this->input->post('bank');
-		$norek = $this->input->post('norek');
-		$namarek = $this->input->post('namarek');
+		$bank = $this->input->post('kode_bank');
+		$norek = $this->input->post('no_rekening');
+		$namarek = $this->input->post('nama_rekening');
 		$id_akun = $this->input->post('id_akun');
 		$data_ins = array('kode_bank' => $bank, 'id_akun' => $id_akun, 'no_rekening' => $norek, 'nama_rekening' => $namarek);
 		$insert = $this->rekening->simpan_rekening($data_ins);
 		if($insert){
 			$status = "berhasil";
+			response(200, array('status'=>$status));
 		}else{
 			$status = "gagal";
+			response(400, array('status' => $status));
 		}
-
-		$respons = array('status' => $status);
-		header("Content-type: application/json");
-		echo json_encode($respons);
 	}
 
 	public function ubah_rekening()
 	{
 		$id_rekening = $this->input->post('id_rekening');
-		$kode_bank = $this->input->post('bank_edit');
+		$kode_bank = $this->input->post('kode_bank');
 		$no_rekening = $this->input->post('no_rekening');
 		$nama_rekening = $this->input->post('nama_rekening');
 

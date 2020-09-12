@@ -64,6 +64,7 @@ class Pemesanan extends CI_Controller
 
 public function simpanPemesanan()
 {
+    $this->load->model("Model_keranjang");
     $result = array();
     $id_akun = $this->input->post('id_akun');
     $id_usaha = $this->input->post('id_usaha');
@@ -102,13 +103,17 @@ public function simpanPemesanan()
             $totalProduk = count($produk);
             for($i=0; $i<$totalProduk; $i++){
                 $arrayProduk = $produk[$i];
-                $idVariasi = $arrayProduk['variasi'];
-                $data[] = array('harga' => $arrayProduk['harga_produk'],
-                    'jml_produk' => $arrayProduk['qty'],
-                    'sub_total' => $arrayProduk['total_harga'],
+                $harga_produk = intval($arrayProduk['harga_produk']);
+                $jml_produk = intval($arrayProduk['jml_produk']);
+                $subtotal = intval($harga_produk*$jml_produk);
+                $id_produk = $arrayProduk['id_variasi_produk'];
+                $data[] = array('harga' => $harga_produk,
+                    'jml_produk' => $jml_produk,
+                    'sub_total' => $subtotal,
                     'id_pemesanan' => $id_pemesanan,
-                    'id_produk' => $idVariasi);
+                    'id_produk' => $id_produk);
             }
+            // echo json_encode($data);
             $isDetailPemesanan = $this->Pemesanan->createDetailPemesanan_batch($data);
             if($isDetailPemesanan){
                     //PEMBAYARAN
@@ -116,10 +121,11 @@ public function simpanPemesanan()
                     'expiredDate' => $expiredDate,
                     'id_pemesanan' => $id_pemesanan);
                 $isPembayaran = $this->Pembayaran->createPembayaran($dataPembayaran);
-                if($isPembayaran){
+                $delete_keranjang = $this->Model_keranjang->delete_keranjang_by_id_usaha($id_usaha, $id_akun);
+                if($isPembayaran && $delete_keranjang){
                     $result = array('responseMessage' => 'success', 'listPemesanan' => $produk, 'responseCode' => '00', 'id_pemesanan' => $id_pemesanan);
                 }else{
-                    $statusHeader = 401;
+                    $statusHeader = 404;
                     $result = array('responseMessage' => 'failed ', 'listPemesanan' => null, 'responseCode' => '03');
                 }
             }else{
@@ -1087,12 +1093,24 @@ public function getDetailPemesanan_HTML()
 public function getStrukImage()
 {
     $idPemesanan = $this->input->get('idPemesanan');
-    $data = $this->db->get_where("data_pembayaran", array('id_pemesanan' => $idPemesanan))->row_array();
-    $data['response'] = "success";
-    return $this->output
-    ->set_status_header(200)
-    ->set_content_type('application/json', 'utf-8')
-    ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    try {
+        $data_pembayaran = $this->db->get_where("data_pembayaran", array('id_pemesanan' => $idPemesanan), 1);
+        if($data_pembayaran->num_rows() > 0){
+            $data = $data_pembayaran->row();
+            $image = base_url("foto_struk/" . $data->struk_pembayaran);
+            $result['struk_pembayaran'] = $image;
+            $result['response'] = "success";
+            if($data->struk_pembayaran!==""||!empty($data->struk_pembayaran)){
+                response(200, $result);
+            }else{
+                response(404, array('response' => "failed", 'struk_pembayaran' => null));
+            }
+        }else{
+            response(404, array('response' => "failed. data pemesanan not found", 'struk_pembayaran' => null));
+        }
+    } catch (Exception $e) {
+        response(500, array('response' => "error " . $e->getMessage(), 'struk_pembayaran' => null));
+    }
 }
 
 public function getPemesananWithPembayaran($id_pemesanan)

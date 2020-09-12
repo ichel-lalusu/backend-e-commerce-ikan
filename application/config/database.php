@@ -97,9 +97,10 @@ $query_builder = TRUE;
 // );
 
 // DATABASE CLOUD SERVER
+$host = 'localhost';
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
+	'hostname' => $host,
 	'username' => 'db_risel',
 	'password' => 'risel6789',
 	'database' => 'db_risel',

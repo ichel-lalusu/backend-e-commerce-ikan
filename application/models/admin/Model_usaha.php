@@ -17,7 +17,7 @@ class Model_usaha extends CI_Model{
         return $this->db->get();
     }
 
-    public function get_where($select="*", $where, $group=NULL, $order=NULL, $limit=NULL)
+    public function get_where($where, $group=NULL, $order=NULL, $limit=NULL)
     {
         $this->db->select("`id_usaha`, `nama_usaha`, `foto_usaha`, `alamat_usaha`, `jamBuka`, `jamTutup`, `jml_kapal`, `kapasitas_kapal`, `jml_kolam`, `kab`, `kec`, `kel`, `longitude`, `latitude`, `id_pj`");
         $this->db->from("data_usaha");

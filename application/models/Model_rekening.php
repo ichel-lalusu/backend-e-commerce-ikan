@@ -30,11 +30,12 @@ class Model_rekening extends CI_Model
 
 	public function ambil_rekening_usaha($id_usaha)
 	{
-		$this->db->where('usaha.id_usaha', $id_usaha);
-		$this->db->select('a.kode_bank, a.id_akun, a.no_rekening, a.nama_rekening, b.nama_bank, a.id_rekening');
-		$this->db->from('data_rekening a');
-		$this->db->join('data_master_bank b', 'a.kode_bank = b.kode_bank');
-		$this->db->join("data_usaha usaha", 'a.id_akun = usaha.id_pj');
+		$this->db->select("rekening.`kode_bank`, rekening.`id_akun`, rekening.`no_rekening`, rekening.`nama_rekening`, bank.`nama_bank`, rekening.`id_rekening`")
+				->from("data_usaha usaha")
+				->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
+				->join("data_rekening rekening", "rekening.id_akun = penjual.id_pj")
+				->join("data_master_bank bank", "bank.kode_bank = rekening.kode_bank")
+				->where('usaha.id_usaha', $id_usaha);
 		return $this->db->get();
 	}
 	

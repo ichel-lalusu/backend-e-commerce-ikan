@@ -14,6 +14,20 @@ class Pembeli extends CI_Controller
 		
 	}
 
+	public function index()
+	{
+		try {
+			$response_pembeli = $this->Pembeli->get();
+			if($response_pembeli->num_rows() > 0){
+				response(200, $response_pembeli->result_array());
+			}else{
+				response(404, array());
+			}
+		} catch (Exception $e) {
+			response(500, array());
+		}
+	}
+
 	public function detail_pembeli()
 	{
 		$id_akun = $this->input->get('id_akun');

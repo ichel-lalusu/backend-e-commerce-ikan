@@ -63,7 +63,7 @@ $this->load->view('admin/template/head');
                     </div>
                     <div class="row">
                       <label class="label-control col-sm-6">Foto Profil :</label>
-                      <p class="col-sm-6"><img width="100" src="<?= $url_API . 'foto_penjual/' . $data_penjual->foto_pj ?>" alt="Foto Penjual <?= ucwords($data_penjual->foto_pj) ?>" class="img-circle"></p>
+                      <p class="col-sm-6"><img width="100" src="<?= base_url() . 'foto_penjual/' . $data_penjual->foto_pj ?>" alt="Foto Penjual <?= ucwords($data_penjual->foto_pj) ?>" class="img-circle"></p>
                     </div>
                     <div class="row">
                       <label class="label-control col-sm-6">No. KTP :</label>
