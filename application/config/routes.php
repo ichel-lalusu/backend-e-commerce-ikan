@@ -118,7 +118,7 @@ $route['api/rekening/bank']['get']							= "Rekening/ambil_data_bank";
 $route['api/payment/upload']['post'] = "Pembayaran/ProsesUnggahBuktiPembayaran_Pemesanan";
 $route['api/payment/rekening/detail/html']['post'] = "Pembayaran/pembayaran_ambil_rekening_html";
 $route['api/payment/struk']['get'] = "Pemesanan/getStrukImage";
-$route['api/payment/verify']['get'] = "Pemesanan/verifikasiPembayaranByPenjual";
+$route['api/payment/verify']['post'] = "Pemesanan/verifikasiPembayaranByPenjual";
 
 // PEMBELI API's ROUTE
 
