@@ -1047,7 +1047,7 @@ class Pemesanan extends CI_Controller
                $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
                $status_header = 500;
            }
-           response($statusHeader, $array);
+           response($status_header, $array);
        }
 
        public function getDetailPemesanan_HTML()
