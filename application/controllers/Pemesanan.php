@@ -392,8 +392,8 @@ class Pemesanan extends CI_Controller
             if($status=="Terbayar"){
                 $where .= " AND tgl_pengiriman != date(now())";}
                 $query = $this->Pemesanan->getWhereDataPemesananByIdUsaha($where,$limit, $orderBy);
-            // echo $this->db->last_query();
-            // exit();
+                // echo $this->db->last_query();
+                // exit();
                 if($query->num_rows() > 0){
                     foreach($query->result() as $dataPemesanan){
                         $id1 = str_replace("-","",$dataPemesanan->waktu_pemesanan);
@@ -425,7 +425,7 @@ class Pemesanan extends CI_Controller
                         }
 
                         $queryDetailPesanan = $this->Pemesanan->getDetailPemesanan($idPemesanan);
-                    // echo $this->db->last_query();
+                        // echo $this->db->last_query();
                         $DataDetailPesanan = $queryDetailPesanan->row();
                         if(isset($DataDetailPesanan)){
                         // var_dump($DataDetailPesanan);
@@ -1010,8 +1010,8 @@ class Pemesanan extends CI_Controller
 
         public function verifikasiPembayaranByPenjual()
         {
-            $id_pemesanan = $this->input->get("idPemesanan");
-            $id_pembayaran = $this->input->get("id_pembayaran");
+            $id_pemesanan = $this->input->post("idPemesanan", TRUE);
+            $id_pembayaran = $this->input->post("id_pembayaran", TRUE);
             $data_update = array('verifikasi'=>"1");
         // echo "Masuk";
         // var_dump($this->input->get());
@@ -1044,14 +1044,14 @@ class Pemesanan extends CI_Controller
                     $status_header = 404;
                 }
             } catch (Exception $e) {
-             $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
-             $status_header = 500;
-         }
-         response($statusHeader, $array);
-     }
+               $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
+               $status_header = 500;
+           }
+           response($statusHeader, $array);
+       }
 
-     public function getDetailPemesanan_HTML()
-     {
+       public function getDetailPemesanan_HTML()
+       {
         $idPemesanan = $this->input->post('idPemesanan');
         $statusPemesanan = $this->input->post('statusPemesanan');
         $JenisPengiriman = $this->input->post('JenisPengiriman');
@@ -1183,11 +1183,11 @@ public function getPesananPriority()
             $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }
     } catch (Exception $e) {
-       $status_header = 500;
-       $response['statusMessage'] = 'error';
-       $response['data_pesanan_priority'] = $data_pesanan;
-   }
-   response($status_header, $response);
+     $status_header = 500;
+     $response['statusMessage'] = 'error';
+     $response['data_pesanan_priority'] = $data_pesanan;
+ }
+ response($status_header, $response);
 }
 
 public function getPesananNonPriority()
@@ -1223,11 +1223,11 @@ public function getPesananNonPriority()
             $response['data_pesanan'] = $data_pesanan;
         }
     } catch (Exception $e) {
-       $status_header = 500;
-       $response['statusMessage'] = 'error';
-       $response['data_pesanan'] = $data_pesanan;
-   }
-   response($status_header, $response);
+     $status_header = 500;
+     $response['statusMessage'] = 'error';
+     $response['data_pesanan'] = $data_pesanan;
+ }
+ response($status_header, $response);
 }
 
 private function GET_PESANAN($ID_PESANAN)
