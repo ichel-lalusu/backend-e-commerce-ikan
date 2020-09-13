@@ -792,7 +792,7 @@ class Pemesanan extends CI_Controller
                 $detail_pemesanan = $this->GET_DETAIL_PEMESANAN_WITH_ID($id_pemesanan);
                 $affected_rows = 0;
                 foreach ($detail_pemesanan->result() as $key) {
-                    $data_detail_update = array('berat_akhir'=> $berat[$affected_rows]);
+                    $data_detail_update = array('berat_akhir'=> $berat[$affected_rows]/10);
                     $update_detail_pesanan = $this->Pemesanan->update_detail_pesanan($key->id_dp, $data_detail_update);
                     if($update_detail_pesanan){
                         $affected_rows++;
