@@ -1245,9 +1245,9 @@ private function GET_PESANAN($ID_PESANAN)
 public function procced_order_to_delivery()
 {
     // var_dump($this->input->post());
-    $kurir = $this->input->post('kurir', TRUE);
-    $kendaraan = $this->input->post('kendaraan', TRUE);
-    $pesanan = $this->input->post('pesanan', TRUE);
+    $kurir = $this->input->post('id_kurir', TRUE);
+    $kendaraan = $this->input->post('id_kendaraan', TRUE);
+    $pesanan = $this->input->post('id_pemesanan', TRUE);
     $id_penjual = $this->input->get_request_header('id_pj', TRUE);
     $pesanan = json_decode($pesanan);
     try {
