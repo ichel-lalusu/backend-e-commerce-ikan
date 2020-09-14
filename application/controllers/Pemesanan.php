@@ -613,7 +613,7 @@ class Pemesanan extends CI_Controller
                 $JOIN[] = array('table' => 'data_pembeli pembeli', 'on' => 'pembeli.id_pb = pemesanan.id_pb', 'join' => '');
                 $order = "pemesanan.tipe_pengiriman DESC";
                 $data_pemesanan = $this->Pemesanan->get_where($SELECT_PEMESANAN, $SET_WHERE_LIST_PEMESANAN, $JOIN, NULL, $order);
-        // echo $this->db->last_query();
+                // echo $this->db->last_query();
                 if($data_pemesanan->num_rows() > 0){
                     $status_header=200;
                     foreach ($data_pemesanan->result() as $key) {
@@ -1044,14 +1044,14 @@ class Pemesanan extends CI_Controller
                     $status_header = 404;
                 }
             } catch (Exception $e) {
-               $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
-               $status_header = 500;
-           }
-           response($status_header, $array);
-       }
+             $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
+             $status_header = 500;
+         }
+         response($status_header, $array);
+     }
 
-       public function getDetailPemesanan_HTML()
-       {
+     public function getDetailPemesanan_HTML()
+     {
         $idPemesanan = $this->input->post('idPemesanan');
         $statusPemesanan = $this->input->post('statusPemesanan');
         $JenisPengiriman = $this->input->post('JenisPengiriman');
@@ -1131,7 +1131,7 @@ public function getPemesananWithPembayaran($id_pemesanan)
 
 public function getPesananPriority()
 {
-    $pesanan = $this->input->post("pesanan");
+    $pesanan = $this->input->get("pesanan");
     $data_pesanan = array();
     $data_pesanan_lain = array();
     $response = array();
@@ -1183,16 +1183,16 @@ public function getPesananPriority()
             $response['data_pesanan_non_priority'] = $data_pesanan_lain;
         }
     } catch (Exception $e) {
-     $status_header = 500;
-     $response['statusMessage'] = 'error';
-     $response['data_pesanan_priority'] = $data_pesanan;
- }
- response($status_header, $response);
+       $status_header = 500;
+       $response['statusMessage'] = 'error';
+       $response['data_pesanan_priority'] = $data_pesanan;
+   }
+   response($status_header, $response);
 }
 
 public function getPesananNonPriority()
 {
-    $pesanan = $this->input->post("pesanan");
+    $pesanan = $this->input->get("pesanan");
         // var_dump($pesanan);
         // echo count($pesanan);
     $data_pesanan = array();
@@ -1223,11 +1223,11 @@ public function getPesananNonPriority()
             $response['data_pesanan'] = $data_pesanan;
         }
     } catch (Exception $e) {
-     $status_header = 500;
-     $response['statusMessage'] = 'error';
-     $response['data_pesanan'] = $data_pesanan;
- }
- response($status_header, $response);
+       $status_header = 500;
+       $response['statusMessage'] = 'error';
+       $response['data_pesanan'] = $data_pesanan;
+   }
+   response($status_header, $response);
 }
 
 private function GET_PESANAN($ID_PESANAN)

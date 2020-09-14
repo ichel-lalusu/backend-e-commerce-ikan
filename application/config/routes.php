@@ -135,8 +135,8 @@ $route['api/pesanan/detail-pesanan-by-id']['get'] = "Pemesanan/getDataPemesananB
 $route['api/pesanan/detail-in-html']['post'] = "Pemesanan/getDetailPemesanan_HTML";
 $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPembayaran/$1";
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
-$route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
-$route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+$route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
+$route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
 
 $route['api/pengiriman']['get']				= "Pengiriman/get_pengiriman";
 $route['api/track']['get']			= "Pengiriman/track_pengiriman_pesanan";
