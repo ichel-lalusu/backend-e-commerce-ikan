@@ -1247,7 +1247,7 @@ public function procced_order_to_delivery()
     // var_dump($this->input->post());
     $kurir = $this->input->post('kurir', TRUE);
     $kendaraan = $this->input->post('kendaraan', TRUE);
-    $pesanan = $this->input->post('priority_pesanan', TRUE);
+    $pesanan = $this->input->post('pesanan', TRUE);
     $id_penjual = $this->input->get_request_header('id_pj', TRUE);
     $pesanan = json_decode($pesanan);
     try {
