@@ -1248,16 +1248,17 @@ public function procced_order_to_delivery()
     $kurir = $this->input->post('id_kurir', TRUE);
     $kendaraan = $this->input->post('id_kendaraan', TRUE);
     $pesanan = $this->input->post('id_pemesanan', TRUE);
-    $id_penjual = $this->input->get_request_header('id_pj', TRUE);
+    $id_penjual = $this->input->post('id_pj', TRUE);
     $pesanan = json_decode($pesanan);
     try {
-        $data_penjual = $this->Usaha->data_profile($id_penjual);
-        if($data_penjual->num_rows() > 0){
-            response(401, array('statusMessage' => "authentication is needed"));
-        }
+        // $data_penjual = $this->Usaha->data_profile($id_penjual);
+        // if($data_penjual->num_rows() > 0){
+        //     response(401, array('statusMessage' => "authentication is needed"));
+        // }
         $data = $this->Pemesanan->getPesananPriority($pesanan);
         $data2 = $this->Pemesanan->getPesananNonPriority($pesanan);
         $data_pengiriman = array('waktu_pengiriman' => date('Y-m-d H:i:s'), 
+            'id_pj' => $id_penjual,
             'id_kurir' => $kurir, 
             'id_kendaraan' => $kendaraan);
         $insert_pengiriman = $this->Model_pengiriman->insert_pengiriman($data_pengiriman);
