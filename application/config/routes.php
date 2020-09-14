@@ -138,8 +138,9 @@ $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
 $route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
 $route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
 
+$route['api/pengiriman']['post']		= "Pemesanan/procced_order_to_delivery";
 $route['api/pengiriman']['get']				= "Pengiriman/get_pengiriman";
-$route['api/track']['get']			= "Pengiriman/track_pengiriman_pesanan";
+$route['api/track']['get']					= "Pengiriman/track_pengiriman_pesanan";
 
 $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
