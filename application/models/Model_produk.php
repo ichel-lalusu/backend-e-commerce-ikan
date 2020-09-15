@@ -13,28 +13,46 @@ class Model_produk extends CI_Model
 				GROUP BY p.id_produk;");
 	}
 
+	public function get_by_id_pj($id_pj=0)
+	{
+		$query = $this->db->query("SELECT produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
+			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as minprice, 
+			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as max_price
+			FROM data_produk produk
+			JOIN data_usaha usaha
+			ON produk.id_usaha = usaha.id_usaha
+			JOIN data_penjual penjual
+			ON penjual.id_pj = usaha.id_pj
+			WHERE penjual.id_pj = $id_pj");
+		return $query;
+	}
+
 	public function ambil_produk_penjual_by_id($id_usaha, $filter=NULL)
 	{
 		$this->db->where_in('u.id_usaha', $id_usaha);
 		if($filter=="terbaru"){
-			$this->db->order_by('dvp.id_produk', 'DESC');
+			$this->db->order_by('p.id_produk', 'DESC');
 		}elseif($filter=="harga_murah"){
 			$this->db->order_by('minprice', 'ASC');
 		}elseif($filter=="harga_mahal"){
 			$this->db->order_by('minprice', 'DESC');
 		}elseif($filter=="stok_sedikit"){
-			$this->db->order_by('dvp.stok', 'DESC');
+			$this->db->order_by('stok', 'DESC');
 		}elseif($filter=="terlaris"){
 
 		}elseif ($filter=NULL) {
 			# code...
 		}
-		$this->db->select('p.id_produk, p.nama_produk, dvp.id_variasiproduk, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice, p.foto_produk, u.id_usaha, p.status_p');
+		$this->db->select('p.id_produk, p.nama_produk, 
+			(SELECT MAX(stok) FROM data_variasi_produk WHERE id_produk = p.id_produk) as stok,
+			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, 
+			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice, 
+			p.foto_produk, u.id_usaha, p.status_p');
 		$this->db->from('data_produk p');
-		$this->db->join('data_variasi_produk dvp', 'dvp.id_produk = p.id_produk');
+		// $this->db->join('data_variasi_produk dvp', 'dvp.id_produk = p.id_produk');
 		$this->db->join('data_usaha u', 'p.id_usaha = u.id_usaha');
 		$this->db->order_by("u.id_usaha");
-		$this->db->group_by('dvp.id_produk');
+		// $this->db->group_by('dvp.id_produk');
 		return $this->db->get();
 	}
 
@@ -59,6 +77,21 @@ class Model_produk extends CI_Model
 			$this->db->or_like('v.nama_variasi', $filter, 'both');
 			$this->db->or_like('p.kategori', $filter, 'both');
 		}
+	}
+
+	public function search_produk($filter_input="")
+	{
+		$this->db->select("SELECT produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
+			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as minprice, 
+			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as max_price")
+				 ->from("data_produk produk")
+				 ->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
+				 ->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
+				 ->where("penjual.id_pj", "any");
+		if($filter_input!=="" || $filter_input!==null){
+			$this->db->like('produk.nama_produk', $filter_input, 'both');
+		}
+		return $this->db->get();
 	}
 
 	public function insert_produk($data)

@@ -88,6 +88,14 @@ class Model_pemesanan extends CI_Model
         return $this->db->get();
     }
 
+    public function get_selected_detail_pemesanan($select="", $where)
+    {
+        $this->db->select($select)
+                 ->from("data_detail_pemesanan")
+                 ->where($where);
+        return $this->db->get();
+    }
+
     public function getDetailPemesanan($idPemesanan)
     {
         $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk');

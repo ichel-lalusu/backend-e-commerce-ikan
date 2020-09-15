@@ -27,4 +27,10 @@ class Model_pembayaran extends CI_Model
         $this->db->limit(1);
         return $this->db->get("data_pembayaran");
     }
+
+    public function get_selected_pembayaran($select="", $where="")
+    {
+        $this->db->select($select)->from("data_pembayaran")->where($where);
+        return $this->db->get();
+    }
 }

@@ -62,12 +62,13 @@ $route['api/produk/variasi/update']['post'] 				= "Produk/updateVariasiProdukV3"
 $route['api/produk/aktifkan']['post'] 						= "Produk/aktifkan_produk";
 $route['api/produk/non-aktifkan']['post'] 					= "Produk/hapus_data_produk";
 $route['api/produk/search']['get'] 							= "Produk/cariProdukLike";
-$route['api/produk/filtered']['get']						= "Produk/ambil_produk_penjual_by_id";
+$route['api/produk/filtered']['get']						= "Produk/ambil_produk_penjual_by_id_usaha";
 $route['api/produk/detail']['get']							= "Produk/detail_produk";
 $route['api/produk/variasi']['get']							= "Produk/ambil_variasi_produk";
 $route['api/produk/all-variasi']['get']						= "Produk/getAllVariasi";
 
 // USER API's ROUTE
+$route['api/signup']['post']                                = "User/signup";
 $route['api/user/signup/penjual']['post'] 					= "Penjual/prosessignuppenjual";
 $route['api/user/signup/usaha']['post'] 					= "Penjual/prosessignupusaha";
 $route['api/user/signup/pembeli']['post'] 					= "Pembeli/prosessignuppembeli";
@@ -118,7 +119,7 @@ $route['api/rekening/bank']['get']							= "Rekening/ambil_data_bank";
 $route['api/payment/upload']['post'] = "Pembayaran/ProsesUnggahBuktiPembayaran_Pemesanan";
 $route['api/payment/rekening/detail/html']['post'] = "Pembayaran/pembayaran_ambil_rekening_html";
 $route['api/payment/struk']['get'] = "Pemesanan/getStrukImage";
-$route['api/payment/verify']['get'] = "Pemesanan/verifikasiPembayaranByPenjual";
+$route['api/payment/verify']['post'] = "Pemesanan/verifikasiPembayaranByPenjual";
 
 // PEMBELI API's ROUTE
 
@@ -135,11 +136,12 @@ $route['api/pesanan/detail-pesanan-by-id']['get'] = "Pemesanan/getDataPemesananB
 $route['api/pesanan/detail-in-html']['post'] = "Pemesanan/getDetailPemesanan_HTML";
 $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPembayaran/$1";
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
-$route['api/pesanan/pesanan-priority']['post']					="Pemesanan/getPesananPriority";
-$route['api/pesanan/pesanan-non-priority']['post']			= "Pemesanan/getPesananNonPriority";
+$route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
+$route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
 
+$route['api/pengiriman']['post']		= "Pemesanan/procced_order_to_delivery";
 $route['api/pengiriman']['get']				= "Pengiriman/get_pengiriman";
-$route['api/track']['get']			= "Pengiriman/track_pengiriman_pesanan";
+$route['api/track']['get']					= "Pengiriman/track_pengiriman_pesanan";
 
 $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
