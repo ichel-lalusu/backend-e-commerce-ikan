@@ -24,7 +24,7 @@ class Produk extends CI_Controller
 	{
 		$id_akun = $this->input->post('id_akun');
 		// echo $id_akun;
-		$data_produk = $this->produk->ambil_produk_penjual($id_akun);
+		$data_produk = $this->produk->get_by_id_pj($id_akun);
 		$ambil_data = $data_produk->result_array();
 		$response = array();
 		if($data_produk->num_rows() > 0):
@@ -36,7 +36,7 @@ class Produk extends CI_Controller
 		endif;
 	}
 
-	public function ambil_produk_penjual_by_id()
+	public function ambil_produk_penjual_by_id_usaha()
 	{
 		$id_usaha = $this->input->get('id_usaha');
 		$filter = ($this->input->get('filter')!==null) ? $this->input->get('filter') : '';
@@ -80,21 +80,12 @@ class Produk extends CI_Controller
 			// echo $this->db->last_query();
 			// exit();
 			if(count($data_produk) > 0){
-				$this->output
-		            ->set_status_header(200)
-		            ->set_content_type('application/json', 'utf-8')
-		            ->set_output(json_encode($data_produk, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(200, $data_produk);
 			}else{
-				$this->output
-		            ->set_status_header(404)
-		            ->set_content_type('application/json', 'utf-8')
-		            ->set_output(json_encode(array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+				response(404, array());
 			}
 		} catch (Exception $e) {
-			$this->output
-		            ->set_status_header(500)
-		            ->set_content_type('application/json', 'utf-8')
-		            ->set_output(json_encode(array('Server Error'), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(500, array('Server Error'));
 		}
 	}
 
@@ -105,7 +96,7 @@ class Produk extends CI_Controller
 		$data = array();
 		$status_header = 500;
 		try {
-			$data_produk = $this->produk->ambil_produk_penjual_by_id($id_usaha, NULL, $input);
+			$data_produk = $this->produk->search_produk($input);
 			if($data_produk->num_rows() > 0){
 				$status_header = 200;
 				$data['data'] = $data_produk->result_array();
@@ -121,11 +112,7 @@ class Produk extends CI_Controller
 			$data['data'] = array();
 			$data['status'] = 'gagal';
 		}
-		
-		$this->output
-            ->set_status_header($status_header)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		response($status_header, $data);
 	}
 
 	public function prosesinput_produk()

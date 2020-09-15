@@ -1,6 +1,7 @@
 <?php
 $this->load->view('admin/template/head');
 ?>
+<link rel="stylesheet" href="<?= base_url('assets/plugins/datepicker/css/bootstrap-datepicker.min.css') ?>">
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
     <!-- Site wrapper -->
@@ -14,8 +15,7 @@ $this->load->view('admin/template/head');
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1><a class="btn btn-secondary" href="<?= base_url('admin/Pembeli') ?>" title="Back" data-title="Back"><i class="fa fa-chevron-left"></i>
-                                </a> Tambah Data Pembeli</h1>
+                            <h1>Tambah Data Pembeli</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -32,83 +32,142 @@ $this->load->view('admin/template/head');
             <section class="content">
                 <div class="container-fluid">
                     <!-- <div class="row"> -->
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <div class="card-title">FORM TAMBAH PEMBELI
+                    <form novalidate="" enctype="multipart/form-data" action="<?= base_url('admin/Pembeli/create') ?>" method="post" name="form-pembeli">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <div class="card-title">FORM AKUN PEMBELI</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="username">Username:</label>
+                                    <input type="text" class="form-control" name="username" id="username" placeholder="Username" minlength="3" required autocomplete="off" autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="password" class="form-control" name="password" id="password" placeholder="*******" minlength="5" required autocomplete="off">
+                                </div>
                             </div>
                         </div>
-                        <form novalidate="" enctype="multipart/form-data" action="<?= base_url('admin/Pembeli/create') ?>" method="post">
-                        <input type="hidden" name="id_usaha" value="<?=$id_usaha?>">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <div class="card-title">FORM DETAIL PEMBELI</div>
+                            </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label class="form-control-label" for="nama_kurir">Nama Kurir:</label>
-                                                    <input class="form-control" name="nama_kurir" type="text" id="nama_kurir" required="" autocomplete="off" autofocus="" placeholder="Nama Kurir/Pengantar">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-control-label" for="telp_kurir">No. Telp:</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text">+62</span>
-                                                        </div>
-                                                        <input class="form-control" name="telp_kurir" type="num" id="telp_kurir" required="" placeholder="No Telp Kurir/Pengantar. Ex: +62.." autocomplete="off" maxlength="">
-                                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="nama_lengkap">Nama Pembeli:</label>
+                                            <input type="text" class="form-control" name="nama_lengkap" id="nama_lengkap" required placeholder="Nama Lengkap" autocomplete="off">
+                                            <input type="hidden" name="usertype" value="pembeli">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="foto_pb">Foto Pembeli:</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="foto_pb">
+                                                    <label class="custom-file-label" for="foto_pb">Pilih Foto</label>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label class="form-control-label" for="jk_kurir">Jenis Kelamin Kurir:</label>
-                                                    <div>
-                                                        <label for="L" class="btn btn-default btn-sm">
-                                                            <input type="radio" name="jk_kurir" id="L" value="Laki-laki"> Laki-laki
-                                                        </label>
-                                                        <label for="P" class="btn btn-default btn-sm">
-                                                            <input type="radio" name="jk_kurir" id="P" value="Perempuan"> Perempuan
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-control-label" for="foto_kurir">Foto Kurir:</label>
-                                                    <div class="input-group">
-                                                        <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" id="foto_kurir" name="foto_kurir">
-                                                            <label class="custom-file-label" for="foto_kurir">Pilih Foto Kurir</label>
-                                                        </div>
-                                                    </div>
+                                        <div class="form-group">
+                                            <label for="jk_pb">Jenis Kelamin:</label>
+                                            <div>
+                                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                    <label class="btn btn-primary">
+                                                        <input type="radio" name="jk_pb" id="jk_pb1" autocomplete="off" value="Laki-laki"> Laki-laki
+                                                    </label>
+                                                    <label class="btn btn-primary">
+                                                        <input type="radio" name="jk_pb" id="jk_pb2" autocomplete="off" value="Perempuan"> Perempuan
+                                                    </label>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="telp_pb">No Telp:</label>
+                                            <input type="number" class="form-control" id="telp_pb" name="telp_pb" required autocomplete="off" minlength="10" maxlength="13">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="">Tgl Lahir</label>
+                                            <input type="text" class="form-control" id="tgllahir_pb" name="tgllahir_pb" require placeholder="Tanggal Lahir" autocomplete="off">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="alamat">Alamat:</label>
+                                            <textarea name="alamat" id="alamat" cols="10" rows="1" class="form-control" placeholder="Alamat" autocomplete="off"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="kec_pb">Kecamatan</label>
+                                            <input type="text" class="form-control" id="kec_pb" name="kec_pb" placeholder="Kecamatan" required autocomplete="off" minlength="3">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="kab_pb">Kabupaten</label>
+                                            <input type="text" class="form-control" id="kab_pb" name="kab_pb" placeholder="Kabupaten" required autocomplete="off" minlength="3">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="kel_pb">Kelurahan</label>
+                                            <input type="text" class="form-control" id="kel_pb" name="kel_pb" placeholder="Kelurahan" required autocomplete="off" minlength="3">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <div class="float-right">
-                                    <a class="btn btn-danger" href="<?= base_url('admin/penjual') ?>">BATAL</a>
-                                    <button class="btn btn-success" type="submit">SIMPAN</button>
-                                </div>
-                                <!-- <button class="btn btn-outline-danger" type="button" onclick="window.history.back();">Batal</button> -->
-                        </form>
-                    </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="float-right">
+                                <a class="btn btn-danger" href="<?= base_url('admin/Pembeli') ?>">BATAL</a>
+                                <button class="btn btn-success" type="button" onclick="simpan_pembeli()">SIMPAN</button>
+                            </div>
+                            <!-- <button class="btn btn-outline-danger" type="button" onclick="window.history.back();">Batal</button> -->
+                    </form>
                 </div>
         </div>
     </div>
+    <!-- </div> -->
     </section>
 
     <?php
     $this->load->view('admin/template/footerjs');
     ?>
+    <script src="<?= base_url('assets/plugins/datepicker/js/bootstrap-datepicker.min.js') ?>"></script>
     <!-- CUSTOME JAVASCRIPT HERE -->
     <script type="text/javascript">
         $(document).ready(function() {
             bsCustomFileInput.init();
+            $('#tgllahir_pb').datepicker({
+                format: "dd-mm-yyyy",
+                todayHighlight: true,
+                toggleActive: true
+            });
         });
+
+        function simpan_pembeli() {
+            const form_pembeli = new FormData($("form")[0]);
+            const file_foto_pb = document.getElementById("foto_pb");
+            form_pembeli.append("foto_pb", file_foto_pb.files[0]);
+            fetch("<?= base_url('api/signup') ?>", {
+                    method: "POST",
+                    mode: "cors",
+                    body: form_pembeli
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status == "berhasil") {
+                        toastup("success", "Sukses Menyimpan");
+                    } else {
+                        toastup("failed", data.message);
+                    }
+                });
+        }
+
+        function toastup(status = "failed", message = "Gagal menyimpan", timer = 1500) {
+            Swal.fire({
+                position: 'top-end',
+                icon: status,
+                title: message,
+                showConfirmButton: false,
+                timer: timer
+            });
+        }
     </script>
 </body>
 
