@@ -174,10 +174,11 @@ class User extends CI_Controller
 		$kab_pb			= (!empty($this->input->post('kab_pb'))) ? $this->input->post('kab_pb') : $this->failed_sign_up('Kabupaten');
 		$kec_pb			= (!empty($this->input->post('kec_pb'))) ? $this->input->post('kec_pb') : $this->failed_sign_up('Kecamatan');
 		$kel_pb			= (!empty($this->input->post('kel_pb'))) ? $this->input->post('kel_pb') : $this->failed_sign_up('Kelurahan');
+		$usertype		= $this->input->post("usertype", TRUE);
 		$longitude_pb 	= $this->input->post('longitude');
 		$latitude_pb 	= $this->input->post('latitude');
 		$foto_pb 		= '';
-
+		// var_dump($this->input->post());
 		
 		try {
 			$cek_user = cek_username($username);
@@ -239,7 +240,7 @@ class User extends CI_Controller
 					'username' => $username,
 					'password' => $password,
 					'id_akun' => $last_id,
-					'level_user' => 'pembeli');
+					'level_user' => $usertype);
 				$INSERT_DATA_PENGGUNA = $this->sign_user($data_pengguna_array);
 
 				if($INSERT_DATA_PENGGUNA){

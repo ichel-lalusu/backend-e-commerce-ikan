@@ -62,12 +62,13 @@ $route['api/produk/variasi/update']['post'] 				= "Produk/updateVariasiProdukV3"
 $route['api/produk/aktifkan']['post'] 						= "Produk/aktifkan_produk";
 $route['api/produk/non-aktifkan']['post'] 					= "Produk/hapus_data_produk";
 $route['api/produk/search']['get'] 							= "Produk/cariProdukLike";
-$route['api/produk/filtered']['get']						= "Produk/ambil_produk_penjual_by_id";
+$route['api/produk/filtered']['get']						= "Produk/ambil_produk_penjual_by_id_usaha";
 $route['api/produk/detail']['get']							= "Produk/detail_produk";
 $route['api/produk/variasi']['get']							= "Produk/ambil_variasi_produk";
 $route['api/produk/all-variasi']['get']						= "Produk/getAllVariasi";
 
 // USER API's ROUTE
+$route['api/signup']['post']                                = "User/signup";
 $route['api/user/signup/penjual']['post'] 					= "Penjual/prosessignuppenjual";
 $route['api/user/signup/usaha']['post'] 					= "Penjual/prosessignupusaha";
 $route['api/user/signup/pembeli']['post'] 					= "Pembeli/prosessignuppembeli";
