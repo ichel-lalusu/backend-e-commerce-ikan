@@ -175,8 +175,8 @@ class User extends CI_Controller
 		$kec_pb			= (!empty($this->input->post('kec_pb'))) ? $this->input->post('kec_pb') : $this->failed_sign_up('Kecamatan');
 		$kel_pb			= (!empty($this->input->post('kel_pb'))) ? $this->input->post('kel_pb') : $this->failed_sign_up('Kelurahan');
 		$usertype		= $this->input->post("usertype", TRUE);
-		$longitude_pb 	= $this->input->post('longitude');
-		$latitude_pb 	= $this->input->post('latitude');
+		$longitude_pb 	= $this->input->post('longitude', TRUE);
+		$latitude_pb 	= $this->input->post('latitude', TRUE);
 		$foto_pb 		= '';
 		// var_dump($this->input->post());
 		

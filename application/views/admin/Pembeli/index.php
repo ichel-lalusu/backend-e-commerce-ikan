@@ -130,7 +130,7 @@ $this->load->view('admin/template/head');
                       </td>
                       <td>${longutude}, ${latitude}</td>
                       <td class="text-center">
-                        <a href="${url_detail}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info">Detail</a>
+                        <a href="${url_detail}" rel="noopener noreferrer" class="btn btn-sm btn-outline-info">Detail</a>
                         <a href="${url_edit}" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
                         <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalDelete${id_pb}"><i class="fa fa-trash"></i></button>
                         <a href="${url_pemesanan}" class="btn btn-sm mt-2 btn-sm" style="background-color: orange;">Data Pesanan</a>

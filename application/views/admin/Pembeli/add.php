@@ -177,7 +177,7 @@ $this->load->view('admin/template/head');
         }
 
         function toastup(status = "failed", message = "Gagal menyimpan", timer = 1500) {
-            Swal.fire({
+            return Swal.fire({
                 position: 'top-end',
                 icon: status,
                 title: message,
