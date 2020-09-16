@@ -95,10 +95,10 @@ $this->load->view('admin/template/head');
                                             <label for="jk_pb">Jenis Kelamin:</label>
                                             <div>
                                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                    <label class="btn btn-secondary" id="jk_1">
+                                                    <label class="btn btn-primary" id="jk_1">
                                                         <input type="radio" name="jk_pb" id="option1" value="Laki-laki" autocomplete="off"> Laki-laki
                                                     </label>
-                                                    <label class="btn btn-secondary" id="jk_2">
+                                                    <label class="btn btn-primary" id="jk_2">
                                                         <input type="radio" name="jk_pb" id="option2" value="Perempuan" autocomplete="off"> Perempuan
                                                     </label>
                                                 </div>
@@ -112,7 +112,8 @@ $this->load->view('admin/template/head');
                                         </div>
 
                                         <div class="form-group">
-                                            <button id="simpan" class="btn btn-primary btn-sm btn-block" type="button">Simpan</button>
+                                            <button id="simpan" class="btn btn-primary btn-block" type="button">Simpan</button>
+                                            <a href="<?=base_url('admin/pembeli')?>" class="btn btn-secondary btn-block">Batal</a>
                                         </div>
                                     </div>
                                     <!-- /.card-body -->
