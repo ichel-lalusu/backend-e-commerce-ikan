@@ -77,10 +77,12 @@ class Model_pemesanan extends CI_Model
         $this->nama_pemesan = $data_pembeli->nama_pb;
     }
 
-    public function get_pemesanan_pengiriman($where, $order)
+    public function get_pemesanan_pengiriman($where, $order=NULL)
     {
         $this->db->where($where);
-        $this->db->order_by($order);
+        if($order!==NULL){
+            $this->db->order_by($order);
+        }
         $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`, 
             pengiriman.`id_detail_pengiriman`, pengiriman.`id_pengiriman`, pengiriman.`id_pemesanan`, pengiriman.`urutan`, pengiriman.`status`, pengiriman.`penerima`");
         $this->db->from("data_pemesanan pemesanan");
@@ -185,11 +187,16 @@ class Model_pemesanan extends CI_Model
         return $this->db->delete("data_pemesanan", $where);
     }
 
-    public function get_where($select="*", $where, $JOIN=NULL, $group=NULL, $order=NULL, $limit=NULL)
+    public function get_where($select="", $where="", $JOIN=NULL, $group=NULL, $order=NULL, $limit=NULL)
     {
-        $this->db->select($select);
+        $select1 = "pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, 
+        pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`";
+        $selected = $select1 . ($select!==""||$select!==NULL||!empty($select)) ? ", " . $select : "";
+        $this->db->select($selected);
         $this->db->from("data_pemesanan pemesanan");
-        $this->db->where($where);
+        if(is_array($where) || $where!==""){
+            $this->db->where($where);
+        }
         if($group!==NULL){
             $this->db->group_by($group);
         }

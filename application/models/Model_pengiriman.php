@@ -14,7 +14,7 @@ class Model_pengiriman extends CI_Model
 
 	public function insert_batch($data)
 	{
-		return $this->db->insert_batch("$data_pengiriman", $data);
+		return $this->db->insert_batch("data_pengiriman", $data);
 	}
 
 	public function data_pengiriman($id_pengiriman)
@@ -52,10 +52,27 @@ class Model_pengiriman extends CI_Model
 		return $this->db->get();
 	}
 
+	public function Detail_pengiriman()
+	{
+		return $this->db->select("detail.`id_detail_pengiriman`, detail.`id_pengiriman`, detail.`id_pemesanan`, detail.`urutan`, detail.`status`, detail.`penerima`, pemesanan.jarak as distance, pemesanan.biaya_kirim as ongkir")
+				->from("data_detail_pengiriman detail")
+				->join("data_pemesanan pemesanan", "pemesanan.id_pemesanan = detail.id_pemesanan");
+	}
+
 	public function get_lokasi_kurir($kurir)
 	{
 		return $this->db->select("`id_track`, `id_kurir`, `longitude`, `latitude`")
 				 ->order_by("id_track", 'DESC')
 				 ->get("data_track_kurir");
+	}
+
+	public function set_id_pengiriman($id_pengiriman)
+	{
+		$this->id_pengiriman = $id_pengiriman;
+	}
+
+	public function get_id_pengiriman()
+	{
+		return $this->id_pengiriman;
 	}
 }
