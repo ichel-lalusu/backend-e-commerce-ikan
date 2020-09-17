@@ -4,7 +4,8 @@
  */
 class Model_pemesanan extends CI_Model
 {
-	public $nama_pemesan;
+    public $nama_pemesan;
+    
 	public function createPemesanan($data)
     {
         return $this->db->insert('data_pemesanan', $data);
@@ -273,5 +274,9 @@ class Model_pemesanan extends CI_Model
         return $this->db->get();
     }
 
+    public function update_pemesanan(int $id_pemesanan=0, array $data=array())
+    {
+        return $this->db->where("id_pemesanan", $id_pemesanan)->update("data_pemesaan", $data, 1);
+    }
 
 }
