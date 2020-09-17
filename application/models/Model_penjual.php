@@ -5,6 +5,11 @@
  */
 class Model_penjual extends CI_Model
 {
+	public $id_pj;
+	public $nama_pj;
+	public $id_usaha;
+	public $nama_usaha;
+	
 	public function ambil_data_penjual($username)
 	{
 		$this->db->select('*');

@@ -4,6 +4,7 @@
  */
 class Model_kurir extends CI_Model
 {
+	public $id_kurir;
 	public function get_kurir_usaha($id_usaha)
 	{
 		$this->db->select("id_kurir, nama_kurir, foto_kurir, jk_kurir, telp_kurir, id_usaha");
@@ -71,5 +72,20 @@ class Model_kurir extends CI_Model
 		$this->db->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj");
 		$this->db->where("kurir.id_usaha", $id_usaha);
 		return $this->db->get();
+	}
+
+	public function get_location_kurir($id_kurir)
+	{
+		$query = $this->db->select("`id_track`, `id_kurir`, `longitude`, `latitude`")
+				->from("data_track_kurir")
+				->where('id_kurir', $id_kurir)
+				->order_by("id_track", 'DESC')
+				->limit(1)
+				->get();
+		if($query->num_rows() > 0){
+			return $query->row();
+		}else{
+			return false;
+		}
 	}
 }
