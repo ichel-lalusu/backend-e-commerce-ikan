@@ -5,6 +5,7 @@
 class Model_kurir extends CI_Model
 {
 	public $id_kurir;
+	public $id_track;
 	public function get_kurir_usaha($id_usaha)
 	{
 		$this->db->select("id_kurir, nama_kurir, foto_kurir, jk_kurir, telp_kurir, id_usaha");
@@ -87,5 +88,22 @@ class Model_kurir extends CI_Model
 		}else{
 			return false;
 		}
+	}
+
+	public function insert_location_kurir(array $data=array())
+	{
+		$this->db->insert("data_track_kurir", $data);
+		$this->set_idTrack($this->db->insert_id());
+		return TRUE;
+	}
+
+	public function set_idTrack($id_track)
+	{
+		$this->id_track = $id_track;
+	}
+
+	public function get_idTrack()
+	{
+		return $this->id_track;
 	}
 }

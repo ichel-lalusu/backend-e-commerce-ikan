@@ -6,6 +6,7 @@ class Model_pengiriman extends CI_Model
 {
 	public $data_pengiriman;
 	public $id_pengiriman;
+	public $id_detail_pengiriman;
 	public $id_penjual;
 	public function insert_pengiriman($data)
 	{
@@ -33,6 +34,11 @@ class Model_pengiriman extends CI_Model
 	{
 		$this->db->where("id_pengiriman", $id_pengiriman);
 		return $this->db->update("data_pengiriman", $data_pengiriman);
+	}
+
+	public function update_status_detail_pengiriman(int $id_pemesanan=0, array $data=array())
+	{
+		return $this->db->where("id_pemesanan", $id_pemesanan)->update("data_detail_pengiriman", $data, 1);
 	}
 
 	public function get_pengiriman_penjual($id_penjual)
@@ -74,5 +80,15 @@ class Model_pengiriman extends CI_Model
 	public function get_id_pengiriman()
 	{
 		return $this->id_pengiriman;
+	}
+
+	public function set_idDetailPengiriman($id_detail_pengiriman)
+	{
+		$this->id_detail_pengiriman = $id_detail_pengiriman;
+	}
+
+	public function get_idDetailPengiriman()
+	{
+		return $this->id_detail_pengiriman;
 	}
 }
