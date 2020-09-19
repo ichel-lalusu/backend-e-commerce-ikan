@@ -35,11 +35,11 @@ class Pengiriman extends CI_Controller
 			$DataTrack = new Model_kurir();
 			$latitude = floatval($this->input->post('latitude', TRUE));
 			$longitude = floatval($this->input->post('longitude', TRUE));
-			$id_kurir = intval($this->input->post('id_kurir', true));
+			$id_kurir = intval($this->input->post('id_kurir', TRUE));
 			$data_track = array('id_kurir' => $id_kurir, 'latitude' => $latitude, 'longitude' => $longitude);
 			$DataTrack->insert_location_kurir($data_track);
 			$id_track = $DataTrack->get_idTrack();
-			$result = array('id_track' => $id_track, 'message' => "success");
+			$result = array('id_track' => $id_track, 'message' => "success", $this->input->post());
 			response(200, $result);
 		} catch (\Throwable $th) {
 			//throw $th;
@@ -51,23 +51,31 @@ class Pengiriman extends CI_Controller
 	{
 		$Penjual = new Model_penjual();
 		$Pengiriman = new Model_pengiriman();
+		$Pembeli = new Model_pembeli();
 		$id_pengiriman = $this->input->get('id_pengiriman', TRUE);
-		$id_penjual = $this->input->get('akun', TRUE);
+		$id_akun = $this->input->get('akun', TRUE);
 		$result = array();
 		try {
 			// $id_pj = $this->input->post("id_akun", TRUE);
-			$data_penjual = $Penjual->data_profile($id_penjual);
+			$data_penjual = $Penjual->data_profile($id_akun);
 			// echo "id_pj : " . $id_pj;
-			if ($data_penjual->num_rows() > 0) {
-				response(401, array('statusMessage' => "authentication is needed"));
+			if ($data_penjual->num_rows() == 0) {
+				$this->db->reset_query();
+				$this->Model_pembeli->set_id_pembeli($id_akun);
+				$Data_pembeli = $this->Model_pembeli->profile()->get();
+				if($Data_pembeli->num_rows() > 0){
+					$this->get_pengiriman_pembeli();
+				}else{
+					response(401, array('statusMessage' => "authentication is needed"));
+				}
 			}
-			$data_pengiriman = $this->Model_pengiriman->get_pengiriman_penjual($id_penjual);
+			$data_pengiriman = $Pengiriman->get_pengiriman_penjual($id_akun);
 			if ($data_pengiriman->num_rows() > 0) {
 				$result = $data_pengiriman->row_array();
 				$id_pengiriman = $data_pengiriman->row()->id_pengiriman;
 				$Pengiriman->set_id_pengiriman($id_pengiriman);
 				// $this->Model_pengiriman->id_pengiriman = $data_pengiriman->row()->id_pengiriman;
-				$detail_pengiriman = $this->Model_pengiriman->get_detail_pengiriman();
+				$detail_pengiriman = $Pengiriman->get_detail_pengiriman();
 
 				foreach ($detail_pengiriman->result() as $detail) {
 					$where = "pemesanan.id_pemesanan = $detail->id_pemesanan";
@@ -114,6 +122,21 @@ class Pengiriman extends CI_Controller
 		} catch (Exception $e) {
 			response(500, $result);
 		}
+	}
+
+	private function get_pengiriman_pembeli()
+	{
+		$Pengiriman = new Model_pengiriman();
+		$Pembeli = new Model_pembeli();
+		$id_akun = intval($this->input->post("id_akun", TRUE));
+		$id_pemesanan = intval($this->input->post("id_pemesanan", TRUE));
+		$this->db->where("id_pemesanan", $id_pemesanan);
+		$Data_pengiriman = $Pengiriman->Detail_pengiriman()->get();
+		$this->db->reset_query();
+		if($Data_pengiriman->num_rows() == 0){
+			response(404, array('message' => "Data Kosong"));
+		}
+		
 	}
 
 	protected function track_lokasi_kurir(int $id_kurir)
@@ -222,7 +245,7 @@ class Pengiriman extends CI_Controller
 			if ($Detail_pengiriman1->num_rows() == 0) {
 				$result = array(
 					'message'	=> "Pengiriman telah selesai",
-					'code'		=> 3
+					'code'		=> 2
 				);
 				response(200, $result);
 			}
@@ -234,12 +257,12 @@ class Pengiriman extends CI_Controller
 			$Pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
 			$result = array(
 				'message' 	=> "Melanjutkan pengiriman selanjutnya",
-				'code'		=> 2
+				'code'		=> 1
 			);
 			response(200, $result);
 		} catch (\Throwable $th) {
 			//throw $th;
-			response(500, array('message' => "Error: " . $th->getMessage()));
+			response(500, array('message' => "Error: " . $th->getMessage(), 'code' => 0));
 		}
 	}
 }
