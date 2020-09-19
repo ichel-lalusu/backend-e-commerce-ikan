@@ -2,6 +2,12 @@
 $this->load->view('admin/template/head');
 ?>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datepicker/css/bootstrap-datepicker.min.css') ?>">
+<style>
+    #map {
+        width: 100%;
+        height: 400px;
+    }
+</style>
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
     <!-- Site wrapper -->
@@ -84,17 +90,17 @@ $this->load->view('admin/template/head');
                                         </div>
                                         <div class="form-group">
                                             <label for="telp_pb">No Telp:</label>
-                                            <input type="number" class="form-control" id="telp_pb" name="telp_pb" required autocomplete="off" minlength="10" maxlength="13">
+                                            <input type="number" placeholder="08XXXXXXXX" class="form-control" id="telp_pb" name="telp_pb" required autocomplete="off" minlength="10" maxlength="13">
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="">Tgl Lahir</label>
                                             <input type="text" class="form-control" id="tgllahir_pb" name="tgllahir_pb" require placeholder="Tanggal Lahir" autocomplete="off">
                                         </div>
+                                    </div>
+                                    <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="alamat">Alamat:</label>
-                                            <textarea name="alamat" id="alamat" cols="10" rows="1" class="form-control" placeholder="Alamat" autocomplete="off"></textarea>
+                                            <input type="text" name="alamat" id="alamat" cols="10" rows="1" class="form-control" placeholder="Alamat" autocomplete="off">
                                         </div>
                                         <div class="form-group">
                                             <label for="kec_pb">Kecamatan</label>
@@ -108,6 +114,14 @@ $this->load->view('admin/template/head');
                                             <label for="kel_pb">Kelurahan</label>
                                             <input type="text" class="form-control" id="kel_pb" name="kel_pb" placeholder="Kelurahan" required autocomplete="off" minlength="3">
                                         </div>
+                                        <div class="form-group">
+                                            <!-- <label for="">Map</label> -->
+                                            <!-- <div id="map"></div> -->
+                                            <input type="hidden" name="latitude" value="0">
+                                            <input type="hidden" name="longitude" value="0">
+                                        </div>
+
+
                                     </div>
                                 </div>
                             </div>
@@ -128,10 +142,13 @@ $this->load->view('admin/template/head');
     <?php
     $this->load->view('admin/template/footerjs');
     ?>
+    <!-- <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyAuoJ8tWSNs6owWkZsFI_Ssw4N_QOV__YM"></script> -->
     <script src="<?= base_url('assets/plugins/datepicker/js/bootstrap-datepicker.min.js') ?>"></script>
     <!-- CUSTOME JAVASCRIPT HERE -->
     <script type="text/javascript">
+        var firstLt, firstLg;
         $(document).ready(function() {
+            // current_location();
             bsCustomFileInput.init();
             $('#tgllahir_pb').datepicker({
                 format: "dd-mm-yyyy",
@@ -160,7 +177,7 @@ $this->load->view('admin/template/head');
         }
 
         function toastup(status = "failed", message = "Gagal menyimpan", timer = 1500) {
-            Swal.fire({
+            return Swal.fire({
                 position: 'top-end',
                 icon: status,
                 title: message,
@@ -168,6 +185,69 @@ $this->load->view('admin/template/head');
                 timer: timer
             });
         }
+
+        // function current_location() {
+        //     navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        // }
+
+        // function onSuccess(position) {
+        //     var element = document.getElementById('map');
+        //     var marker;
+        //     var posisilat;
+        //     var posisilng;
+        //     firstLt = position.coords.latitude;
+        //     firstLg = position.coords.longitude;
+        //     initMap(firstLt, firstLg);
+        //     /*if(function_exists('initMap')){
+        //       initMap(position.coords.latitude, position.coords.longitude);  
+        //     }*/
+
+        // };
+
+        // function onError(error) {
+        //     alert('code: ' + error.code + '\n' +
+        //         'message: ' + error.message + '\n');
+        // }
+
+        // function taruhMarker(peta, posisiTitik) {
+        //     if (marker) {
+        //         // pindahkan marker
+        //         marker.setPosition(posisiTitik);
+        //     } else {
+        //         // buat marker baru
+        //         marker = new google.maps.Marker({
+        //             position: posisiTitik,
+        //             map: peta
+        //         });
+        //     }
+        //     posisilat = posisiTitik.lat();
+        //     posisilng = posisiTitik.lng();
+        //     console.log("Posisi marker: " + posisilat + "," + posisilng);
+        //     $("body").find("input[name='latitude_pb']").val(posisilat);
+        //     //$("#latitude_pb").val(posisilat);
+        //     //$("#longitude_pb").val(posisilng);
+        //     $("body").find("input[name='longitude_pb']").val(posisilng);
+        // }
+
+        // function initMap(lat, lng) {
+        //     $("body").find("input[name='latitude']").val(lat);
+        //     $("body").find("input[name='longitude']").val(lng);
+        //     var propertiPeta = {
+        //         center: new google.maps.LatLng(lat, lng), //nentuin titik pusat nya dimana (awal map kebuka, bukan posisi marker)
+        //         zoom: 17, //semakin banyak semakin dekat min 1 maksimal
+        //         mapTypeId: google.maps.MapTypeId.ROADMAP //roadmap, satelite, hybrid, terrain
+        //     };
+        //     var point = new google.maps.LatLng(lat, lng);
+        //     var peta = new google.maps.Map(document.getElementById("map"), propertiPeta); //utama bikin map
+        //     marker = new google.maps.Marker({
+        //         position: point,
+        //         map: peta
+        //         //icon
+        //     });
+        //     google.maps.event.addListener(peta, 'click', function(event) {
+        //         taruhMarker(this, event.latLng);
+        //     });
+        // }
     </script>
 </body>
 
