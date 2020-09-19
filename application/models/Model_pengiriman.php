@@ -49,6 +49,16 @@ class Model_pengiriman extends CI_Model
 	 	return $this->db->get();
 	}
 
+	public function pengiriman_pembeli($id_pembeli, $id_pengiriman=null)
+	{
+		if($id_pengiriman!==null){
+			$this->db->where('id_pengirmian', $id_pengiriman);
+		}
+		return $this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`")
+		->from("data_pengiriman")
+		->where("id_pb", $id_pembeli);
+	}
+
 	public function get_detail_pengiriman()
 	{
 		$this->db->select("detail.`id_detail_pengiriman`, detail.`id_pengiriman`, detail.`id_pemesanan`, detail.`urutan`, detail.`status`, detail.`penerima`, pemesanan.jarak as distance, pemesanan.biaya_kirim as ongkir")
