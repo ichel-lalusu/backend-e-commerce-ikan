@@ -66,7 +66,7 @@ class Pengiriman extends CI_Controller
 				if ($Data_pembeli->num_rows() > 0) {
 					$this->get_pengiriman_pembeli();
 				} else {
-					response(401, array('statusMessage' => "authentication is needed"));
+					response(401, array('message' => "authentication is needed"));
 				}
 			}
 			$data_pengiriman = $Pengiriman->get_pengiriman_penjual($id_akun);
@@ -123,6 +123,7 @@ class Pengiriman extends CI_Controller
 					'latitude' => floatval($result_usaha->latitude),
 					'longitude' => floatval($result_usaha->longitude)
 				);
+				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
 				// $result['lokasi_kurir'] = $this->track_lokasi_kurir($result['id_kurir']);
 				response(200, $result);
 			} else {
@@ -131,6 +132,15 @@ class Pengiriman extends CI_Controller
 		} catch (Exception $e) {
 			response(500, $result);
 		}
+	}
+
+	protected function contruct_detail_kurir($id_kurir){
+		$Kurir = new Model_kurir();
+		$response_detail_kurir = $Kurir->get_by_id($id_kurir)->row();
+		return array(
+			'nama_kurir' => $response_detail_kurir->nama_kurir,
+			'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
+			'kontak' => $response_detail_kurir->telp_kurir);
 	}
 
 	private function get_pengiriman_pembeli()
