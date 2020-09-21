@@ -110,7 +110,9 @@ class Pengiriman extends CI_Controller
 							'nama_produk' => $data_detail_pemesanan->nama_produk,
 							'berat' => intval($data_detail_pemesanan->jml_produk),
 							'nama_variasi' => $data_detail_pemesanan->nama_variasi,
-							'foto_produk' => base_url('foto_usaha/foto_produk') . $data_detail_pemesanan->foto_produk
+							'foto_produk' => base_url('foto_usaha/foto_produk') . $data_detail_pemesanan->foto_produk,
+							'total_harga' => intval($data_detail_pemesanan->sub_total),
+							'detail_pembayaran' => $this->construct_detail_pembayaran($detail->id_pemesanan),
 						),
 						'destinasi' => array(
 							'latitude' => floatval($data_pemesanan->latitude_pb),
@@ -167,6 +169,17 @@ class Pengiriman extends CI_Controller
 			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
 			'plat' => $response_detail_kendaraan->plat_kendaraan,
 			'kapasitas' => $response_detail_kendaraan->kapasitas_kendaraan);
+	}
+
+	protected function construct_detail_pembayaran($id_pemesanan)
+	{
+		$Pembayaran = new Model_pembayaran();
+		$where = "id_pemesanan = " . $id_pemesanan;
+		$detail_pembayaran = $Pembayaran->get_selected_pembayaran("", $where)->row();
+		return array(
+			'metode_pembayaran' => $detail_pembayaran->metode_pembayaran,
+			'waktu_pembayaran' => $detail_pembayaran->waktu_pembayaran,
+			'status_pembayaran' => $detail_pembayaran->status_pembayaran);
 	}
 
 	private function get_pengiriman_pembeli()

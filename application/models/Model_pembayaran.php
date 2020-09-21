@@ -30,6 +30,10 @@ class Model_pembayaran extends CI_Model
 
     public function get_selected_pembayaran($select="", $where="")
     {
+        $select1 = "`id_pembayaran`, `metode_pembayaran`, `expiredDate`, `waktu_pembayaran`, `kode_bank`, `no_rekening_pb`, `nama_rekening_pb`, `struk_pembayaran`, `status_pembayaran`, `id_pemesanan`, `verifikasi`";
+        if($select!==""){
+            $select1 .= ",".$select;
+        }
         $this->db->select($select)->from("data_pembayaran")->where($where);
         return $this->db->get();
     }
