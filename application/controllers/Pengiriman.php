@@ -147,7 +147,7 @@ class Pengiriman extends CI_Controller
 	protected function construct_detail_kendaraan($id_kendaraan)
 	{
 		$Kendaraan = new Model_kendaraan();
-		$response_detail_kendaraan = $kendaraan->get_detail_kendaraan($id_kendaraan);
+		$response_detail_kendaraan = $Kendaraan->get_detail_kendaraan($id_kendaraan);
 		return array(
 			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
 			'plat' => $response_detail_kendaraan->plat_kendaraan,
