@@ -17,6 +17,7 @@ class Pengiriman extends CI_Controller
 		$this->load->model("Model_pengiriman");
 		$this->load->model("Model_kurir");
 		$this->load->model("Model_kendaraan");
+		$this->load->model("Model_usaha");
 		$this->StatusPemesananBaru = "Baru";
 		$this->load->library('encryption');
 		$this->encryption->initialize(array('driver' => 'mcrypt'));
@@ -125,6 +126,8 @@ class Pengiriman extends CI_Controller
 				);
 				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
 				$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
+				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_usaha']);
+
 				// $result['lokasi_kurir'] = $this->track_lokasi_kurir($result['id_kurir']);
 				response(200, $result);
 			} else {
@@ -133,6 +136,16 @@ class Pengiriman extends CI_Controller
 		} catch (Exception $e) {
 			response(500, $result);
 		}
+	}
+
+	protected function construct_detail_usaha($id_usaha){
+		$Usaha = new Model_usaha();
+		$response_detail_usaha = $Usaha->ambil_usaha_by_id($id_usaha)->row();
+		return array(
+			'nama_usaha' => $response_detail_usaha->nama_usaha,
+			'alamat_usaha' => $response_detail_usaha->alamat_usaha,
+			'longitude' => $response_detail_usaha->longitude,
+			'latitude' => $response_detail_usaha->latitude);
 	}
 
 	protected function contruct_detail_kurir($id_kurir){
@@ -147,7 +160,7 @@ class Pengiriman extends CI_Controller
 	protected function construct_detail_kendaraan($id_kendaraan)
 	{
 		$Kendaraan = new Model_kendaraan();
-		$response_detail_kendaraan = $Kendaraan->get_detail_kendaraan($id_kendaraan);
+		$response_detail_kendaraan = $Kendaraan->get_detail_kendaraan($id_kendaraan)->row();
 		return array(
 			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
 			'plat' => $response_detail_kendaraan->plat_kendaraan,
