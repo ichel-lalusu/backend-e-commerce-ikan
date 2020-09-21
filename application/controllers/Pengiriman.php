@@ -124,6 +124,7 @@ class Pengiriman extends CI_Controller
 					'longitude' => floatval($result_usaha->longitude)
 				);
 				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
+				$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
 				// $result['lokasi_kurir'] = $this->track_lokasi_kurir($result['id_kurir']);
 				response(200, $result);
 			} else {
@@ -141,6 +142,16 @@ class Pengiriman extends CI_Controller
 			'nama_kurir' => $response_detail_kurir->nama_kurir,
 			'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
 			'kontak' => $response_detail_kurir->telp_kurir);
+	}
+
+	protected function construct_detail_kendaraan($id_kendaraan)
+	{
+		$Kendaraan = new Model_kendaraan();
+		$response_detail_kendaraan = $kendaraan->get_detail_kendaraan($id_kendaraan);
+		return array(
+			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
+			'plat' => $response_detail_kendaraan->plat_kendaraan,
+			'kapasitas' => $response_detail_kendaraan->kapasitas_kendaraan);
 	}
 
 	private function get_pengiriman_pembeli()
