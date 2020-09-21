@@ -126,7 +126,7 @@ class Pengiriman extends CI_Controller
 				);
 				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
 				$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
-				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_usaha']);
+				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
 
 				// $result['lokasi_kurir'] = $this->track_lokasi_kurir($result['id_kurir']);
 				response(200, $result);
@@ -138,9 +138,11 @@ class Pengiriman extends CI_Controller
 		}
 	}
 
-	protected function construct_detail_usaha($id_usaha){
+	protected function construct_detail_usaha($id_pj){
 		$Usaha = new Model_penjual();
-		$response_detail_usaha = $Usaha->ambil_usaha_by_id($id_usaha)->row();
+		$this->db->where("id_pj", $id_pj)
+				->limit(1);
+		$response_detail_usaha = $Usaha->ambil_semua_usaha()->row();
 		return array(
 			'nama_usaha' => $response_detail_usaha->nama_usaha,
 			'alamat_usaha' => $response_detail_usaha->alamat_usaha,

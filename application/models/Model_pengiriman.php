@@ -43,7 +43,7 @@ class Model_pengiriman extends CI_Model
 
 	public function get_pengiriman_penjual($id_penjual)
 	{
-		$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`")
+		$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`, id_pj")
 				 ->from("data_pengiriman")
 				 ->where("id_pj", $id_penjual);
 	 	return $this->db->get();
