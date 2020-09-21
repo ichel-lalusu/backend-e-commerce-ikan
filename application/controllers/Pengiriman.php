@@ -17,7 +17,7 @@ class Pengiriman extends CI_Controller
 		$this->load->model("Model_pengiriman");
 		$this->load->model("Model_kurir");
 		$this->load->model("Model_kendaraan");
-		$this->load->model("Model_usaha");
+		// $this->load->model("Model_usaha");
 		$this->StatusPemesananBaru = "Baru";
 		$this->load->library('encryption');
 		$this->encryption->initialize(array('driver' => 'mcrypt'));
@@ -139,7 +139,7 @@ class Pengiriman extends CI_Controller
 	}
 
 	protected function construct_detail_usaha($id_usaha){
-		$Usaha = new Model_usaha();
+		$Usaha = new Model_penjual();
 		$response_detail_usaha = $Usaha->ambil_usaha_by_id($id_usaha)->row();
 		return array(
 			'nama_usaha' => $response_detail_usaha->nama_usaha,
