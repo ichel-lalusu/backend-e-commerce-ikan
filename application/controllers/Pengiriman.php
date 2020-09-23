@@ -224,7 +224,7 @@ class Pengiriman extends CI_Controller
 			$data_lokasi = $lokasi_kurir->row();
 			return array('latitude' => $data_lokasi->latitude, 'longitude' => $data_lokasi->longitude);
 		} else {
-			return array();
+			return "";
 		}
 	}
 
