@@ -17,7 +17,7 @@ class Pengiriman extends CI_Controller
 		$this->load->model("Model_pengiriman");
 		$this->load->model("Model_kurir");
 		$this->load->model("Model_kendaraan");
-		$this->load->model("Model_usaha");
+		// $this->load->model("Model_usaha");
 		$this->StatusPemesananBaru = "Baru";
 		$this->load->library('encryption');
 		$this->encryption->initialize(array('driver' => 'mcrypt'));
@@ -80,7 +80,7 @@ class Pengiriman extends CI_Controller
 
 				foreach ($detail_pengiriman->result() as $detail) {
 					$where = "pemesanan.id_pemesanan = $detail->id_pemesanan";
-					$select_pemesanan = "pemesanan.tipe_pengiriman, pemesanan.id_pb, pemesanan.id_usaha, pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, pembeli.alamat_pb, pembeli.kel_pb, pembeli.kec_pb, pembeli.telp_pb, pembeli.kab_pb, usaha.nama_usaha, usaha.alamat_usaha, usaha.latitude, usaha.longitude";
+					$select_pemesanan = "pemesanan.tipe_pengiriman, pemesanan.total_harga as total_harga, pemesanan.id_pb, pemesanan.id_usaha, pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, pembeli.alamat_pb, pembeli.kel_pb, pembeli.kec_pb, pembeli.foto_pb, pembeli.telp_pb, pembeli.kab_pb, usaha.nama_usaha, usaha.alamat_usaha, usaha.latitude, usaha.longitude";
 					$join[] = array('table' => "data_pembeli pembeli", 'on' => 'pemesanan.id_pb = pembeli.id_pb', 'join' => null);
 					$join[] = array('table' => "data_usaha usaha", 'on' => 'pemesanan.id_usaha = usaha.id_usaha', 'join' => null);
 					$pemesanan = $this->Model_pemesanan->get_where($select_pemesanan, $where, $join);
@@ -90,6 +90,7 @@ class Pengiriman extends CI_Controller
 					$kecamatan_pembeli = ($data_pemesanan->kec_pb !== "") ? $data_pemesanan->kec_pb : "";
 					$kabupaten_pembeli = ($data_pemesanan->kab_pb !== "") ? $data_pemesanan->kab_pb : "";
 					$notelp_pembeli = ($data_pemesanan->telp_pb !== "") ? $data_pemesanan->telp_pb : "";
+					$foto_pb = base_url("foto_pembeli/") . $data_pemesanan->foto_pb;
 					// var_dump($data_pemesanan->result());
 					$detail_pemesanan = $this->Model_pemesanan->getDetailPemesanan($detail->id_pemesanan);
 					$data_detail_pemesanan = $detail_pemesanan->row();
@@ -104,13 +105,13 @@ class Pengiriman extends CI_Controller
 							'kelurahan' => $kelurahan_pembeli,
 							'kecamatan' => $kecamatan_pembeli,
 							'kabupaten' => $kabupaten_pembeli,
-							'no_telp' => $notelp_pembeli
+							'no_telp' => $notelp_pembeli,
+							'foto_pb' => $foto_pb,
 						),
 						'detail_pemesanan' => array(
-							'nama_produk' => $data_detail_pemesanan->nama_produk,
-							'berat' => intval($data_detail_pemesanan->jml_produk),
-							'nama_variasi' => $data_detail_pemesanan->nama_variasi,
-							'foto_produk' => base_url('foto_usaha/foto_produk') . $data_detail_pemesanan->foto_produk
+							'total_harga' => intval($data_pemesanan->total_harga),
+							'detail_produk' => $this->construct_data_produk($detail->id_pemesanan),
+							'detail_pembayaran' => $this->construct_detail_pembayaran($detail->id_pemesanan),
 						),
 						'destinasi' => array(
 							'latitude' => floatval($data_pemesanan->latitude_pb),
@@ -126,9 +127,8 @@ class Pengiriman extends CI_Controller
 				);
 				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
 				$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
-				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_usaha']);
-
-				// $result['lokasi_kurir'] = $this->track_lokasi_kurir($result['id_kurir']);
+				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
+				$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
 				response(200, $result);
 			} else {
 				response(404, $result);
@@ -138,23 +138,48 @@ class Pengiriman extends CI_Controller
 		}
 	}
 
-	protected function construct_detail_usaha($id_usaha){
-		$Usaha = new Model_usaha();
-		$response_detail_usaha = $Usaha->ambil_usaha_by_id($id_usaha)->row();
+	protected function construct_data_produk($id_pemesanan)
+	{
+		$Pemesanan = new Model_pemesanan();
+		$Data_produk = $Pemesanan->getDetailPemesanan($id_pemesanan);
+		$result = array();
+		foreach ($Data_produk->result() as $produk) {
+			$result[] = array(
+				'id_produk' => intval($produk->id_produk),
+				'nama_produk' => $produk->nama_produk,
+				'foto_produk' => base_url('foto_usaha/produk/').$produk->foto_produk,
+				'nama_variasi' => $produk->nama_variasi,
+				'harga' => intval($produk->harga),
+				'qty' => intval($produk->berat_produk),
+				'sub_total' => intval($produk->sub_total));
+		}
+		return $result;
+	}
+
+	protected function construct_detail_usaha($id_pj){
+		$Usaha = new Model_penjual();
+		$this->db->where("id_pj", $id_pj)
+				->limit(1);
+		$response_detail_usaha = $Usaha->ambil_semua_usaha()->row();
 		return array(
 			'nama_usaha' => $response_detail_usaha->nama_usaha,
 			'alamat_usaha' => $response_detail_usaha->alamat_usaha,
-			'longitude' => $response_detail_usaha->longitude,
-			'latitude' => $response_detail_usaha->latitude);
+			'longitude' => floatval($response_detail_usaha->longitude),
+			'latitude' => floatval($response_detail_usaha->latitude));
 	}
 
 	protected function contruct_detail_kurir($id_kurir){
 		$Kurir = new Model_kurir();
-		$response_detail_kurir = $Kurir->get_by_id($id_kurir)->row();
-		return array(
-			'nama_kurir' => $response_detail_kurir->nama_kurir,
-			'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
-			'kontak' => $response_detail_kurir->telp_kurir);
+		$data_kurir = $Kurir->get_by_id($id_kurir);
+		if($data_kurir->num_rows() > 0){
+			$response_detail_kurir = $data_kurir->row();
+			return array(
+				'nama_kurir' => $response_detail_kurir->nama_kurir,
+				'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
+				'kontak' => $response_detail_kurir->telp_kurir);
+		}else{
+			return "";
+		}
 	}
 
 	protected function construct_detail_kendaraan($id_kendaraan)
@@ -165,6 +190,17 @@ class Pengiriman extends CI_Controller
 			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
 			'plat' => $response_detail_kendaraan->plat_kendaraan,
 			'kapasitas' => $response_detail_kendaraan->kapasitas_kendaraan);
+	}
+
+	protected function construct_detail_pembayaran($id_pemesanan)
+	{
+		$Pembayaran = new Model_pembayaran();
+		$where = "id_pemesanan = " . $id_pemesanan;
+		$detail_pembayaran = $Pembayaran->get_selected_pembayaran("", $where)->row();
+		return array(
+			'metode_pembayaran' => $detail_pembayaran->metode_pembayaran,
+			'waktu_pembayaran' => $detail_pembayaran->waktu_pembayaran,
+			'status_pembayaran' => $detail_pembayaran->status_pembayaran);
 	}
 
 	private function get_pengiriman_pembeli()
@@ -186,9 +222,9 @@ class Pengiriman extends CI_Controller
 		$lokasi_kurir = $this->Model_pengiriman->get_lokasi_kurir($id_kurir);
 		if ($lokasi_kurir->num_rows() > 0) {
 			$data_lokasi = $lokasi_kurir->row();
-			return array('id_kurir' => $id_kurir, 'latitude' => $data_lokasi->latitude, 'longitude' => $data_lokasi->longitude);
+			return array('latitude' => $data_lokasi->latitude, 'longitude' => $data_lokasi->longitude);
 		} else {
-			return array('id_kurir' => $id_kurir, 'latitude' => 0, 'longitude' => 0);
+			return "";
 		}
 	}
 
@@ -211,7 +247,7 @@ class Pengiriman extends CI_Controller
 			$this->db->where("detail.id_pengiriman", $id_pengiriman)
 				->where("detail.status", "pengantaran");
 			$Detail_pengiriman = $Pengiriman->Detail_pengiriman()->get()->row();
-			$id_pengiriman = $Detail_pengiriman->id_pengiriman;
+			$id_pengiriman = $id_pengiriman;
 			$id_pemesanan = $Detail_pengiriman->id_pemesanan;
 			$id_kendaraan = $data_pengiriman->id_kendaraan;
 			$this->db->reset_query();
