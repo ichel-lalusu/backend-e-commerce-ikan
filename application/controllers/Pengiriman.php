@@ -170,11 +170,16 @@ class Pengiriman extends CI_Controller
 
 	protected function contruct_detail_kurir($id_kurir){
 		$Kurir = new Model_kurir();
-		$response_detail_kurir = $Kurir->get_by_id($id_kurir)->row();
-		return array(
-			'nama_kurir' => $response_detail_kurir->nama_kurir,
-			'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
-			'kontak' => $response_detail_kurir->telp_kurir);
+		$data_kurir = $Kurir->get_by_id($id_kurir);
+		if($data_kurir->num_rows() > 0){
+			$response_detail_kurir = $data_kurir->row();
+			return array(
+				'nama_kurir' => $response_detail_kurir->nama_kurir,
+				'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
+				'kontak' => $response_detail_kurir->telp_kurir);
+		}else{
+			return "";
+		}
 	}
 
 	protected function construct_detail_kendaraan($id_kendaraan)

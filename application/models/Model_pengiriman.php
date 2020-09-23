@@ -20,9 +20,10 @@ class Model_pengiriman extends CI_Model
 
 	public function get_detail_by_id_pemesanan($id_pemesanan)
 	{
-		$this->db->where("id_pemesanan", $id_pemesanan);
-		return $this->db->select("`id_detail_pengiriman`, `id_pengiriman`, `id_pemesanan`, `urutan`, `status`")
-		->from("data_detail_pengiriman")->get();
+		$this->db->select("`id_detail_pengiriman`, `id_pengiriman`, `id_pemesanan`, `urutan`, `status`")
+				->where("id_pemesanan", $id_pemesanan)
+				->from("data_detail_pengiriman");
+		return $this->db->get();
 	}
 
 	public function data_pengiriman($id_pengiriman)
