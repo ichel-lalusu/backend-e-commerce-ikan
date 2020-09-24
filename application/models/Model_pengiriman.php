@@ -5,9 +5,11 @@
 class Model_pengiriman extends CI_Model
 {
 	public $data_pengiriman;
-	public $id_pengiriman;
-	public $id_detail_pengiriman;
-	public $id_penjual;
+	public $id_pengiriman=0;
+	public $id_detail_pengiriman=0;
+	public $id_penjual=0;
+	public $status_detail_pengiriman="";
+	public $status_pengiriman="";
 	public function insert_pengiriman($data)
 	{
 		return $this->db->insert("data_pengiriman", $data);
@@ -44,9 +46,9 @@ class Model_pengiriman extends CI_Model
 		return $this->db->update("data_pengiriman", $data_pengiriman);
 	}
 
-	public function update_status_detail_pengiriman(int $id_pemesanan=0, array $data=array())
+	public function update_status_detail_pengiriman($id_pemesanan=0, array $data=array())
 	{
-		return $this->db->where("id_pemesanan", $id_pemesanan)->update("data_detail_pengiriman", $data, 1);
+		return $this->db->update("data_detail_pengiriman", $data, "id_pemesanan = $id_pemesanan", 1);
 	}
 
 	public function get_pengiriman_penjual($id_penjual)
@@ -93,6 +95,7 @@ class Model_pengiriman extends CI_Model
 	public function set_id_pengiriman($id_pengiriman)
 	{
 		$this->id_pengiriman = $id_pengiriman;
+		$this->db->set("id_pengiriman", $id_pengiriman);
 	}
 
 	public function get_id_pengiriman()
@@ -108,5 +111,17 @@ class Model_pengiriman extends CI_Model
 	public function get_idDetailPengiriman()
 	{
 		return $this->id_detail_pengiriman;
+	}
+
+	public function set_status_detail($status)
+	{
+		$this->status_detail_pengiriman = $status;
+		$this->db->set("data_detail_pengiriman.status", $status);
+	}
+
+	public function set_status_pengiriman($status_p)
+	{
+		$this->status_pengiriman = $status_p;
+		$this->db->set("data_pengiriman.status", $status_p);
 	}
 }
