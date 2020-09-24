@@ -5,7 +5,13 @@
 class Model_pemesanan extends CI_Model
 {
     public $nama_pemesan;
+    public $id_pemesanan;
     
+    public function set_idPemesanan($id_pemesanan)
+    {
+        $this->id_pemesanan = $id_pemesanan;
+        $this->db->set('id_pemesanan',$id_pemesanan);
+    }
 	public function createPemesanan($data)
     {
         return $this->db->insert('data_pemesanan', $data);
@@ -101,7 +107,7 @@ class Model_pemesanan extends CI_Model
 
     public function getDetailPemesanan($idPemesanan)
     {
-        $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk');
+        $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk, ddp.berat_akhir');
         $this->db->from('data_detail_pemesanan ddp');
         $this->db->join('data_variasi_produk dvp', 'ddp.id_produk = dvp.id_variasiproduk');
         $this->db->join('data_produk dp', 'dvp.id_produk = dp.id_produk');
@@ -276,7 +282,7 @@ class Model_pemesanan extends CI_Model
 
     public function update_pemesanan(int $id_pemesanan=0, array $data=array())
     {
-        return $this->db->where("id_pemesanan", $id_pemesanan)->update("data_pemesaan", $data, 1);
+        return $this->db->update("data_pemesanan", $data, "id_pemesanan = $id_pemesanan", 1);
     }
 
 }

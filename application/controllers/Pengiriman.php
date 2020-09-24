@@ -70,6 +70,7 @@ class Pengiriman extends CI_Controller
 					response(401, array('message' => "authentication is needed"));
 				}
 			}
+			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
 			$data_pengiriman = $Pengiriman->get_pengiriman_penjual($id_akun);
 			if ($data_pengiriman->num_rows() > 0) {
 				$result = $data_pengiriman->row_array();
@@ -147,37 +148,42 @@ class Pengiriman extends CI_Controller
 			$result[] = array(
 				'id_produk' => intval($produk->id_produk),
 				'nama_produk' => $produk->nama_produk,
-				'foto_produk' => base_url('foto_usaha/produk/').$produk->foto_produk,
+				'foto_produk' => base_url('foto_usaha/produk/') . $produk->foto_produk,
 				'nama_variasi' => $produk->nama_variasi,
 				'harga' => intval($produk->harga),
-				'qty' => intval($produk->berat_produk),
-				'sub_total' => intval($produk->sub_total));
+				'qty' => intval($produk->berat_akhir),
+				'sub_total' => intval($produk->sub_total)
+			);
 		}
 		return $result;
 	}
 
-	protected function construct_detail_usaha($id_pj){
+	protected function construct_detail_usaha($id_pj)
+	{
 		$Usaha = new Model_penjual();
 		$this->db->where("id_pj", $id_pj)
-				->limit(1);
+			->limit(1);
 		$response_detail_usaha = $Usaha->ambil_semua_usaha()->row();
 		return array(
 			'nama_usaha' => $response_detail_usaha->nama_usaha,
 			'alamat_usaha' => $response_detail_usaha->alamat_usaha,
 			'longitude' => floatval($response_detail_usaha->longitude),
-			'latitude' => floatval($response_detail_usaha->latitude));
+			'latitude' => floatval($response_detail_usaha->latitude)
+		);
 	}
 
-	protected function contruct_detail_kurir($id_kurir){
+	protected function contruct_detail_kurir($id_kurir)
+	{
 		$Kurir = new Model_kurir();
 		$data_kurir = $Kurir->get_by_id($id_kurir);
-		if($data_kurir->num_rows() > 0){
+		if ($data_kurir->num_rows() > 0) {
 			$response_detail_kurir = $data_kurir->row();
 			return array(
 				'nama_kurir' => $response_detail_kurir->nama_kurir,
 				'foto_kurir' => base_url('foto_kurir/' . $response_detail_kurir->foto_kurir),
-				'kontak' => $response_detail_kurir->telp_kurir);
-		}else{
+				'kontak' => $response_detail_kurir->telp_kurir
+			);
+		} else {
 			return "";
 		}
 	}
@@ -189,7 +195,8 @@ class Pengiriman extends CI_Controller
 		return array(
 			'jenis_kendaraan' => $response_detail_kendaraan->jenis_kendaraan,
 			'plat' => $response_detail_kendaraan->plat_kendaraan,
-			'kapasitas' => $response_detail_kendaraan->kapasitas_kendaraan);
+			'kapasitas' => $response_detail_kendaraan->kapasitas_kendaraan
+		);
 	}
 
 	protected function construct_detail_pembayaran($id_pemesanan)
@@ -200,7 +207,8 @@ class Pengiriman extends CI_Controller
 		return array(
 			'metode_pembayaran' => $detail_pembayaran->metode_pembayaran,
 			'waktu_pembayaran' => $detail_pembayaran->waktu_pembayaran,
-			'status_pembayaran' => $detail_pembayaran->status_pembayaran);
+			'status_pembayaran' => $detail_pembayaran->status_pembayaran
+		);
 	}
 
 	private function get_pengiriman_pembeli()
@@ -305,39 +313,60 @@ class Pengiriman extends CI_Controller
 			$id_pengiriman = $this->input->post("id_pengiriman", TRUE);
 			$nama_peneriman = $this->input->post("nama_penerima", TRUE);
 			$datetime = date("Y-m-d H:i:s");
-			$status_pengiriman = "terkirim";
+			$status_pengiriman = 'terkirim';
 			$status_pemesanan = ucfirst($status_pengiriman);
 			$result = array();
 
 			//TODO: UPDATE DATA DETAIL PENGIRIMAN DAN PEMESANAN YANG SEDANG DI SELESAIKAN KURIR
-			$data_pengiriman = array('penerima' => ucwords($nama_peneriman), 'status' => $status_pengiriman);
+			$data_pengiriman = array('status' => $status_pengiriman, 'penerima' => ucwords($nama_peneriman));
 			$data_pemesanan = array('status_pemesanan' => $status_pemesanan);
-			$Pengiriman->update_status_detail_pengiriman($id_pemesanan, $data_pengiriman);
-			$Pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
+			$updatePengiriman = $Pengiriman->update_status_detail_pengiriman($id_pemesanan, $data_pengiriman);
+			$this->db->reset_query();
+			// echo $this->db->last_query() . "\n";
+			$updatePemesanan = $Pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
+			$this->db->reset_query();
+			// echo $this->db->last_query() . "\n";
 
 			//TODO: UPDATE DATA DETAIL PENGIRIMAN SETELAH DATA TERAKHIR TERUPDATE
-			$Pengiriman->set_id_pengiriman($id_pengiriman);
-			$this->db->order_by("detail.urutan", 'ASC');
-			$this->db->where("status", "menunggu");
-			$Detail_pengiriman1 = $Pengiriman->get_detail_pengiriman();
-			if ($Detail_pengiriman1->num_rows() == 0) {
+
+			if ($updatePengiriman && $updatePengiriman) {
+				$Pengiriman->set_id_pengiriman($id_pengiriman);
+				$this->db->order_by("detail.urutan", 'ASC');
+				$this->db->where("status", "menunggu");
+				$Detail_pengiriman1 = $Pengiriman->get_detail_pengiriman();
+				$result = array();
+				if ($Detail_pengiriman1->num_rows() == 0) {
+					// array_push($result, ['message'])
+					$result = array(
+						'nama_penerima' => $nama_peneriman,
+						'status_pengiriman' => $status_pengiriman,
+						'status_pemesanan' => $status_pemesanan,
+						'id_pemesanan' => $id_pemesanan,
+						'message'	=> "Pengiriman telah selesai",
+						'code'		=> 2
+					);
+					response(200, $result);
+				}else{
+					$result = array(
+						'nama_penerima' => $nama_peneriman,
+						'status_pengiriman' => $status_pengiriman,
+						'status_pemesanan' => $status_pemesanan,
+						'id_pemesanan' => $id_pemesanan,
+						'message' 	=> "Melanjutkan pengiriman selanjutnya",
+						'code'		=> 1
+					);
+					response(200, $result);
+				}
+				// $row_detail_pengiriman = $Detail_pengiriman1->row();
+				
+			} else {
+				$error = $this->db->error();
 				$result = array(
-					'message'	=> "Pengiriman telah selesai",
-					'code'		=> 2
+					'message' 	=> "failed " . $error['message'],
+					'code'		=> 99
 				);
-				response(200, $result);
+				response(400, $result);
 			}
-			$row_detail_pengiriman = $Detail_pengiriman1->row();
-			$id_pemesanan = intval($row_detail_pengiriman->id_pemesanan);
-			$data_pengiriman = array('status' => "pengantaran");
-			$data_pemesanan = array('status_pemesanan' => 'Pengiriman');
-			$Pengiriman->update_status_detail_pengiriman($id_pemesanan, $data_pengiriman);
-			$Pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
-			$result = array(
-				'message' 	=> "Melanjutkan pengiriman selanjutnya",
-				'code'		=> 1
-			);
-			response(200, $result);
 		} catch (\Throwable $th) {
 			//throw $th;
 			response(500, array('message' => "Error: " . $th->getMessage(), 'code' => 0));
