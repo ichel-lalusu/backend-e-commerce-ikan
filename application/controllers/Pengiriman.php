@@ -209,7 +209,7 @@ class Pengiriman extends CI_Controller
 		$Pembeli = new Model_pembeli();
 		$id_akun = intval($this->input->post("id_akun", TRUE));
 		$id_pemesanan = intval($this->input->post("id_pemesanan", TRUE));
-		$this->db->where("id_pemesanan", $id_pemesanan);
+		$this->db->where("pemesanan.id_pemesanan", $id_pemesanan);
 		$Data_pengiriman = $Pengiriman->Detail_pengiriman()->get();
 		$this->db->reset_query();
 		if ($Data_pengiriman->num_rows() == 0) {
