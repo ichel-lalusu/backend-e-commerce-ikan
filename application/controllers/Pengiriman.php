@@ -70,6 +70,7 @@ class Pengiriman extends CI_Controller
 					response(401, array('message' => "authentication is needed"));
 				}
 			}
+			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
 			$data_pengiriman = $Pengiriman->get_pengiriman_penjual($id_akun);
 			if ($data_pengiriman->num_rows() > 0) {
 				$result = $data_pengiriman->row_array();
@@ -150,7 +151,7 @@ class Pengiriman extends CI_Controller
 				'foto_produk' => base_url('foto_usaha/produk/').$produk->foto_produk,
 				'nama_variasi' => $produk->nama_variasi,
 				'harga' => intval($produk->harga),
-				'qty' => intval($produk->berat_produk),
+				'qty' => intval($produk->berat_akhir),
 				'sub_total' => intval($produk->sub_total));
 		}
 		return $result;
