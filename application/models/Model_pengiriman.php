@@ -18,6 +18,14 @@ class Model_pengiriman extends CI_Model
 		return $this->db->insert_batch("data_pengiriman", $data);
 	}
 
+	public function get_detail_by_id_pemesanan($id_pemesanan)
+	{
+		$this->db->select("`id_detail_pengiriman`, `id_pengiriman`, `id_pemesanan`, `urutan`, `status`")
+				->where("id_pemesanan", $id_pemesanan)
+				->from("data_detail_pengiriman");
+		return $this->db->get();
+	}
+
 	public function data_pengiriman($id_pengiriman)
 	{
 		$this->db->where("id_pengiriman", $id_pengiriman);
@@ -43,7 +51,7 @@ class Model_pengiriman extends CI_Model
 
 	public function get_pengiriman_penjual($id_penjual)
 	{
-		$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`")
+		$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`, id_pj")
 				 ->from("data_pengiriman")
 				 ->where("id_pj", $id_penjual);
 	 	return $this->db->get();

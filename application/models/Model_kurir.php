@@ -106,4 +106,11 @@ class Model_kurir extends CI_Model
 	{
 		return $this->id_track;
 	}
+
+	public function get_by_id($id_kurir)
+	{
+		return $this->db->select("id_kurir, nama_kurir, foto_kurir, jk_kurir, telp_kurir, id_usaha")
+		->where("id_kurir", $id_kurir)
+		->get("data_kurir");
+	}
 }

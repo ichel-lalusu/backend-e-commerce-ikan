@@ -376,6 +376,7 @@ class Pemesanan extends CI_Controller
         $idusaha = $this->input->get('id_usaha');
         $status = (!empty($this->input->get('status')) ? $this->input->get('status') : null);
         $tipePengiriman = (!empty($this->input->get('tipePengiriman')) ? $this->input->get('tipePengiriman') : null);
+        $Pengiriman = new Model_pengiriman();
         $limit = null;
         $orderBy = "tgl_pengiriman ASC";
         if($status=="Siap Dikirim"){
@@ -453,6 +454,16 @@ class Pemesanan extends CI_Controller
                             $TotalHargaProduk = array_sum($SubTotal);
                             $TotalBeratProduk = array_sum($SubBerat);
                             $TotalProduk = array_sum($SubTotalProduk);
+                            $data_pengiriman_pemesanan = $Pengiriman->get_detail_by_id_pemesanan($idPemesanan);
+                            $detail_pengiriman = array();
+                            if($data_pengiriman_pemesanan->num_rows() > 0){
+                                $result_pengiriman = $data_pengiriman_pemesanan->row();
+                                $detail_pengiriman = array(
+                                    'id_pengiriman' => $result_pengiriman->id_pengiriman,
+                                    'id_detail_pengiriman' => $result_pengiriman->id_detail_pengiriman,
+                                    'urutan' => $result_pengiriman->urutan,
+                                    'status' => $result_pengiriman->status);
+                            }
                             $result[] = array('ID' => $id4,
                                 'idPemesanan' => $idPemesanan,
                                 'TotalHargaAll' => $TotalHargaAll,
@@ -468,7 +479,8 @@ class Pemesanan extends CI_Controller
                                 'DataUsaha' => $DataUsaha,
                                 'DataPembeli' => $DataPembeli,
                                 'DataPembayaran' => $DataPembayaran,
-                                'statusPengiriman' => $statusPengiriman);
+                                'statusPengiriman' => $statusPengiriman,
+                                'detail_pengiriman' => $detail_pengiriman);
                         }
                     }
                     $resultArray = array('dataPesanan' => $result,
