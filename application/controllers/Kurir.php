@@ -116,8 +116,7 @@ class Kurir extends CI_Controller
 		$config['file_name']			= $file_name;
 		// var_dump($config);
 		// exit();
-		$array_insert = array('nama_kurir' => $nama_kurir, 
-			'foto_kurir' => $foto_kurir, 
+		$array_insert = array('nama_kurir' => $nama_kurir,
 			'jk_kurir' => $jk_kurir,
 			'telp_kurir' => $telp_kurir,);
 		$this->load->library('upload', $config);
@@ -150,10 +149,7 @@ class Kurir extends CI_Controller
 		$update = $this->Model_kurir->update_kurir($array_insert, $id_kurir, $id_usaha);
 		if($update){
 			$array = array('status' => "berhasil");
-			$this->output
-			->set_status_header(201)
-			->set_content_type('application/json', 'utf-8')
-			->set_output(json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+			response(200, $array);
 		}else{
 			$array = array('status' => "gagal");
 			$this->output
