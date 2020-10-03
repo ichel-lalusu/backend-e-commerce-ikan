@@ -45,7 +45,6 @@ class Model_keranjang extends CI_Model
 	public function update_keranjang_akun_yang_sudah_ada($where, $data)
 	{
 		$this->db->where($where);
-		$this->db->limit(1);
 		return $this->db->update("data_keranjang", $data);
 	}
 
