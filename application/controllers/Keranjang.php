@@ -48,6 +48,7 @@ class Keranjang extends CI_Controller
 
 	public function simpan_keranjang()
 	{
+		$KERANJANG = new Model_keranjang();
 		$result_data = array();
 		$keranjang = array();
 		try {
@@ -71,6 +72,12 @@ class Keranjang extends CI_Controller
 				if($cek_di_keranjang->num_rows() > 0){
 					// KONDISI SAAT ADA DI DATABASE
 					$data_keranjang = $cek_di_keranjang->row();
+					$data_query = array(
+						'distance' => $distance,
+						'estimasi_ongkir' => $estimasi_ongkir
+					);
+					$where_update_query = array('id_variasi_produk ' => $id_variasi_produk, 'id_akun' => $id_akun);
+					$KERANJANG->update_keranjang_akun_yang_sudah_ada($where_update_query, $data_query);
 					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total);
 				}else{
 					// KONDISI SAAT TIDAK ADA DI DATABASE, CREATE DATA

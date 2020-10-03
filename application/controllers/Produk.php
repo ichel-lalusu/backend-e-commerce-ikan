@@ -12,6 +12,8 @@ class Produk extends CI_Controller
 		// header("'Access-Control-Allow-Credentials' : true");
 		$this->load->model("Model_produk", "produk");
 		$this->load->model("Model_penjual", "penjual");
+		$this->load->model("Model_pembeli");
+		$this->load->model("Model_keranjang");
 		$this->load->helper("Response_helper");
 	}
 
@@ -423,14 +425,42 @@ class Produk extends CI_Controller
 
 	public function ambil_stok_variasi()
 	{
-		$variasi = $this->input->post('variasi');
-		$data_stok = $this->produk->ambil_stok_variasi($variasi);
-		if($data_stok->num_rows() > 0){
-			echo json_encode($data_stok->row());
-		}else{
-			echo "{}";
+		$PEMBELI = new Model_pembeli();
+		$KERANJANG = new Model_keranjang();
+		$variasi = intval($this->input->get('variasi', TRUE));
+		$id_akun = intval($this->input->get('id_akun', TRUE));
+		$data = array();
+		// var_dump($this->input->get());
+		// exit();
+		try {
+			$stok_item = $this->produk->ambil_stok_variasi($variasi);
+			if($stok_item->num_rows() > 0){
+				$data['stok_item'] = $stok_item->row_array();
+				if($id_akun){
+					$cek_pembeli = $PEMBELI->detail_pembeli($id_akun);
+					$row_pb = $cek_pembeli->num_rows();
+					if($row_pb > 0){
+						$cek_keranjang = $KERANJANG->get_detail_produk_keranjang_pembeli($variasi, $id_akun);
+						// echo $this->db->last_query();
+						$row_keranjang = $cek_keranjang->num_rows();
+						if($row_keranjang > 0){
+							$data['item_keranjang'] = $cek_keranjang->row_array();
+						}else{
+							$data['item_keranjang'] = array();
+						}
+					}
+				}
+				$data['status'] = "success";
+				response(200, $data);
+			}else{
+				$data['status'] = "not found";
+				response(404, $data);
+			}
+		} catch (\Throwable $th) {
+			$data['message'] = $th->getMessage();
+			$data['status'] = "failed";
+			response(500, $data);
 		}
-		header("Content-type: Applicatoin/json");
 	}
 
 	public function all_var_produk()
