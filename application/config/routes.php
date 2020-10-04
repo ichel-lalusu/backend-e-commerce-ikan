@@ -138,6 +138,7 @@ $route['api/pesanan/detail-with-payment/(:num)'] = "Pemesanan/getPemesananWithPe
 $route['api/pesanan/complete']['post']						= "Pemesanan/PemesananSelesai";
 $route['api/pesanan/pesanan-priority']['get']					="Pemesanan/getPesananPriority";
 $route['api/pesanan/pesanan-non-priority']['get']			= "Pemesanan/getPesananNonPriority";
+$route['api/pesanan/konfirmasi-ambil']['post']              = "Pemesanan/konfirmasi_pesanan_diambil";
 
 $route['api/pengiriman']['post']		            = "Pemesanan/procced_order_to_delivery";
 $route['api/pengiriman']['get']				        = "Pengiriman/get_pengiriman";
