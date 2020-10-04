@@ -82,6 +82,7 @@ class Pembayaran extends CI_Controller
 			$this->load->library('upload', $config);
 			if ( ! $this->upload->do_upload('struk_pembayaran')){
 				$dataFoto = array('error' => $this->upload->display_errors());
+				response(400, array('status' => "failed", 'message' => $dataFoto));
 			}else{
 				
 				$dataFoto = array('upload_data' => $this->upload->data());
