@@ -1024,7 +1024,7 @@ class Pemesanan extends CI_Controller
         {
             $id_pemesanan = $this->input->post("idPemesanan", TRUE);
             $id_pembayaran = $this->input->post("id_pembayaran", TRUE);
-            $data_update = array('verifikasi'=>"1");
+            $data_update = array('verifikasi'=>1);
         // echo "Masuk";
         // var_dump($this->input->get());
             $array = array();
@@ -1331,6 +1331,31 @@ protected function save_detail_pengiriman($data=array(), $id_pengiriman)
         }
     }
     return $data_pesanan;
+}
+
+public function konfirmasi_pesanan_diambil()
+{
+    $id_pesanan = intval($this->input->post('id_pesanan'));
+    $PESANAN = new Model_pemesanan();
+    try {
+        //code...
+        $where_array = array('id_pesanan' => $id_pesanan);
+        $detail_pesanan = $PESANAN->get_pemesanan_pengiriman($where_array,null);
+        if($detail_pesanan->num_rows() > 0){
+            $array_update_pesanan = array('status_pemesanan' => "Terkirim");
+            $do_update = $PESANAN->update_pemesanan($id_pesanan, $array_update_pesanan);
+            if($do_update){
+                response(200, array('status' => 'success', 'message' => "Berhasil update pesanan", 'id_pesanan' => $id_pesanan));
+            }else{
+                response(400, array('status' => 'failed', 'message' => "Gagal update pesanan", 'id_pesanan' => $id_pesanan));
+            }
+        }else{
+            response(404, array('status' => 'failed', 'message' => "Pesanan tidak ditemuka"));
+        }
+    } catch (\Throwable $th) {
+        //throw $th;
+        response(500, array('status' => 'failed', 'message' => "Error dengan " . $th->getMessage(), 'id_pesanan' => $id_pesanan));
+    }
 }
 
 }
