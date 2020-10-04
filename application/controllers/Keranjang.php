@@ -78,7 +78,7 @@ class Keranjang extends CI_Controller
 					);
 					$where_update_query = array('id_variasi_produk ' => $id_variasi_produk, 'id_pb' => $id_akun);
 					$KERANJANG->update_keranjang_akun_yang_sudah_ada($where_update_query, $data_query);
-					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total);
+					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $harga_produk, $sub_total);
 				}else{
 					// KONDISI SAAT TIDAK ADA DI DATABASE, CREATE DATA
 					$simpan_keranjang = $this->create_keranjang($id_usaha, $id_akun, $id_variasi_produk, $id_produk, $jml_produk, $harga_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total);
@@ -96,14 +96,15 @@ class Keranjang extends CI_Controller
 		}
 	}
 
-	protected function update_keranjang($data_keranjang, $id_akun=null, $id_variasi_produk=null, $jml_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $sub_total=0)
+	protected function update_keranjang($data_keranjang, $id_akun=null, $id_variasi_produk=null, $jml_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $harga_produk=0, $sub_total=0)
 	{
 		$data_update = array('jml_produk' => intval($jml_produk + $data_keranjang->jml_produk), 
 								'sub_total' => intval($sub_total + $data_keranjang->sub_total), 
 								'ikan_per_kg' => $ikan_per_kg,
 								'potong_per_ekor' => $potong_per_ekor,
 								'distance' => $distance,
-								'estimasi_ongkir' => $estimasi_ongkir);
+								'estimasi_ongkir' => $estimasi_ongkir,
+								'harga_produk' => $harga_produk);
 		$where_update = "id_pb = '$id_akun' AND id_variasi_produk = '$id_variasi_produk'";
 		return $this->Model_keranjang->update_keranjang_akun_yang_sudah_ada($where_update, $data_update);
 	}
