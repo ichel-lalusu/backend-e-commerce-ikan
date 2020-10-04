@@ -15,6 +15,24 @@ class Model_keranjang extends CI_Model
 		return $this->db->get();
 	}
 
+	public function get_by_id_keranjang($id_keranjang=0)
+	{
+		$this->db->select("`id_keranjang`, `id_produk`, `id_variasi_produk`, `id_pb`, `id_usaha`, `harga_produk`, `jml_produk`, `sub_total`, `ikan_per_kg`, `potong_per_ekor`, `distance`, `estimasi_ongkir`, `created_date`")
+				 ->from("data_keranjang")
+				 ->where("id_keranjang", $id_keranjang)
+				 ->limit(1);
+		return $this->db->get();
+	}
+
+	public function delete_by_id_keranjang(Int $id_keranjang = null)
+	{
+		if($id_keranjang!==null){
+			return $this->db->delete("data_keranjang", array('id_keranjang' => $id_keranjang));
+		}else{
+			return false;
+		}
+	}
+
 	public function get_keranjang_pembeli_by_usaha($id_akun, $id_usaha)
 	{
 		$this->db->where("k.id_pb", $id_akun);
