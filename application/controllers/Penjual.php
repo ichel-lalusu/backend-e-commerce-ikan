@@ -244,7 +244,7 @@ class Penjual extends CI_Controller
 			$configPJ['max_width']            = 5000;
 			$configPJ['max_height']           = 5000;
 			$configPJ['remove_spaces']		  = TRUE;
-			$configPJ['encrypt_name']		  = TRUE;
+			// $configPJ['encrypt_name']		  = TRUE;
 			$configPJ['file_name']			= $file_name;
 
 			$this->load->library('upload', $configPJ);
