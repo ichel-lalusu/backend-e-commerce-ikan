@@ -1339,7 +1339,7 @@ public function konfirmasi_pesanan_diambil()
     $PESANAN = new Model_pemesanan();
     try {
         //code...
-        $where_array = array('pemesanan.id_pesanan' => $id_pesanan);
+        $where_array = array('pemesanan.id_pemesanan' => $id_pesanan);
         $detail_pesanan = $PESANAN->get_pemesanan_pengiriman($where_array,null);
         if($detail_pesanan->num_rows() > 0){
             $array_update_pesanan = array('status_pemesanan' => "Terkirim");
