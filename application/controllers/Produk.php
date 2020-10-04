@@ -482,7 +482,7 @@ class Produk extends CI_Controller
 		echo json_encode($result);
 	}
 
-	public function updatevariasi_produk()
+	public function updatevariasi_produk($data)
 	{
 		$id_produk = $this->input->post('id_produk');
 		$variasi = ($this->input->post('dVariasi')) ? $this->input->post('dVariasi') : [];

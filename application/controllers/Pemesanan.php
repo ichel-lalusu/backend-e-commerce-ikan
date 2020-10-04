@@ -1024,7 +1024,7 @@ class Pemesanan extends CI_Controller
         {
             $id_pemesanan = $this->input->post("idPemesanan", TRUE);
             $id_pembayaran = $this->input->post("id_pembayaran", TRUE);
-            $data_update = array('verifikasi'=>"1");
+            $data_update = array('verifikasi'=>1);
         // echo "Masuk";
         // var_dump($this->input->get());
             $array = array();
