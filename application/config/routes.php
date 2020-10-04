@@ -150,6 +150,7 @@ $route['api/keranjang']['get']					= "Keranjang";
 $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
 $route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
 $route['api/keranjang/delete']['get']			= "Keranjang/delete_keranjang";
+$route['api/keranjang/delete-produk']['post']   = "Keranjang/delete_produk_keranjang";
 
 
 

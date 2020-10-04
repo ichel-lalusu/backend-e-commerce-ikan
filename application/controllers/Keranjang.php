@@ -170,6 +170,36 @@ class Keranjang extends CI_Controller
 		}
 	}
 
+	public function delete_produk_keranjang()
+	{
+		$KERANJANG = new Model_keranjang();
+		$id_keranjang = intval($this->input->post('id_keranjang', TRUE));
+		$cek_di_keranjang = $KERANJANG->get_by_id_keranjang($id_keranjang);
+		$returnArray = array();
+		if($cek_di_keranjang->num_rows() > 0){
+			$status_delete = $KERANJANG->delete_by_id_keranjang($id_keranjang);
+			if($status_delete){
+				$returnArray = array(
+					'status' => "success",
+					'message' => "berhasil hapus produk di keranjang"
+				);
+				response(200, $returnArray);
+			}else{
+				$returnArray = array(
+					'status' => "failed",
+					'message' => "gagal hapus produk di keranjang"
+				);
+				response(400, $returnArray);
+			}
+		}else{
+			$returnArray = array(
+				'status' => "failed",
+				'message' => "gagal hapus produk di keranjang karena data tidak ditemukan"
+			);
+			response(404, $returnArray);
+		}
+	}
+
 	protected function delete_keranjang_by_id_usaha()
 	{
 		$id_usaha = $this->input->get('id_usaha', TRUE);
