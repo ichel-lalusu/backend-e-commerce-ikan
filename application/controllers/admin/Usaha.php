@@ -85,7 +85,7 @@ class Usaha extends CI_Controller
 
   public function transaksi($id_usaha)
   {
-    $where = " id_usaha = '$id_usaha'";
+    $where = " id_usaha = " . $id_usaha;
     $order = " id_pemesanan DESC, waktu_pemesanan DESC";
     $select_pemesanan = "`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`";
     $dataPemesanan = $this->Pemesanan->get_where($select_pemesanan, $where, NULL, $order, NULL);
