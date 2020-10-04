@@ -76,7 +76,7 @@ class Keranjang extends CI_Controller
 						'distance' => $distance,
 						'estimasi_ongkir' => $estimasi_ongkir
 					);
-					$where_update_query = array('id_variasi_produk ' => $id_variasi_produk, 'id_akun' => $id_akun);
+					$where_update_query = array('id_variasi_produk ' => $id_variasi_produk, 'id_pb' => $id_akun);
 					$KERANJANG->update_keranjang_akun_yang_sudah_ada($where_update_query, $data_query);
 					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total);
 				}else{
