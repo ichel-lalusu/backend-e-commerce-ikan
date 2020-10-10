@@ -93,28 +93,39 @@ class Produk extends CI_Controller
 
 	public function cariProdukLike()
 	{
-		$input = $this->input->get('input');
-		$id_usaha = $this->input->get('id_usaha');
+		$input = $this->input->get('input', true);
+		$order = $this->input->get("order_type", TRUE);
+		$lower_input = strtolower($input);
+		$uppwerOrder = strtoupper($order);
 		$data = array();
-		$status_header = 500;
 		try {
-			$data_produk = $this->produk->search_produk($input);
+			$cek_str = $this->cek_str($input);
+			if(!$cek_str){
+				response(400, array('status' => "failed", 'message' => "karakter harus lebih dari 2", 'data' => $data));
+			}
+			$data_produk = $this->produk->search_produk($lower_input, $uppwerOrder);
 			if($data_produk->num_rows() > 0){
-				$status_header = 200;
 				$data['data'] = $data_produk->result_array();
-				$data['status'] = 'sukses';
+				$data['status'] = 'success';
+				$data['message'] = "Berhasil ditemukan";
 			}else{
-				$status_header = 404;
-				$data['data'] = array();
-				$data['status'] = 'kosong';
+				response(404, array('status' => 'failed', 'message' => "Tidak ditemukan", 'data' => $data));
 			}
 			// $data = $data_produk->result_array();
 		} catch (Exception $e) {
-			$status_header = 500;
-			$data['data'] = array();
-			$data['status'] = 'gagal';
+			response(500, array('status' => 'failed', 'message' => "Gagal karena " . $e->getMessage(), 'data'=>$data));
 		}
-		response($status_header, $data);
+		response(200, $data);
+	}
+
+	private function cek_str(String $input){
+		$str = str_split($input);
+		$counted_str = count($str);
+		if($counted_str < 3){
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 	public function prosesinput_produk()
