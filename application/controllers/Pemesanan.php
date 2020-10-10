@@ -1024,13 +1024,12 @@ class Pemesanan extends CI_Controller
 
         public function verifikasiPembayaranByPenjual()
         {
-            $id_pemesanan = $this->input->post("idPemesanan", TRUE);
-            $id_pembayaran = $this->input->post("id_pembayaran", TRUE);
+            $id_pemesanan = intval($this->input->post("idPemesanan", TRUE));
+            $id_pembayaran = intval($this->input->post("id_pembayaran", TRUE));
             $data_update = array('verifikasi'=>1);
         // echo "Masuk";
         // var_dump($this->input->get());
             $array = array();
-            $status_header = 500;
             try {
                 $get_data = $this->db->get_where("data_pembayaran", "id_pemesanan = $id_pemesanan", 1);
                 if($get_data->num_rows() > 0){
@@ -1042,27 +1041,55 @@ class Pemesanan extends CI_Controller
                         $data_update2 = array("status_pemesanan"=>"Terbayar");
                         $update_pemesanan = $this->Pemesanan->updatePemesanan($data_update2, $where2);
                         if($update_pemesanan > 0){
-                            
-                            $array = array('status' => 'success', 'message' => 'Verifikasi Berhasil');
-                            $status_header = 200;
-
+                            $updateStokProdukPemesanan = $this->UpdateStokProduk($id_pemesanan);
+                            $array = array('status' => 'success', 'message' => 'Verifikasi Berhasil', 'respon_update_stok' => $updateStokProdukPemesanan, 'id_pemesanan' => $id_pemesanan);
                         }else{
-                            $array = array('status' => 'success', 'message' => 'Gagal Ter Verifikasi');
-                            $status_header = 400;
+                            $array = array('status' => 'failed', 'message' => 'Gagal Ter Verifikasi');
+                            response(400, $array);
                         }
                     }  else{
                         $array = array('status' => 'failed', 'message' => 'Gagal Ter Verifikasi');
-                        $status_header = 400;
+                        response(400, $array);
                     }  
                 }else{
                     $array = array('status' => 'failed', 'message' => 'Data Pesanan Belum Pernah Ada');
-                    $status_header = 404;
+                    response(400, $array);
                 }
             } catch (Exception $e) {
              $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
-             $status_header = 500;
+             response(500, $array);
          }
-         response($status_header, $array);
+         response(200, $array);
+     }
+
+     protected function UpdateStokProduk($id_pemesanan){
+         try {
+             //code...
+             $DataDetail = $this->Model_pemesanan->getDetailPemesanan($id_pemesanan);
+             $counter_update = 0;
+             $id_terupdate = array();
+             if($DataDetail->num_rows() > 0){
+                 foreach ($DataDetail->result() as $key) {
+                     # code...
+                     $jml_yang_dipesan = intval($key->jml_produk);
+                     $id_variasi_produk = intval($key->id_produk);
+                    // UPDATE STOK BY MODEL SQL PRODUK
+                     $update_stok = $this->Produk->updateStokProdukFromPemesanan($id_variasi_produk, $jml_yang_dipesan);
+                     if($update_stok){
+                         $id_terupdate[] = $id_variasi_produk; 
+                         $counter_update++;
+                     }else{
+                         response(400, array('status' => "failed", "message" => "Update stok gagal"));
+                     }
+                 }
+                 if($counter_update > 0){
+                     return array('status' => 'success', 'message' => "Update stok produk sukses", 'affected_rows' => $counter_update, 'id_terupdate' => $id_terupdate, 'id_pemesanan' => $id_pemesanan);
+                 }
+             }
+         } catch (\Throwable $th) {
+             //throw $th;
+             response(500, array('status' => "failed", "message" => "Update stok gagal karena " . $th->getMessage()));
+         }
      }
 
      public function getDetailPemesanan_HTML()

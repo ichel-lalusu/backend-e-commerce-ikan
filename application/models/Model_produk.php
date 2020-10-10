@@ -251,9 +251,9 @@ class Model_produk extends CI_Model
 		return $this->db->get('data_produk p');
 	}
 
-	public function updateStokProdukFromPemesanan($idVariasiProduk,$stokUsed)
+	public function updateStokProdukFromPemesanan($idVariasiProduk, Int $stokUsed=0)
 	{
-		return $this->db->query("UPDATE data_variasi_produk SET stok = (stok-".$stokUsed.") WHERE id_variasiproduk = '".$idVariasiProduk."' LIMIT 1");
+		return $this->db->query("UPDATE data_variasi_produk SET stok = (stok-".$stokUsed.") WHERE id_variasiproduk = ".$idVariasiProduk." LIMIT 1");
 	}
 
 	public function getVariasiProdukByIdProdukIdVariasi($idProduk, $idVariasi)
