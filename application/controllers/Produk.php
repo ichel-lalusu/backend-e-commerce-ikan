@@ -261,6 +261,7 @@ class Produk extends CI_Controller
 		$id_toko			= intval($this->input->post('id_toko'));
 		$min_pemesanan		= intval($this->input->post('minOrder'));
 		$ekor_per_kg 		= intval($this->input->post('total_ekor_per_kg'));
+		$deskripsi			= $this->input->post('deskripsi');
 		// $variasi			= ($_POST['variasi']) ? $_POST['variasi'] : [];
 		// $variasi			= ($this->input->post('variasi')!==null) ? $this->input->post('variasi') : null;
 
@@ -310,7 +311,8 @@ class Produk extends CI_Controller
 			'foto_produk' => $foto_produk,
 			'berat_produk' => $berat_produk,
 			'min_pemesanan' => $min_pemesanan,
-			'ekor_per_kg' => $ekor_per_kg
+			'ekor_per_kg' => $ekor_per_kg,
+			'deskripsi' => $deskripsi
 		);
 		try {
 			$update = $this->produk->ubah_produk($data_update, $id_produk);
