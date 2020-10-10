@@ -104,11 +104,13 @@ class Pemesanan extends CI_Controller
                     $jml_produk = intval($arrayProduk['jml_produk']);
                     $subtotal = intval($harga_produk*$jml_produk);
                     $id_produk = $arrayProduk['id_variasi_produk'];
+                    $catatan = $arrayProduk['catatan'];
                     $data[] = array('harga' => $harga_produk,
                         'jml_produk' => $jml_produk,
                         'sub_total' => $subtotal,
                         'id_pemesanan' => $id_pemesanan,
-                        'id_produk' => $id_produk);
+                        'id_produk' => $id_produk,
+                        'catatan' => $catatan);
                 }
                 $isDetailPemesanan = $this->Pemesanan->createDetailPemesanan_batch($data);
                 if($isDetailPemesanan){
@@ -762,7 +764,7 @@ class Pemesanan extends CI_Controller
         private function GET_DETAIL_PEMESANAN_WITH_ID($ID_PESANAN)
         {
             $response = array();
-            $SELECT_DETAIL = "detail_pemesanan.`id_dp`, detail_pemesanan.`harga`, detail_pemesanan.`jml_produk`, detail_pemesanan.`sub_total`, detail_pemesanan.`id_pemesanan`, detail_pemesanan.`id_produk`, detail_pemesanan.`berat_akhir`, produk.nama_produk, variasi.nama_variasi, produk.foto_produk, produk.berat_produk";
+            $SELECT_DETAIL = "detail_pemesanan.`id_dp`, detail_pemesanan.`harga`, detail_pemesanan.`jml_produk`, detail_pemesanan.`sub_total`, detail_pemesanan.`id_pemesanan`, detail_pemesanan.`id_produk`, detail_pemesanan.`berat_akhir`, produk.nama_produk, variasi.nama_variasi, produk.foto_produk, produk.berat_produk, detail_pemesanan.catatan";
             $SET_WHERE_LIST_DETAIL = "detail_pemesanan.id_pemesanan = '$ID_PESANAN'";
             $JOIN[] = array('table' => 'data_variasi_produk variasi_produk', 'on' => 'variasi_produk.id_variasiproduk = detail_pemesanan.id_produk', 'join' => NULL);
             $JOIN[] = array('table' => 'data_produk produk', 'on' => 'produk.id_produk = variasi_produk.id_produk', 'join' => NULL);
@@ -1040,6 +1042,7 @@ class Pemesanan extends CI_Controller
                         $data_update2 = array("status_pemesanan"=>"Terbayar");
                         $update_pemesanan = $this->Pemesanan->updatePemesanan($data_update2, $where2);
                         if($update_pemesanan > 0){
+                            
                             $array = array('status' => 'success', 'message' => 'Verifikasi Berhasil');
                             $status_header = 200;
 
