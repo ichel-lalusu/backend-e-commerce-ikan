@@ -46,6 +46,54 @@ class Keranjang extends CI_Controller
 		}
 	}
 
+	public function getDetailKeranjangProduk()
+	{
+		$KERANJANG = new Model_keranjang();
+		$id_keranjang = intval($this->input->post("id_keranjang", TRUE));
+		$id_akun = intval($this->input->post("id_akun", TRUE));
+		// var_dump($this->input->post());
+		$result_array = array();
+		try {
+			$count_user = $KERANJANG->is_keranjang_has_akun($id_akun)->num_rows();
+			// echo $this->db->last_query();
+			// exit();
+			if($count_user > 0){
+
+				$detail_produk_keranjang = $KERANJANG->get_detail_produk_keranjang($id_keranjang);
+				if($detail_produk_keranjang->num_rows() > 0){
+					$detail_produk_keranjang = $detail_produk_keranjang->row_array();
+					$result_array = array(
+						'data' => $detail_produk_keranjang,
+						'status' => "success",
+						'message' => "Berhasil ambil data detail keranjang",
+						'id_keranjang' => $id_keranjang);
+				}else{
+					$result_array = array(
+						'data' => array(),
+						'status' => "failed",
+						'message' => "Gagal ambil data detail keranjang",
+						'id_keranjang' => $id_keranjang);
+					response(404, $result_array);
+				}
+			}else{
+				$result_array = array(
+						'data' => array(),
+						'status' => "failed",
+						'message' => "Gagal ambil data detail keranjang karena bukan pembeli",
+						'id_keranjang' => $id_keranjang);
+				response(400, $result_array);
+			}
+		} catch (Exception $e) {
+			$result_array = array(
+						'data' => array(),
+						'status' => "failed",
+						'message' => "Gagal karena " . $e->getMessage(),
+						'id_keranjang' => $id_keranjang);	
+			response(500, $result_array);
+		}
+		response(200, $result_array);
+	}
+
 	public function simpan_keranjang()
 	{
 		$KERANJANG = new Model_keranjang();
@@ -63,6 +111,7 @@ class Keranjang extends CI_Controller
 				$harga_produk = $this->input->post('harga_produk', TRUE);
 				$ikan_per_kg = $this->input->post('ikan_per_kg', TRUE);
 				$potong_per_ekor = $this->input->post('potong_per_ekor', TRUE);
+				$catatan = $this->input->post('catatan', TRUE);
 				$distance = floatval($this->input->post('distance', TRUE));
 				$estimasi_ongkir = intval($this->input->post('estimasi_ongkir', TRUE));
 				$sub_total = ($jml_produk * $harga_produk);
@@ -78,10 +127,10 @@ class Keranjang extends CI_Controller
 					);
 					$where_update_query = array('id_variasi_produk ' => $id_variasi_produk, 'id_pb' => $id_akun);
 					$KERANJANG->update_keranjang_akun_yang_sudah_ada($where_update_query, $data_query);
-					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $harga_produk, $sub_total);
+					$simpan_keranjang = $this->update_keranjang($data_keranjang, $id_akun, $id_variasi_produk, $jml_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $harga_produk, $sub_total, $catatan);
 				}else{
 					// KONDISI SAAT TIDAK ADA DI DATABASE, CREATE DATA
-					$simpan_keranjang = $this->create_keranjang($id_usaha, $id_akun, $id_variasi_produk, $id_produk, $jml_produk, $harga_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total);
+					$simpan_keranjang = $this->create_keranjang($id_usaha, $id_akun, $id_variasi_produk, $id_produk, $jml_produk, $harga_produk, $ikan_per_kg, $potong_per_ekor, $distance, $estimasi_ongkir, $sub_total, $catatan);
 				}
 				if($simpan_keranjang){
 					$this->keranjang_init($id_akun);
@@ -96,7 +145,7 @@ class Keranjang extends CI_Controller
 		}
 	}
 
-	protected function update_keranjang($data_keranjang, $id_akun=null, $id_variasi_produk=null, $jml_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $harga_produk=0, $sub_total=0)
+	protected function update_keranjang($data_keranjang, $id_akun=null, $id_variasi_produk=null, $jml_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $harga_produk=0, $sub_total=0, $catatan="")
 	{
 		$data_update = array('jml_produk' => intval($jml_produk + $data_keranjang->jml_produk), 
 								'sub_total' => intval($sub_total + $data_keranjang->sub_total), 
@@ -104,12 +153,13 @@ class Keranjang extends CI_Controller
 								'potong_per_ekor' => $potong_per_ekor,
 								'distance' => $distance,
 								'estimasi_ongkir' => $estimasi_ongkir,
-								'harga_produk' => $harga_produk);
+								'harga_produk' => $harga_produk,
+								'catatan' => $catatan);
 		$where_update = "id_pb = '$id_akun' AND id_variasi_produk = '$id_variasi_produk'";
 		return $this->Model_keranjang->update_keranjang_akun_yang_sudah_ada($where_update, $data_update);
 	}
 
-	protected function create_keranjang($id_usaha=null, $id_akun=null, $id_variasi_produk=null, $id_produk=null, $jml_produk=0, $harga_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $sub_total=0)
+	protected function create_keranjang($id_usaha=null, $id_akun=null, $id_variasi_produk=null, $id_produk=null, $jml_produk=0, $harga_produk=0, $ikan_per_kg=0, $potong_per_ekor=null, $distance=0, $estimasi_ongkir=0, $sub_total=0, $catatan="")
 	{
 		$data = array(
 						'id_produk' => $id_produk,
@@ -123,7 +173,8 @@ class Keranjang extends CI_Controller
 						'potong_per_ekor' => $potong_per_ekor,
 						'distance' => $distance,
 						'estimasi_ongkir' => $estimasi_ongkir,
-						'created_date' => date('Y-m-d H:i:s'));
+						'created_date' => date('Y-m-d H:i:s'),
+						'catatan' => $catatan);
 		return $this->Model_keranjang->create_data_keranjang_variasi_produk($data);
 	}
 
