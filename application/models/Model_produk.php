@@ -1,5 +1,7 @@
 <?php
 
+use phpDocumentor\Reflection\Types\Boolean;
+
 /**
  * 
  */
@@ -79,7 +81,16 @@ class Model_produk extends CI_Model
 		}
 	}
 
-	public function search_produk(String $filter_input, String $order_type = null)
+	protected function SearchingConstruct()
+	{
+		return $this->db->from("data_produk produk")
+		->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
+		->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
+		->where("produk.status_p", "aktif")
+		->like("penjual.id_pj", "", 'both');
+	}
+
+	public function search_produk(String $filter_input, String $order_type = null, int $id_usaha = 0)
 	{
 		// HANDLE ORDER TYPE
 		$defaultKolomOrder = "produk.nama_produk";
@@ -87,38 +98,168 @@ class Model_produk extends CI_Model
 		if ($order_type === null || $order_type === "") {
 			$order_type = "ASC_PRODUK";
 		}
+		if($id_usaha===0 || $id_usaha==="" || $id_usaha===null || $id_usaha === "undefined"){
+			return $this->emptyResultSearch();
+		}
 
 		// QUERY
-		$this->db->select("produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
-			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as minprice, 
-			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as max_price,
-			usaha.nama_usaha, usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng")
-			->from("data_produk produk")
-			->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
-			->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
-			->where("produk.status_p", "aktif")
-			->like("penjual.id_pj", "", 'both');
+		$this->getSelectProdukOnSearch();
+		$this->SearchingConstruct();
 
 		// FILTER INPUT
-		if ($filter_input !== "" || $filter_input !== null) {
-			$this->db->like('produk.nama_produk', $filter_input, 'both');
+		if ($filter_input === "" || $filter_input === null) {
+			return $this->emptyResultSearch();
 		}
-
+		$this->db->like('produk.nama_produk', $filter_input, 'both');
+		$this->db->where("usaha.id_usaha", $id_usaha);
 		// FILTER ORDER
-		$split_order_type = explode("_", $order_type);
-		if ($order_type == "ASC_PRODUK") {
-			$this->db->order_by("produk.nama_produk", $split_order_type[0], TRUE);
-		} elseif ($order_type == "ASC_HARGA") {
-			$this->db->order_by("minprice", $split_order_type[0], TRUE);
-			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
-		} elseif ($order_type == "DESC_HARGA") {
-			$this->db->order_by("minprice", $split_order_type[0], TRUE);
-			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
-		} else {
-			$this->db->order_by($defaultKolomOrder, $defaultOrder, TRUE);
-		}
+		$this->filterOrderOnSearch($order_type);
 
 		return $this->db->get();
+	}
+
+	protected function getSelectProdukOnSearch()
+	{
+		return $this->db->select("produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
+		(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as minprice, 
+		(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as max_price,
+		usaha.nama_usaha, usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng");
+	}
+
+	public function staticConstructProdukOnSearch($key, $id_usaha, $distance)
+	{
+		$returnProduk = array(
+			'id_produk' => intval($key->id_produk),
+			'nama_produk' => $key->nama_produk,
+			'foto' => base_url('foto_usaha/produk/') . $key->foto_produk,
+			'berat_produk' => intval($key->berat_produk),
+			'minprice' => intval($key->minprice),
+			'max_price' => intval($key->max_price),
+			'id_usaha' => intval($key->id_usaha),
+			'distance' => $distance['text'],
+			'detail_usaha' => array(
+							'nama_usaha' => $key->nama_usaha, 
+							'lat' => floatval($key->lat),
+							'lng' => floatval($key->lng),
+							)				
+		);
+		return $returnProduk;
+	}
+
+	public function constructProdukOnSearch($data_produk)
+	{
+		$returnProduk = array();
+		foreach ($data_produk->result() as $key) {
+			$returnProduk[] = array(
+				'id_produk' => intval($key->id_produk),
+				'nama_produk' => $key->nama_produk,
+				'foto' => base_url('foto_usaha/produk/') . $key->foto_produk,
+				'berat_produk' => intval($key->berat_produk),
+				'minprice' => intval($key->minprice),
+				'max_price' => intval($key->max_price),
+				'id_usaha' => intval($key->id_usaha),
+				'detail_usaha' => array(
+								'nama_usaha' => $key->nama_usaha, 
+								'lat' => floatval($key->lat),
+								'lng' => floatval($key->lng),
+								)				
+			);
+		}
+		return $returnProduk;
+	}
+
+	public function constructResultDataSearchProduk($data_produk, $id_usaha)
+	{
+		$resultArray = array();
+		while ($id_usaha) {
+			
+		}
+		for ($i=0; $i < count($data_produk); $i++) { 
+			
+		}
+	}
+
+	public function searchUsahaOnSearch(String $keyword="", String $order_type=null)
+	{
+		$returnUsaha = array();
+		$resultDataUsaha = $this->search_usaha_on_search($keyword, $order_type);
+		if($this->isResultDataUsahaNotEmpty($resultDataUsaha)){
+			foreach ($resultDataUsaha->result() as $key) {
+				$returnUsaha[] = array('id_usaha' => intval($key->id_usaha), 'lat' => floatval($key->lat), 'lng' => floatval($key->lng));
+			}
+		}
+		return $returnUsaha;
+	}
+
+	protected function search_usaha_on_search(String $keyword="", String $order_type=null)
+	{
+		if ($order_type === null || $order_type === "") {
+			$order_type = "ASC_PRODUK";
+		}
+
+		// QUERY
+		$this->getUsahaOnSearch();
+		$this->SearchingConstruct();
+
+		// FILTER INPUT
+		if ($keyword === "" || $keyword === null) {
+			return $this->emptyResultSearch();
+		}
+		$this->db->like('produk.nama_produk', $keyword, 'both');
+		// FILTER ORDER
+		// $this->filterOrderOnSearch($order_type);
+
+		return $this->db->get();
+	}
+
+	protected function getUsahaOnSearch()
+	{
+		$this->db->select("usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng");
+		return $this->db->distinct();
+	}
+
+	protected function isResultDataUsahaNotEmpty($data_usaha)
+	{
+		if($data_usaha->num_rows() > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	protected function filterOrderOnSearch(String $order_type="")
+	{
+		$defaultKolomOrder = "produk.nama_produk";
+		$defaultOrder = "ASC";
+		$split_order_type = explode("_", $order_type);
+		if ($order_type == "ASC_PRODUK") {
+			return $this->db->order_by("produk.nama_produk", $split_order_type[0], TRUE);
+		} elseif ($order_type == "ASC_HARGA") {
+			return $this->db->order_by("minprice", $split_order_type[0], TRUE);
+			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
+		} elseif ($order_type == "DESC_HARGA") {
+			return $this->db->order_by("minprice", $split_order_type[0], TRUE);
+			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
+		} else {
+			return $this->db->order_by($defaultKolomOrder, $defaultOrder, TRUE);
+		}
+	}
+
+	protected function emptyResultSearch()
+	{
+		$this->getSelectProdukOnSearch();
+		$this->SearchingConstruct();
+		$this->db->where("produk.id_produk", "")->where("usaha.id_usaha", "");
+		return $this->db->get();
+	}
+
+	public function isProdukNotEmpty($data_produk)
+	{
+		if($data_produk->num_rows() > 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public function insert_produk($data)
