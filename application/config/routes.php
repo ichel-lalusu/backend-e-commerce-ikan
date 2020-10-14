@@ -61,7 +61,9 @@ $route['api/produk/update']['post'] 						= "Produk/prosesupdate_produk";
 $route['api/produk/variasi/update']['post'] 				= "Produk/updateVariasiProdukV3";
 $route['api/produk/aktifkan']['post'] 						= "Produk/aktifkan_produk";
 $route['api/produk/non-aktifkan']['post'] 					= "Produk/hapus_data_produk";
-$route['api/produk/search']['get'] 							= "Produk/cariProdukLike";
+// $route['api/produk-search']['get'] 							= "Produk/cariProdukLike";
+$route['api/produk-search']['post']                         = "Produk/getSearchProduk";
+$route['api/produkSearchUsaha']['get']                      = "Produk/getUsahaOnSearch";
 $route['api/produk/filtered']['get']						= "Produk/ambil_produk_penjual_by_id_usaha";
 $route['api/produk/detail']['get']							= "Produk/detail_produk";
 $route['api/produk/variasi']['get']							= "Produk/ambil_variasi_produk";
@@ -152,6 +154,7 @@ $route['api/keranjang']['post']					= "Keranjang/simpan_keranjang";
 $route['api/keranjang/update']['post']			= "Keranjang/ubah_keranjang";
 $route['api/keranjang/delete']['get']			= "Keranjang/delete_keranjang";
 $route['api/keranjang/delete-produk']['post']   = "Keranjang/delete_produk_keranjang";
+$route['api/keranjang-detail']['post']			= "Keranjang/getDetailKeranjangProduk";
 
 
 

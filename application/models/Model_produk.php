@@ -1,4 +1,7 @@
 <?php
+
+use phpDocumentor\Reflection\Types\Boolean;
+
 /**
  * 
  */
@@ -13,7 +16,7 @@ class Model_produk extends CI_Model
 				GROUP BY p.id_produk;");
 	}
 
-	public function get_by_id_pj($id_pj=0)
+	public function get_by_id_pj($id_pj = 0)
 	{
 		$query = $this->db->query("SELECT produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
 			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as minprice, 
@@ -27,20 +30,19 @@ class Model_produk extends CI_Model
 		return $query;
 	}
 
-	public function ambil_produk_penjual_by_id($id_usaha, $filter=NULL)
+	public function ambil_produk_penjual_by_id($id_usaha, $filter = NULL)
 	{
 		$this->db->where_in('u.id_usaha', $id_usaha);
-		if($filter=="terbaru"){
+		if ($filter == "terbaru") {
 			$this->db->order_by('p.id_produk', 'DESC');
-		}elseif($filter=="harga_murah"){
+		} elseif ($filter == "harga_murah") {
 			$this->db->order_by('minprice', 'ASC');
-		}elseif($filter=="harga_mahal"){
+		} elseif ($filter == "harga_mahal") {
 			$this->db->order_by('minprice', 'DESC');
-		}elseif($filter=="stok_sedikit"){
+		} elseif ($filter == "stok_sedikit") {
 			$this->db->order_by('stok', 'DESC');
-		}elseif($filter=="terlaris"){
-
-		}elseif ($filter=NULL) {
+		} elseif ($filter == "terlaris") {
+		} elseif ($filter = NULL) {
 			# code...
 		}
 		$this->db->select('p.id_produk, p.nama_produk, 
@@ -56,14 +58,14 @@ class Model_produk extends CI_Model
 		return $this->db->get();
 	}
 
-	public function get_detail_produk_where($where, $order=NULL)
+	public function get_detail_produk_where($where, $order = NULL)
 	{
 		$this->db->select('dvp.id_produk, p.nama_produk, p.foto_produk, u.nama_usaha, u.longitude, u.latitude, p.kategori, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice');
 		$this->db->from('data_produk p');
 		$this->db->join('data_variasi_produk dvp', 'dvp.id_produk = p.id_produk');
 		$this->db->join('data_usaha u', 'p.id_usaha = u.id_usaha');
 		$this->db->where($where);
-		if($order!==NULL){
+		if ($order !== NULL) {
 			$this->db->order_by($order);
 		}
 		$this->db->group_by('dvp.id_produk');
@@ -72,26 +74,192 @@ class Model_produk extends CI_Model
 
 	public function ambil_produk_penjual_like($filter)
 	{
-		if($filter!=="" || $filter!==null){
+		if ($filter !== "" || $filter !== null) {
 			$this->db->like('p.produk', $filter, 'both');
 			$this->db->or_like('v.nama_variasi', $filter, 'both');
 			$this->db->or_like('p.kategori', $filter, 'both');
 		}
 	}
 
-	public function search_produk($filter_input="")
+	protected function SearchingConstruct()
 	{
-		$this->db->select("SELECT produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
-			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as minprice, 
-			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk) as max_price")
-				 ->from("data_produk produk")
-				 ->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
-				 ->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
-				 ->where("penjual.id_pj", "any");
-		if($filter_input!=="" || $filter_input!==null){
-			$this->db->like('produk.nama_produk', $filter_input, 'both');
+		return $this->db->from("data_produk produk")
+		->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
+		->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
+		->where("produk.status_p", "aktif")
+		->like("penjual.id_pj", "", 'both');
+	}
+
+	public function search_produk(String $filter_input, String $order_type = null, int $id_usaha = 0)
+	{
+		// HANDLE ORDER TYPE
+		$defaultKolomOrder = "produk.nama_produk";
+		$defaultOrder = "ASC";
+		if ($order_type === null || $order_type === "") {
+			$order_type = "ASC_PRODUK";
 		}
+		if($id_usaha===0 || $id_usaha==="" || $id_usaha===null || $id_usaha === "undefined"){
+			return $this->emptyResultSearch();
+		}
+
+		// QUERY
+		$this->getSelectProdukOnSearch();
+		$this->SearchingConstruct();
+
+		// FILTER INPUT
+		if ($filter_input === "" || $filter_input === null) {
+			return $this->emptyResultSearch();
+		}
+		$this->db->like('produk.nama_produk', $filter_input, 'both');
+		$this->db->where("usaha.id_usaha", $id_usaha);
+		// FILTER ORDER
+		$this->filterOrderOnSearch($order_type);
+
 		return $this->db->get();
+	}
+
+	protected function getSelectProdukOnSearch()
+	{
+		return $this->db->select("produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
+		(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as minprice, 
+		(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as max_price,
+		usaha.nama_usaha, usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng");
+	}
+
+	public function staticConstructProdukOnSearch($key, $id_usaha, $distance)
+	{
+		$returnProduk = array(
+			'id_produk' => intval($key->id_produk),
+			'nama_produk' => $key->nama_produk,
+			'foto' => base_url('foto_usaha/produk/') . $key->foto_produk,
+			'berat_produk' => intval($key->berat_produk),
+			'minprice' => intval($key->minprice),
+			'max_price' => intval($key->max_price),
+			'id_usaha' => intval($key->id_usaha),
+			'distance' => $distance['text'],
+			'detail_usaha' => array(
+							'nama_usaha' => $key->nama_usaha, 
+							'lat' => floatval($key->lat),
+							'lng' => floatval($key->lng),
+							)				
+		);
+		return $returnProduk;
+	}
+
+	public function constructProdukOnSearch($data_produk)
+	{
+		$returnProduk = array();
+		foreach ($data_produk->result() as $key) {
+			$returnProduk[] = array(
+				'id_produk' => intval($key->id_produk),
+				'nama_produk' => $key->nama_produk,
+				'foto' => base_url('foto_usaha/produk/') . $key->foto_produk,
+				'berat_produk' => intval($key->berat_produk),
+				'minprice' => intval($key->minprice),
+				'max_price' => intval($key->max_price),
+				'id_usaha' => intval($key->id_usaha),
+				'detail_usaha' => array(
+								'nama_usaha' => $key->nama_usaha, 
+								'lat' => floatval($key->lat),
+								'lng' => floatval($key->lng),
+								)				
+			);
+		}
+		return $returnProduk;
+	}
+
+	public function constructResultDataSearchProduk($data_produk, $id_usaha)
+	{
+		$resultArray = array();
+		while ($id_usaha) {
+			
+		}
+		for ($i=0; $i < count($data_produk); $i++) { 
+			
+		}
+	}
+
+	public function searchUsahaOnSearch(String $keyword="", String $order_type=null)
+	{
+		$returnUsaha = array();
+		$resultDataUsaha = $this->search_usaha_on_search($keyword, $order_type);
+		if($this->isResultDataUsahaNotEmpty($resultDataUsaha)){
+			foreach ($resultDataUsaha->result() as $key) {
+				$returnUsaha[] = array('id_usaha' => intval($key->id_usaha), 'lat' => floatval($key->lat), 'lng' => floatval($key->lng));
+			}
+		}
+		return $returnUsaha;
+	}
+
+	protected function search_usaha_on_search(String $keyword="", String $order_type=null)
+	{
+		if ($order_type === null || $order_type === "") {
+			$order_type = "ASC_PRODUK";
+		}
+
+		// QUERY
+		$this->getUsahaOnSearch();
+		$this->SearchingConstruct();
+
+		// FILTER INPUT
+		if ($keyword === "" || $keyword === null) {
+			return $this->emptyResultSearch();
+		}
+		$this->db->like('produk.nama_produk', $keyword, 'both');
+		// FILTER ORDER
+		// $this->filterOrderOnSearch($order_type);
+
+		return $this->db->get();
+	}
+
+	protected function getUsahaOnSearch()
+	{
+		$this->db->select("usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng");
+		return $this->db->distinct();
+	}
+
+	protected function isResultDataUsahaNotEmpty($data_usaha)
+	{
+		if($data_usaha->num_rows() > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	protected function filterOrderOnSearch(String $order_type="")
+	{
+		$defaultKolomOrder = "produk.nama_produk";
+		$defaultOrder = "ASC";
+		$split_order_type = explode("_", $order_type);
+		if ($order_type == "ASC_PRODUK") {
+			return $this->db->order_by("produk.nama_produk", $split_order_type[0], TRUE);
+		} elseif ($order_type == "ASC_HARGA") {
+			return $this->db->order_by("minprice", $split_order_type[0], TRUE);
+			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
+		} elseif ($order_type == "DESC_HARGA") {
+			return $this->db->order_by("minprice", $split_order_type[0], TRUE);
+			// $this->db->order_by("max_price", $split_order_type[0], TRUE);
+		} else {
+			return $this->db->order_by($defaultKolomOrder, $defaultOrder, TRUE);
+		}
+	}
+
+	protected function emptyResultSearch()
+	{
+		$this->getSelectProdukOnSearch();
+		$this->SearchingConstruct();
+		$this->db->where("produk.id_produk", "")->where("usaha.id_usaha", "");
+		return $this->db->get();
+	}
+
+	public function isProdukNotEmpty($data_produk)
+	{
+		if($data_produk->num_rows() > 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public function insert_produk($data)
@@ -130,7 +298,7 @@ class Model_produk extends CI_Model
 
 	public function ambil_data_by($id_produk, $variasi)
 	{
-		$this->db->select('*, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice, (select nama_variasi FROM data_variasi v join data_variasi_produk vp on vp.id_variasi = v.id_variasi WHERE vp.id_variasiproduk = '.$variasi.') as variasi');
+		$this->db->select('*, (SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as minprice, (SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = p.id_produk) as maxprice, (select nama_variasi FROM data_variasi v join data_variasi_produk vp on vp.id_variasi = v.id_variasi WHERE vp.id_variasiproduk = ' . $variasi . ') as variasi');
 		$this->db->where('p.id_produk', $id_produk);
 		$this->db->from('data_produk p');
 		return $this->db->get();
@@ -196,7 +364,7 @@ class Model_produk extends CI_Model
 
 	public function ubah_produk($data, $id_produk)
 	{
-		$this->db->where('id_produk',$id_produk);
+		$this->db->where('id_produk', $id_produk);
 		return $this->db->update('data_produk', $data);
 	}
 
@@ -251,9 +419,9 @@ class Model_produk extends CI_Model
 		return $this->db->get('data_produk p');
 	}
 
-	public function updateStokProdukFromPemesanan($idVariasiProduk,$stokUsed)
+	public function updateStokProdukFromPemesanan($idVariasiProduk, Int $stokUsed = 0)
 	{
-		return $this->db->query("UPDATE data_variasi_produk SET stok = (stok-".$stokUsed.") WHERE id_variasiproduk = '".$idVariasiProduk."' LIMIT 1");
+		return $this->db->query("UPDATE data_variasi_produk SET stok = (stok-" . $stokUsed . ") WHERE id_variasiproduk = " . $idVariasiProduk . " LIMIT 1");
 	}
 
 	public function getVariasiProdukByIdProdukIdVariasi($idProduk, $idVariasi)

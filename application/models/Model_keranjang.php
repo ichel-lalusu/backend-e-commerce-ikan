@@ -24,6 +24,18 @@ class Model_keranjang extends CI_Model
 		return $this->db->get();
 	}
 
+	public function get_detail_produk_keranjang($id_keranjang=0)
+	{
+		$this->db->select("k.`id_keranjang`, k.`id_produk`, k.`id_variasi_produk`, k.`id_pb`, k.`id_usaha`, k.`harga_produk`, k.`jml_produk`, k.`sub_total`, k.`ikan_per_kg`, k.`potong_per_ekor`, k.`distance`, k.`estimasi_ongkir`, k.`created_date`, p.nama_produk, v.nama_variasi")
+				 ->from("data_keranjang k")
+				 ->join("data_produk p", "p.id_produk = k.id_produk")
+				 ->join("data_variasi_produk vp", "vp.id_variasiproduk = k.id_variasi_produk")
+				 ->join("data_variasi v", "v.id_variasi = vp.id_variasi")
+				 ->where("id_keranjang", $id_keranjang)
+				 ->limit(1);
+		return $this->db->get();
+	}
+
 	public function delete_by_id_keranjang(Int $id_keranjang = null)
 	{
 		if($id_keranjang!==null){
@@ -37,7 +49,7 @@ class Model_keranjang extends CI_Model
 	{
 		$this->db->where("k.id_pb", $id_akun);
 		$this->db->where("k.id_usaha", $id_usaha);
-		$this->db->select("k.`id_keranjang`, p.nama_produk, v.nama_variasi, k.`id_produk`, k.`id_variasi_produk`, k.`id_pb`, k.`id_usaha`, k.`harga_produk`, k.`jml_produk`, k.`created_date`, k.`sub_total`, p.foto_produk, k.estimasi_ongkir, k.distance");
+		$this->db->select("k.`id_keranjang`, p.nama_produk, v.nama_variasi, k.`id_produk`, k.`id_variasi_produk`, k.`id_pb`, k.`id_usaha`, k.`harga_produk`, k.`jml_produk`, k.`created_date`, k.`sub_total`, p.foto_produk, k.estimasi_ongkir, k.distance, k.catatan");
 		$this->db->from("data_keranjang k");
 		$this->db->join("data_variasi_produk vp", "vp.id_variasiproduk = k.id_variasi_produk");
 		$this->db->join("data_variasi v", "v.id_variasi = vp.id_variasi");
@@ -66,7 +78,7 @@ class Model_keranjang extends CI_Model
 		return $this->db->update("data_keranjang", $data);
 	}
 
-	private function is_keranjang_has_akun($id_akun)
+	public function is_keranjang_has_akun($id_akun)
 	{
 		$this->db->select("`id_keranjang`, `id_produk`, `id_variasi_produk`, `id_pb`, `id_usaha`, `harga_produk`, `jml_produk`, `created_date`, `sub_total`");
 		$this->db->where("id_pb", $id_akun);

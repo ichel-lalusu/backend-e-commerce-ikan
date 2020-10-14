@@ -91,30 +91,115 @@ class Produk extends CI_Controller
 		}
 	}
 
-	public function cariProdukLike()
+	public function getUsahaOnSearch()
 	{
-		$input = $this->input->get('input');
-		$id_usaha = $this->input->get('id_usaha');
-		$data = array();
-		$status_header = 500;
+		$keyword = $this->input->get("keyword", TRUE);
+		$orderType = $this->input->get("order_type", TRUE);
+		$lower_input = strtolower($keyword);
+		$upperOrder = strtoupper($orderType);
+		$returnData = array();
 		try {
-			$data_produk = $this->produk->search_produk($input);
-			if($data_produk->num_rows() > 0){
-				$status_header = 200;
-				$data['data'] = $data_produk->result_array();
-				$data['status'] = 'sukses';
+			//code...
+			$cek_str = $this->cek_str($keyword);
+			if(!$cek_str){
+				response(400, array('status' => "failed", 'message' => "karakter harus lebih dari 2", 'data' => array()));
+			}
+			$data_usaha = $this->produk->searchUsahaOnSearch($lower_input, $upperOrder);
+			if(count($data_usaha) > 0){
+				$returnData = array('data' => $data_usaha, 'status' => 'success', 'message' => "Berhasil ambil data usaha pada search");
+				response(200, $returnData);
 			}else{
-				$status_header = 404;
-				$data['data'] = array();
-				$data['status'] = 'kosong';
+				$returnData = array('data' => array(), 'status' => 'failed', 'message' => "Gagal ambil data usaha pada search");
+				response(404, $returnData);
+			}
+		} catch (\Throwable $th) {
+			//throw $th;
+			$returnData = array('data' => array(), 'status' => 'failed', 'message' => "Gagal ambil data usaha pada search karena " . $th->getMessage());
+			response(404, $returnData);
+		}
+	}
+
+	public function getSearchProduk()
+	{
+		$keyword = $this->input->post('keyword', true);
+		$order = $this->input->get("order_type", TRUE);
+		$id_usaha = $this->input->post("id_usaha", TRUE);
+		$distance_text = $this->input->post("distance_text", TRUE);
+		$lower_input = strtolower($keyword);
+		$upperOrder = strtoupper($order);
+		$data = array();
+		try {
+			$cek_str = $this->cek_str($lower_input);
+			if(!$cek_str){
+				response(400, array('status' => "failed", 'message' => "karakter harus lebih dari 2", 'data' => $data));
+			}
+			$responseProdukByUsaha = array();
+			for ($i=0; $i < count($id_usaha); $i++) { 
+				$id = intval($id_usaha[$i]);
+				$result_produk = $this->produk->search_produk($lower_input, $upperOrder, $id);
+				$isProdukNotEmpty = $this->produk->isProdukNotEmpty($result_produk);
+				if($isProdukNotEmpty){
+					foreach($result_produk->result() as $produks){
+						$responseProdukByUsaha[] = $this->produk->staticConstructProdukOnSearch($produks, $id, $distance_text[$id]);
+					}
+					// $responseProdukByUsaha[$id] = $this->produk->constructProdukOnSearch($result_produk);
+					// $responseProdukByUsaha[$id] = ;
+				}
+			}
+			if(count($responseProdukByUsaha) > 0){
+				$data['data_produk'] = $responseProdukByUsaha;
+				$data['status'] = "success";
+				$data['message'] = "Berhasil ambil data produk pada search";
+			}else{
+				$data['data_produk'] = $responseProdukByUsaha;
+				$data['status'] = "failed";
+				$data['message'] = "Gagal ambil data produk pada search";
 			}
 			// $data = $data_produk->result_array();
 		} catch (Exception $e) {
-			$status_header = 500;
-			$data['data'] = array();
-			$data['status'] = 'gagal';
+			response(500, array('status' => 'failed', 'message' => "Gagal karena " . $e->getMessage(), 'data'=>$data));
 		}
-		response($status_header, $data);
+		response(200, $data);
+	}
+
+	public function cariProdukLike()
+	{
+		$input = $this->input->get('input', true);
+		$order = $this->input->get("order_type", TRUE);
+		$id_usaha = intval($this->input->get("id_usaha", TRUE));
+		$lower_input = strtolower($input);
+		$upperOrder = strtoupper($order);
+		$data = array();
+		try {
+			$cek_str = $this->cek_str($input);
+			if(!$cek_str){
+				response(400, array('status' => "failed", 'message' => "karakter harus lebih dari 2", 'data' => $data));
+			}
+			$result_produk = $this->produk->search_produk($lower_input, $upperOrder, $id_usaha);
+			$isProdukNotEmpty = $this->produk->isProdukNotEmpty($result_produk);
+			if($isProdukNotEmpty){
+				$data_produk = $this->produk->constructProdukOnSearch($result_produk);
+				$data['data_produk'] = $data_produk;
+				$data['status'] = 'success';
+				$data['message'] = "Berhasil ditemukan";
+			}else{
+				response(404, array('status' => 'failed', 'message' => "Tidak ditemukan", 'data' => $data));
+			}
+			// $data = $data_produk->result_array();
+		} catch (Exception $e) {
+			response(500, array('status' => 'failed', 'message' => "Gagal karena " . $e->getMessage(), 'data'=>$data));
+		}
+		response(200, $data);
+	}	
+
+	private function cek_str(String $input){
+		$str = str_split($input);
+		$counted_str = count($str);
+		if($counted_str < 3){
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 	public function prosesinput_produk()
@@ -261,6 +346,7 @@ class Produk extends CI_Controller
 		$id_toko			= intval($this->input->post('id_toko'));
 		$min_pemesanan		= intval($this->input->post('minOrder'));
 		$ekor_per_kg 		= intval($this->input->post('total_ekor_per_kg'));
+		$deskripsi			= $this->input->post('deskripsi');
 		// $variasi			= ($_POST['variasi']) ? $_POST['variasi'] : [];
 		// $variasi			= ($this->input->post('variasi')!==null) ? $this->input->post('variasi') : null;
 
@@ -310,7 +396,8 @@ class Produk extends CI_Controller
 			'foto_produk' => $foto_produk,
 			'berat_produk' => $berat_produk,
 			'min_pemesanan' => $min_pemesanan,
-			'ekor_per_kg' => $ekor_per_kg
+			'ekor_per_kg' => $ekor_per_kg,
+			'deskripsi' => $deskripsi
 		);
 		try {
 			$update = $this->produk->ubah_produk($data_update, $id_produk);
