@@ -91,7 +91,8 @@ class Model_produk extends CI_Model
 		// QUERY
 		$this->db->select("produk.id_produk, produk.nama_produk, produk.kategori, produk.foto_produk, produk.berat_produk, produk.min_pemesanan, 
 			(SELECT MIN(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as minprice, 
-			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as max_price")
+			(SELECT MAX(harga) FROM `data_variasi_produk` WHERE id_produk = produk.id_produk and status_p='aktif') as max_price,
+			usaha.nama_usaha, usaha.id_usaha, usaha.latitude as lat, usaha.longitude as lng")
 			->from("data_produk produk")
 			->join("data_usaha usaha", "produk.id_usaha = usaha.id_usaha")
 			->join("data_penjual penjual", "penjual.id_pj = usaha.id_pj")
