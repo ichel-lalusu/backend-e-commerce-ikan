@@ -279,7 +279,7 @@ class Model_produk extends CI_Model
 
 	public function ambil_id_variasi($id_var)
 	{
-		return $this->db->query("SELECT id_variasi FROM data_variasi WHERE nama_variasi = '$id_Var' LIMIT 1;");
+		return $this->db->query("SELECT id_variasi FROM data_variasi WHERE nama_variasi = '$id_var' LIMIT 1;");
 	}
 
 	public function hapus($id_produk)
@@ -395,7 +395,7 @@ class Model_produk extends CI_Model
 		$this->db->from('data_variasi_produk vp');
 		$this->db->join('data_produk p', 'vp.id_produk = p.id_produk');
 		$this->db->where('vp.id_variasiproduk', $id_var);
-		$this->db->where('vp.id_variasi', $id_var2);
+		$this->db->where('vp.id_variasi', $id_Var2);
 		return $this->db->get();
 	}
 
@@ -419,9 +419,10 @@ class Model_produk extends CI_Model
 		return $this->db->get('data_produk p');
 	}
 
-	public function updateStokProdukFromPemesanan($idVariasiProduk, Int $stokUsed = 0)
+	public function updateStokProdukFromPemesanan($idVariasiProduk, array $data)
 	{
-		return $this->db->query("UPDATE data_variasi_produk SET stok = (stok-" . $stokUsed . ") WHERE id_variasiproduk = " . $idVariasiProduk . " LIMIT 1");
+		return $this->db->update("data_variasi_produk", $data, array('id_variasiproduk' => $idVariasiProduk), 1);
+		// return $this->db->query("UPDATE data_variasi_produk SET stok = $stokSisa WHERE id_variasiproduk = " . $idVariasiProduk . " LIMIT 1");
 	}
 
 	public function getVariasiProdukByIdProdukIdVariasi($idProduk, $idVariasi)
