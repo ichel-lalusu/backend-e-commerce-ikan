@@ -651,15 +651,17 @@ class Pemesanan extends CI_Controller
 
         public function get_transaksi_today()
         {
-            $id_usaha = $this->input->get("id_usaha");
+            $id_usaha = $this->input->get("id_usaha", TRUE);
             $response = array();
             $status_header = 500;
+            $getDateToday = date("Y-m-d");
             try {
-                $where = "id_usaha = '$id_usaha'" . 
-                " AND status_pemesanan = 'Terbayar' AND tgl_pengiriman = date(now())";
+                // $where = array('id_usaha' => $id_usaha, 'status_pemesanan' => "Terbayar", 'tgl_pengirmian' => $getDateToday);
+                //  "id_usaha = '$id_usaha'" . 
+                // " AND status_pemesanan = 'Terbayar' AND tgl_pengiriman = '$getDateToday'";
                 $limit = null;
                 $orderBy = "id_pemesanan ASC";
-                $query = $this->Pemesanan->getWhereDataPemesananByIdUsaha($where, $limit, $orderBy);
+                $query = $this->Pemesanan->pemesananUsahaHariIni($id_usaha, $getDateToday, $limit, $orderBy);
             // echo $this->db->last_query();
                 if($query->num_rows() > 0){
             // $dataPemesanan = $query->row();
@@ -1068,22 +1070,46 @@ class Pemesanan extends CI_Controller
              $DataDetail = $this->Model_pemesanan->getDetailPemesanan($id_pemesanan);
              $counter_update = 0;
              $id_terupdate = array();
+             $produkTerupdate = array();
              if($DataDetail->num_rows() > 0){
                  foreach ($DataDetail->result() as $key) {
                      # code...
                      $jml_yang_dipesan = intval($key->jml_produk);
                      $id_variasi_produk = intval($key->id_produk);
-                    // UPDATE STOK BY MODEL SQL PRODUK
-                     $update_stok = $this->Produk->updateStokProdukFromPemesanan($id_variasi_produk, $jml_yang_dipesan);
-                     if($update_stok){
-                         $id_terupdate[] = $id_variasi_produk; 
-                         $counter_update++;
+                     $stokYangTersedia = intval($key->stok);
+                     if($stokYangTersedia == 0 && $stokYangTersedia < $jml_yang_dipesan){
+                         $produkTerupdate[] = array(
+                             'id_variasi_produk' => $id_variasi_produk,
+                             'status' => "Failed",
+                             'message' => "Stok yang tersedia tidak mencukupi dari yang dipesan"
+                         );
                      }else{
-                         response(400, array('status' => "failed", "message" => "Update stok gagal"));
+                         // UPDATE STOK BY MODEL SQL PRODUK
+                         $sisaStok = $stokYangTersedia - $jml_yang_dipesan;
+                         $setData = array("stok"=> $sisaStok);
+                        $update_stok = $this->Produk->updateStokProdukFromPemesanan($id_variasi_produk, $setData);
+                        if($update_stok){
+                            $produkTerupdate[] = array(
+                                'id_variasi_produk' => $id_variasi_produk,
+                                'status' => "success",
+                                'message' => "Berhasil update stok yang tersedia",
+                                'stok' => $sisaStok
+                            );
+                            $id_terupdate[] = $id_variasi_produk; 
+                            $counter_update++;
+                        }else{
+                            response(400, array('status' => "failed", "message" => "Update stok gagal"));
+                        }
                      }
+                    
                  }
                  if($counter_update > 0){
-                     return array('status' => 'success', 'message' => "Update stok produk sukses", 'affected_rows' => $counter_update, 'id_terupdate' => $id_terupdate, 'id_pemesanan' => $id_pemesanan);
+                     return array('status' => 'success', 
+                     'produkTerupdate' => $produkTerupdate,
+                     'message' => "Update stok produk sukses", 
+                     'affected_rows' => $counter_update, 
+                     'id_terupdate' => $id_terupdate, 
+                     'id_pemesanan' => $id_pemesanan);
                  }
              }
          } catch (\Throwable $th) {
@@ -1341,7 +1367,7 @@ public function procced_order_to_delivery()
     response($status_header, $response);
 }
 
-protected function save_detail_pengiriman($data=array(), $id_pengiriman)
+protected function save_detail_pengiriman($data, $id_pengiriman)
 {
     $data_pesanan = array();
     foreach ($data->result() as $key) {

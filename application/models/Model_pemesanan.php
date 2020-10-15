@@ -60,6 +60,20 @@ class Model_pemesanan extends CI_Model
         return $this->db->get('data_pemesanan');
     }
 
+    public function pemesananUsahaHariIni($id_usaha, $date, $limit=null, $orderBy=null)
+    {
+        $this->db->select("`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`");
+        $this->db->where(array('id_usaha' => $id_usaha, 'status_pemesanan' => "Terbayar", 'tgl_pengiriman' => $date));
+        if($limit!=null){
+            $this->db->limit($limit);
+        }
+        if($orderBy!==null){
+            $this->db->order_by($orderBy);
+        }
+        $this->db->from('data_pemesanan');
+        return $this->db->get();
+    }
+
     public function getWhereDataPemesananByIdUsaha($where, $limit=null, $orderBy=null)
     {
         $this->db->select("`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`");
@@ -107,7 +121,7 @@ class Model_pemesanan extends CI_Model
 
     public function getDetailPemesanan($idPemesanan)
     {
-        $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk, ddp.berat_akhir, ddp.catatan');
+        $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk, ddp.berat_akhir, ddp.catatan, dvp.stok');
         $this->db->from('data_detail_pemesanan ddp');
         $this->db->join('data_variasi_produk dvp', 'ddp.id_produk = dvp.id_variasiproduk');
         $this->db->join('data_produk dp', 'dvp.id_produk = dp.id_produk');
