@@ -122,7 +122,7 @@ class Produk extends CI_Controller
 	public function getSearchProduk()
 	{
 		$keyword = $this->input->post('keyword', true);
-		$order = $this->input->get("order_type", TRUE);
+		$order = $this->input->post("order_type", TRUE);
 		$id_usaha = $this->input->post("id_usaha", TRUE);
 		$distance_text = $this->input->post("distance_text", TRUE);
 		$lower_input = strtolower($keyword);
