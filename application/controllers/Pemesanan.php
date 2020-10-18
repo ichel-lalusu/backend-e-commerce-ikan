@@ -1150,7 +1150,7 @@ class Pemesanan extends CI_Controller
             if ($DataDetail->num_rows() > 0) {
                 foreach ($DataDetail->result() as $key) {
                     # code...
-                    $jml_yang_dipesan = intval($key->jml_produk);
+                    $jml_yang_dipesan = intval($key->jml_produk)*10;
                     $id_variasi_produk = intval($key->id_var);
                     $stokYangTersedia = intval($key->stok);
                     $sisaStok = $stokYangTersedia - $jml_yang_dipesan;
