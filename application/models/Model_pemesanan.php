@@ -327,4 +327,10 @@ class Model_pemesanan extends CI_Model
     {
         return $this->db->update("data_pemesanan", $data, "id_pemesanan = $id_pemesanan", 1);
     }
+
+    public function update_pemesanan_in_batch($array_id, $data)
+    {
+        $this->db->where_in("id_pemesanan", $array_id);
+        return $this->db->update("data_pemesanan", $data);
+    }
 }
