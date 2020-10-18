@@ -1413,8 +1413,10 @@ class Pemesanan extends CI_Controller
                 'id_kurir' => $kurir,
                 'id_kendaraan' => $kendaraan
             );
+            $setUpdatePemesanan = array("status_pemesanan"=> "Pengiriman");
+            $updatePemesananDalamPengiriman = $this->Pemesanan->update_pemesanan_in_batch($pesanan, $setUpdatePemesanan);
             $insert_pengiriman = $this->Model_pengiriman->insert_pengiriman($data_pengiriman);
-            if ($insert_pengiriman) {
+            if ($insert_pengiriman && $updatePemesananDalamPengiriman) {
                 $id_pengiriman = $this->db->insert_id();
                 if ($data->num_rows() > 0) {
                     $response['data_pengiriman'] = $this->save_detail_pengiriman($data, $id_pengiriman);
