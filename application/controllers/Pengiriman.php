@@ -71,69 +71,64 @@ class Pengiriman extends CI_Controller
 				}
 			}
 			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
-			$data_pengiriman = $Pengiriman->get_pengiriman_penjual($id_akun);
-			if ($data_pengiriman->num_rows() > 0) {
-				$result = $data_pengiriman->row_array();
-				$id_pengiriman = $data_pengiriman->row()->id_pengiriman;
-				$Pengiriman->set_id_pengiriman($id_pengiriman);
-				// $this->Model_pengiriman->id_pengiriman = $data_pengiriman->row()->id_pengiriman;
-				$detail_pengiriman = $Pengiriman->get_detail_pengiriman();
-
-				foreach ($detail_pengiriman->result() as $detail) {
-					$where = "pemesanan.id_pemesanan = $detail->id_pemesanan";
-					$select_pemesanan = "pemesanan.tipe_pengiriman, pemesanan.total_harga as total_harga, pemesanan.id_pb, pemesanan.id_usaha, pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, pembeli.alamat_pb, pembeli.kel_pb, pembeli.kec_pb, pembeli.foto_pb, pembeli.telp_pb, pembeli.kab_pb, usaha.nama_usaha, usaha.alamat_usaha, usaha.latitude, usaha.longitude";
-					$join[] = array('table' => "data_pembeli pembeli", 'on' => 'pemesanan.id_pb = pembeli.id_pb', 'join' => null);
-					$join[] = array('table' => "data_usaha usaha", 'on' => 'pemesanan.id_usaha = usaha.id_usaha', 'join' => null);
-					$pemesanan = $this->Model_pemesanan->get_where($select_pemesanan, $where, $join);
-					$data_pemesanan = $pemesanan->row();
-					$alamat_pembeli = $data_pemesanan->alamat_pb;
-					$kelurahan_pembeli = ($data_pemesanan->kel_pb !== "") ? $data_pemesanan->kel_pb : "";
-					$kecamatan_pembeli = ($data_pemesanan->kec_pb !== "") ? $data_pemesanan->kec_pb : "";
-					$kabupaten_pembeli = ($data_pemesanan->kab_pb !== "") ? $data_pemesanan->kab_pb : "";
-					$notelp_pembeli = ($data_pemesanan->telp_pb !== "") ? $data_pemesanan->telp_pb : "";
-					$foto_pb = base_url("foto_pembeli/") . $data_pemesanan->foto_pb;
-					// var_dump($data_pemesanan->result());
-					$detail_pemesanan = $this->Model_pemesanan->getDetailPemesanan($detail->id_pemesanan);
-					$data_detail_pemesanan = $detail_pemesanan->row();
-					$result['detail_pengiriman'][] = array(
-						'urutan' => intval($detail->urutan),
-						'id_pemesanan' => intval($detail->id_pemesanan),
-						'id_pembeli' => intval($data_pemesanan->id_pb),
-						'status' => $detail->status,
-						'detail_pembeli' => array(
-							'nama' => $data_pemesanan->nama_pb,
-							'alamat_pembeli' => $alamat_pembeli,
-							'kelurahan' => $kelurahan_pembeli,
-							'kecamatan' => $kecamatan_pembeli,
-							'kabupaten' => $kabupaten_pembeli,
-							'no_telp' => $notelp_pembeli,
-							'foto_pb' => $foto_pb,
-						),
-						'detail_pemesanan' => array(
-							'total_harga' => intval($data_pemesanan->total_harga),
-							'detail_produk' => $this->construct_data_produk($detail->id_pemesanan),
-							'detail_pembayaran' => $this->construct_detail_pembayaran($detail->id_pemesanan),
-						),
-						'destinasi' => array(
-							'latitude' => floatval($data_pemesanan->latitude_pb),
-							'longitude' => floatval($data_pemesanan->longitude_pb)
-						)
-					);
-				}
-				$this->db->where("id_pj", $id_akun);
-				$result_usaha = $Penjual->ambil_semua_usaha()->row();
-				$result['asal'] = array(
-					'latitude' => floatval($result_usaha->latitude),
-					'longitude' => floatval($result_usaha->longitude)
-				);
-				$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
-				$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
-				$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
-				$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
-				response(200, $result);
-			} else {
-				response(404, $result);
+			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
+			$detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman);
+			if($detail_pengiriman->num_rows() == 0){
+				response(400, array('status' => "Failed", 'message' => "Data pengiriman tidak ditemukan", 'id_pengiriman' => $id_pengiriman));
 			}
+			$result = $data_pengiriman->row_array();
+			foreach ($detail_pengiriman->result() as $detail) {
+				$where = "pemesanan.id_pemesanan = $detail->id_pemesanan";
+				$select_pemesanan = "pemesanan.tipe_pengiriman, pemesanan.total_harga as total_harga, pemesanan.id_pb, pemesanan.id_usaha, pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, pembeli.alamat_pb, pembeli.kel_pb, pembeli.kec_pb, pembeli.foto_pb, pembeli.telp_pb, pembeli.kab_pb, usaha.nama_usaha, usaha.alamat_usaha, usaha.latitude, usaha.longitude";
+				$join[] = array('table' => "data_pembeli pembeli", 'on' => 'pemesanan.id_pb = pembeli.id_pb', 'join' => null);
+				$join[] = array('table' => "data_usaha usaha", 'on' => 'pemesanan.id_usaha = usaha.id_usaha', 'join' => null);
+				$pemesanan = $this->Model_pemesanan->get_where($select_pemesanan, $where, $join);
+				$data_pemesanan = $pemesanan->row();
+				$alamat_pembeli = $data_pemesanan->alamat_pb;
+				$kelurahan_pembeli = ($data_pemesanan->kel_pb !== "") ? $data_pemesanan->kel_pb : "";
+				$kecamatan_pembeli = ($data_pemesanan->kec_pb !== "") ? $data_pemesanan->kec_pb : "";
+				$kabupaten_pembeli = ($data_pemesanan->kab_pb !== "") ? $data_pemesanan->kab_pb : "";
+				$notelp_pembeli = ($data_pemesanan->telp_pb !== "") ? $data_pemesanan->telp_pb : "";
+				$foto_pb = base_url("foto_pembeli/") . $data_pemesanan->foto_pb;
+				// var_dump($data_pemesanan->result());
+				$detail_pemesanan = $this->Model_pemesanan->getDetailPemesanan($detail->id_pemesanan);
+				$data_detail_pemesanan = $detail_pemesanan->row();
+				$result['detail_pengiriman'][] = array(
+					'urutan' => intval($detail->urutan),
+					'id_pemesanan' => intval($detail->id_pemesanan),
+					'id_pembeli' => intval($data_pemesanan->id_pb),
+					'status' => $detail->status,
+					'detail_pembeli' => array(
+						'nama' => $data_pemesanan->nama_pb,
+						'alamat_pembeli' => $alamat_pembeli,
+						'kelurahan' => $kelurahan_pembeli,
+						'kecamatan' => $kecamatan_pembeli,
+						'kabupaten' => $kabupaten_pembeli,
+						'no_telp' => $notelp_pembeli,
+						'foto_pb' => $foto_pb,
+					),
+					'detail_pemesanan' => array(
+						'total_harga' => intval($data_pemesanan->total_harga),
+						'detail_produk' => $this->construct_data_produk($detail->id_pemesanan),
+						'detail_pembayaran' => $this->construct_detail_pembayaran($detail->id_pemesanan),
+					),
+					'destinasi' => array(
+						'latitude' => floatval($data_pemesanan->latitude_pb),
+						'longitude' => floatval($data_pemesanan->longitude_pb)
+					)
+				);
+			}
+			$this->db->where("id_pj", $id_akun);
+			$result_usaha = $Penjual->ambil_semua_usaha()->row();
+			$result['asal'] = array(
+				'latitude' => floatval($result_usaha->latitude),
+				'longitude' => floatval($result_usaha->longitude)
+			);
+			$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
+			$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
+			$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
+			$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
+			response(200, $result);
 		} catch (Exception $e) {
 			response(500, $result);
 		}
