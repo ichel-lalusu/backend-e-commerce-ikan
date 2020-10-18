@@ -114,6 +114,15 @@ class Model_pengiriman extends CI_Model
 				->join("data_pemesanan pemesanan", "pemesanan.id_pemesanan = detail.id_pemesanan");
 	}
 
+	public function getDetailPengirimanPembeliByIdPemesanan($id_pemesanan=null, $id_pembeli=null)
+	{
+		$this->db->select("detail.`id_detail_pengiriman`, detail.`id_pengiriman`, detail.`id_pemesanan`, detail.`urutan`, detail.`status`, detail.`penerima`, pemesanan.jarak as distance, pemesanan.biaya_kirim as ongkir")
+				->from("data_detail_pengiriman detail")
+				->join("data_pemesanan pemesanan", "pemesanan.id_pemesanan = detail.id_pemesanan")
+				->where(array('detail.id_pemesanan' => $id_pemesanan, 'pemesanan.id_pb' => $id_pembeli));
+		return $this->db->get();
+	}
+
 	public function get_lokasi_kurir($kurir)
 	{
 		return $this->db->select("`id_track`, `id_kurir`, `longitude`, `latitude`")
