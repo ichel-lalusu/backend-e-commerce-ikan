@@ -118,8 +118,7 @@ class Pengiriman extends CI_Controller
 					)
 				);
 			}
-			$this->db->where("id_pj", $id_akun);
-			$result_usaha = $Penjual->ambil_semua_usaha()->row();
+			$result_usaha = $this->Model_penjual->ambil_data_usaha($id_akun)->row();
 			$result['asal'] = array(
 				'latitude' => floatval($result_usaha->latitude),
 				'longitude' => floatval($result_usaha->longitude)
