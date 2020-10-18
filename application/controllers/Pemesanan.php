@@ -1097,20 +1097,26 @@ class Pemesanan extends CI_Controller
     {
         $id_pemesanan = intval($this->input->post("idPemesanan", TRUE));
         $id_pembayaran = intval($this->input->post("id_pembayaran", TRUE));
-        
+        // var_dump($this->input->post());
         $array = array();
         try {
-            $wherePemesanan = array("id_pemesanan =", $id_pemesanan);
+            $wherePemesanan = array("id_pemesanan"=> $id_pemesanan);
             $get_data = $this->db->get_where("data_pembayaran", $wherePemesanan, 1);
+            // echo $this->db->last_query();
+            // echo '<br>';
             if ($get_data->num_rows() > 0) {
+                
                 $data_update = array('verifikasi' => '1');
                 $whereUpdate = array("id_pembayaran" => $id_pembayaran);
                 $update = $this->db->update("data_pembayaran", $data_update, $whereUpdate);
                 if ($update) {
-
+                    // echo $this->db->last_query();
+                    // echo '<br>';
                     $data_update2 = array("status_pemesanan" => "Terbayar");
                     $update_pemesanan = $this->Pemesanan->updatePemesanan($data_update2, $wherePemesanan);
                     if ($update_pemesanan > 0) {
+                        // echo $this->db->last_query();
+                        // echo '<br>';
                         $updateStokProdukPemesanan = $this->UpdateStokProduk($id_pemesanan);
                         $array = array('status' => 'success', 'message' => 'Verifikasi Berhasil', 'respon_update_stok' => $updateStokProdukPemesanan, 'id_pemesanan' => $id_pemesanan);
                     } else {
@@ -1129,6 +1135,7 @@ class Pemesanan extends CI_Controller
             $array = array('status' => 'failed', 'message' => 'Data Gagal Terbaca Dengan ' . $e->getMessage());
             response(500, $array);
         }
+        // exit();
         response(200, $array);
     }
 
@@ -1136,15 +1143,15 @@ class Pemesanan extends CI_Controller
     {
         try {
             //code...
-            $DataDetail = $this->Model_pemesanan->getDetailPemesananByIdPemesanan($id_pemesanan);
+            $DataDetail = $this->Pemesanan->getDetailPemesananByIdPemesanan($id_pemesanan);
             $counter_update = 0;
             $id_terupdate = array();
             $produkTerupdate = array();
             if ($DataDetail->num_rows() > 0) {
                 foreach ($DataDetail->result() as $key) {
                     # code...
-                    $jml_yang_dipesan = intval($key->jml_produk);
-                    $id_variasi_produk = intval($key->id_produk);
+                    $jml_yang_dipesan = intval($key->jml_produk)*10;
+                    $id_variasi_produk = intval($key->id_var);
                     $stokYangTersedia = intval($key->stok);
                     $sisaStok = $stokYangTersedia - $jml_yang_dipesan;
                     if ($stokYangTersedia == 0 && $stokYangTersedia < $jml_yang_dipesan) {
@@ -1154,6 +1161,8 @@ class Pemesanan extends CI_Controller
                         $setData = array("stok" => $sisaStok);
                         $update_stok = $this->Produk->updateStokProdukFromPemesanan($id_variasi_produk, $setData);
                         if ($update_stok) {
+                            // echo $this->db->last_query();
+                            // echo '<br>';
                             $produkTerupdate[] = array(
                                 'id_variasi_produk' => $id_variasi_produk,
                                 'status' => "success",
