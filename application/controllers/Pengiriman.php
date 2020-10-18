@@ -65,7 +65,7 @@ class Pengiriman extends CI_Controller
 				$this->Model_pembeli->set_id_pembeli($id_akun);
 				$Data_pembeli = $this->Model_pembeli->profile()->get();
 				if ($Data_pembeli->num_rows() > 0) {
-					$this->get_pengiriman_pembeli();
+					return $this->get_pengiriman_pembeli();
 				} else {
 					response(401, array('message' => "authentication is needed"));
 				}
@@ -73,7 +73,7 @@ class Pengiriman extends CI_Controller
 			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
 			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
 			$detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman);
-			if($detail_pengiriman->num_rows() == 0){
+			if ($detail_pengiriman->num_rows() == 0) {
 				response(400, array('status' => "Failed", 'message' => "Data pengiriman tidak ditemukan", 'id_pengiriman' => $id_pengiriman));
 			}
 			$result = $data_pengiriman->row_array();
@@ -169,8 +169,7 @@ class Pengiriman extends CI_Controller
 
 	protected function contruct_detail_kurir($id_kurir)
 	{
-		$Kurir = new Model_kurir();
-		$data_kurir = $Kurir->get_by_id($id_kurir);
+		$data_kurir = $this->Model_kurir->get_by_id($id_kurir);
 		if ($data_kurir->num_rows() > 0) {
 			$response_detail_kurir = $data_kurir->row();
 			return array(
@@ -179,7 +178,7 @@ class Pengiriman extends CI_Controller
 				'kontak' => $response_detail_kurir->telp_kurir
 			);
 		} else {
-			return "";
+			return null;
 		}
 	}
 
@@ -196,9 +195,7 @@ class Pengiriman extends CI_Controller
 
 	protected function construct_detail_pembayaran($id_pemesanan)
 	{
-		$Pembayaran = new Model_pembayaran();
-		$where = "id_pemesanan = " . $id_pemesanan;
-		$detail_pembayaran = $Pembayaran->get_selected_pembayaran("", $where)->row();
+		$detail_pembayaran = $this->Model_pembayaran->getDataPembayaranOnlyByIdPemesanan($id_pemesanan)->row();//->get_selected_pembayaran("", $where)->row();
 		return array(
 			'metode_pembayaran' => $detail_pembayaran->metode_pembayaran,
 			'waktu_pembayaran' => $detail_pembayaran->waktu_pembayaran,
@@ -210,13 +207,78 @@ class Pengiriman extends CI_Controller
 	{
 		$Pengiriman = new Model_pengiriman();
 		$Pembeli = new Model_pembeli();
-		$id_akun = intval($this->input->post("id_akun", TRUE));
-		$id_pemesanan = intval($this->input->post("id_pemesanan", TRUE));
-		$this->db->where("pemesanan.id_pemesanan", $id_pemesanan);
-		$Data_pengiriman = $Pengiriman->Detail_pengiriman()->get();
-		$this->db->reset_query();
-		if ($Data_pengiriman->num_rows() == 0) {
-			response(404, array('message' => "Data Kosong"));
+		$id_akun = intval($this->input->get("akun", TRUE));
+		$id_pemesanan = intval($this->input->get("id_pemesanan", TRUE));
+		try {
+			//code...
+			$detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanPembeliByIdPemesanan($id_pemesanan, $id_akun);
+			
+			if ($detail_pengiriman->num_rows() == 0) {
+				response(404, array('status' => "failed", 'message' => "data pengiriman tidak ditemukan", 'id_pemesanan' => $id_pemesanan));
+			}
+			
+			$detail = $detail_pengiriman->row();
+			$id_pengiriman = $detail->id_pengiriman;
+			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
+			
+			$result = $data_pengiriman->row_array();
+			$resultObject = $data_pengiriman->row();
+			$this->db->reset_query();
+			$pemesanan = $this->Model_pemesanan->getDataPemesananPembeliDanUsahaByIdPemesanan($id_pemesanan);
+			
+			$data_pemesanan = $pemesanan->row();
+			$alamat_pembeli = $data_pemesanan->alamat_pb;
+			$kelurahan_pembeli = ($data_pemesanan->kel_pb !== "") ? $data_pemesanan->kel_pb : "";
+			$kecamatan_pembeli = ($data_pemesanan->kec_pb !== "") ? $data_pemesanan->kec_pb : "";
+			$kabupaten_pembeli = ($data_pemesanan->kab_pb !== "") ? $data_pemesanan->kab_pb : "";
+			$notelp_pembeli = ($data_pemesanan->telp_pb !== "") ? $data_pemesanan->telp_pb : "";
+			$foto_pb = base_url("foto_pembeli/") . $data_pemesanan->foto_pb;
+			
+
+
+			$result['detail_pengiriman'] = array(
+				'urutan' => intval($detail->urutan),
+				'id_pemesanan' => intval($detail->id_pemesanan),
+				'id_pembeli' => intval($data_pemesanan->id_pb),
+				'status' => $detail->status,
+				'detail_pembeli' => array(
+					'nama' => $data_pemesanan->nama_pb,
+					'alamat_pembeli' => $alamat_pembeli,
+					'kelurahan' => $kelurahan_pembeli,
+					'kecamatan' => $kecamatan_pembeli,
+					'kabupaten' => $kabupaten_pembeli,
+					'no_telp' => $notelp_pembeli,
+					'foto_pb' => $foto_pb,
+				),
+				'detail_pemesanan' => array(
+					'total_harga' => intval($data_pemesanan->total_harga),
+					'detail_produk' => $this->construct_data_produk($detail->id_pemesanan),
+					'detail_pembayaran' => $this->construct_detail_pembayaran($detail->id_pemesanan),
+				),
+				'destinasi' => array(
+					'latitude' => floatval($data_pemesanan->latitude_pb),
+					'longitude' => floatval($data_pemesanan->longitude_pb)
+				)
+			);
+			$result_usaha = $this->Model_penjual->ambil_data_usaha($resultObject->id_pj)->row();
+			$result['asal'] = array(
+				'latitude' => floatval($result_usaha->latitude),
+				'longitude' => floatval($result_usaha->longitude)
+			);
+			$cek_lokasi_kurir = $this->track_lokasi_kurir(intval($result['id_kurir']));
+			$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
+			$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
+			$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
+			if($cek_lokasi_kurir==null){
+				
+				$result['lokasi_kurir'] = $this->construct_detail_usaha($result['id_pj']);
+			}else{
+				$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
+			}
+			
+			response(200, $result);
+		} catch (\Throwable $th) {
+			//throw $th;
 		}
 	}
 
@@ -227,7 +289,7 @@ class Pengiriman extends CI_Controller
 			$data_lokasi = $lokasi_kurir->row();
 			return array('latitude' => $data_lokasi->latitude, 'longitude' => $data_lokasi->longitude);
 		} else {
-			return "";
+			return null;
 		}
 	}
 
@@ -341,7 +403,7 @@ class Pengiriman extends CI_Controller
 						'code'		=> 2
 					);
 					response(200, $result);
-				}else{
+				} else {
 					$result = array(
 						'nama_penerima' => $nama_peneriman,
 						'status_pengiriman' => $status_pengiriman,
@@ -353,7 +415,7 @@ class Pengiriman extends CI_Controller
 					response(200, $result);
 				}
 				// $row_detail_pengiriman = $Detail_pengiriman1->row();
-				
+
 			} else {
 				$error = $this->db->error();
 				$result = array(

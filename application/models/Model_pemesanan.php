@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 
  */
@@ -6,13 +7,13 @@ class Model_pemesanan extends CI_Model
 {
     public $nama_pemesan;
     public $id_pemesanan;
-    
+
     public function set_idPemesanan($id_pemesanan)
     {
         $this->id_pemesanan = $id_pemesanan;
-        $this->db->set('id_pemesanan',$id_pemesanan);
+        $this->db->set('id_pemesanan', $id_pemesanan);
     }
-	public function createPemesanan($data)
+    public function createPemesanan($data)
     {
         return $this->db->insert('data_pemesanan', $data);
     }
@@ -27,61 +28,61 @@ class Model_pemesanan extends CI_Model
         return $this->db->insert('data_detail_pemesanan', $data);
     }
 
-    public function getDataPemesananByIdUser($idUser,$limit=null, $orderBy=null,$typeOrder=null)
+    public function getDataPemesananByIdUser($idUser, $limit = null, $orderBy = null, $typeOrder = null)
     {
-        $this->db->where('id_pb=',$idUser);
-        if($limit!=null){
+        $this->db->where('id_pb=', $idUser);
+        if ($limit != null) {
             $this->db->limit($limit);
         }
-        if($orderBy!=null){
-            if($typeOrder!=null){
+        if ($orderBy != null) {
+            if ($typeOrder != null) {
                 $this->db->order_by($orderBy, $typeOrder);
-            }else{
+            } else {
                 $this->db->order_by($orderBy, "ASC");
-            } 
+            }
         }
         return $this->db->get('data_pemesanan');
     }
 
-    public function getDataPemesananByIdUserAndStatus($idUser, $status,$limit=null, $orderBy=null,$typeOrder=null)
+    public function getDataPemesananByIdUserAndStatus($idUser, $status, $limit = null, $orderBy = null, $typeOrder = null)
     {
-        $this->db->where('id_pb=',$idUser);
+        $this->db->where('id_pb=', $idUser);
         $this->db->where('status_pemesanan', $status);
-        if($limit!=null){
+        if ($limit != null) {
             $this->db->limit($limit);
         }
-        if($orderBy!=null){
-            if($typeOrder!=null){
+        if ($orderBy != null) {
+            if ($typeOrder != null) {
                 $this->db->order_by($orderBy, $typeOrder);
-            }else{
+            } else {
                 $this->db->order_by($orderBy, "ASC");
-            } 
+            }
         }
         return $this->db->get('data_pemesanan');
     }
 
-    public function pemesananUsahaHariIni($id_usaha, $date, $limit=null, $orderBy=null)
+    public function pemesananUsahaHariIni($id_usaha, $date, $limit = null, $orderBy = null)
     {
         $this->db->select("`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`");
         $this->db->where(array('id_usaha' => $id_usaha, 'status_pemesanan' => "Terbayar", 'tgl_pengiriman' => $date));
-        if($limit!=null){
+        if ($limit != null) {
             $this->db->limit($limit);
         }
-        if($orderBy!==null){
+        if ($orderBy !== null) {
             $this->db->order_by($orderBy);
         }
         $this->db->from('data_pemesanan');
         return $this->db->get();
     }
 
-    public function getWhereDataPemesananByIdUsaha($where, $limit=null, $orderBy=null)
+    public function getWhereDataPemesananByIdUsaha($where, $limit = null, $orderBy = null)
     {
         $this->db->select("`id_pemesanan`, `waktu_pemesanan`, `tipe_pengiriman`, `tgl_pengiriman`, `jarak`, `biaya_kirim`, `total_harga`, `status_pemesanan`, `id_pb`, `id_usaha`");
         $this->db->where($where);
-        if($limit!=null){
+        if ($limit != null) {
             $this->db->limit($limit);
         }
-        if($orderBy!==null){
+        if ($orderBy !== null) {
             $this->db->order_by($orderBy);
         }
         $this->db->from('data_pemesanan');
@@ -98,10 +99,10 @@ class Model_pemesanan extends CI_Model
         $this->nama_pemesan = $data_pembeli->nama_pb;
     }
 
-    public function get_pemesanan_pengiriman($where, $order=NULL)
+    public function get_pemesanan_pengiriman($where, $order = NULL)
     {
         $this->db->where($where);
-        if($order!==NULL){
+        if ($order !== NULL) {
             $this->db->order_by($order);
         }
         $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`, 
@@ -111,11 +112,11 @@ class Model_pemesanan extends CI_Model
         return $this->db->get();
     }
 
-    public function get_selected_detail_pemesanan($select="", $where)
+    public function get_selected_detail_pemesanan($select = "", $where)
     {
         $this->db->select($select)
-                 ->from("data_detail_pemesanan")
-                 ->where($where);
+            ->from("data_detail_pemesanan")
+            ->where($where);
         return $this->db->get();
     }
 
@@ -126,7 +127,7 @@ class Model_pemesanan extends CI_Model
         $this->db->join('data_variasi_produk dvp', 'ddp.id_produk = dvp.id_variasiproduk');
         $this->db->join('data_produk dp', 'dvp.id_produk = dp.id_produk');
         $this->db->join('data_variasi dv', 'dvp.id_variasi = dv.id_variasi');
-        $this->db->where('id_pemesanan =',$idPemesanan);
+        $this->db->where('id_pemesanan =', $idPemesanan);
         return $this->db->get();
     }
 
@@ -137,13 +138,13 @@ class Model_pemesanan extends CI_Model
         $this->db->join('data_variasi_produk dvp', 'ddp.id_produk = dvp.id_variasiproduk');
         $this->db->join('data_produk dp', 'dvp.id_produk = dp.id_produk');
         $this->db->join('data_variasi dv', 'dvp.id_variasi = dv.id_variasi');
-        $this->db->where('id_pemesanan =',$idPemesanan);
+        $this->db->where('id_pemesanan =', $idPemesanan);
         return $this->db->get();
     }
 
     public function getDataPembayaranByIdPemesanan($idPemesanan)
     {
-        $this->db->where('id_pemesanan' ,$idPemesanan);
+        $this->db->where('id_pemesanan', $idPemesanan);
         $this->db->limit(1);
         return $this->db->get('data_pembayaran');
     }
@@ -153,7 +154,8 @@ class Model_pemesanan extends CI_Model
         return $this->db->update('data_pemesanan', $data, $where, 1);
     }
 
-    public function getHargaPemesananByIdPemesanan($idPemesanan){
+    public function getHargaPemesananByIdPemesanan($idPemesanan)
+    {
         $this->db->select('total_harga');
         $this->db->where('id_pemesanan =', $idPemesanan);
         $this->db->from('data_pemesanan');
@@ -219,55 +221,71 @@ class Model_pemesanan extends CI_Model
         return $this->db->delete("data_pemesanan", $where);
     }
 
-    public function get_where($select="", $where="", $JOIN=NULL, $group=NULL, $order=NULL, $limit=NULL)
+    public function getDataPemesananPembeliDanUsahaByIdPemesanan($id_pemesanan)
+    {
+        # code...
+        $where = array("pemesanan.id_pemesanan" => $id_pemesanan);
+        $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, 
+                        pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, 
+                        pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`, pemesanan.tipe_pengiriman, 
+                        pemesanan.total_harga as total_harga, pemesanan.id_pb, pemesanan.id_usaha, pembeli.nama_pb, pembeli.latitude_pb, 
+                        pembeli.longitude_pb, pembeli.alamat_pb, pembeli.kel_pb, pembeli.kec_pb, pembeli.foto_pb, pembeli.telp_pb, pembeli.kab_pb, usaha.nama_usaha, usaha.alamat_usaha, usaha.latitude, usaha.longitude");
+        $this->db->from("data_pemesanan pemesanan");
+        $this->db->join("data_pembeli pembeli", "pemesanan.id_pb = pembeli.id_pb");
+        $this->db->join("data_usaha usaha", "pemesanan.id_usaha = usaha.id_usaha");
+        $this->db->where($where);
+        return $this->db->get();
+    }
+
+    public function get_where($select = "", $where = "", $JOIN = NULL, $group = NULL, $order = NULL, $limit = NULL)
     {
         $select1 = "pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, 
         pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`";
-        $selected = $select1 . ($select!==""||$select!==NULL||!empty($select)) ? ", " . $select : "";
+        $selected = $select1 . ($select !== "" || $select !== NULL || !empty($select)) ? ", " . $select : "";
         $this->db->select($selected);
         $this->db->from("data_pemesanan pemesanan");
-        if(is_array($where) || $where!==""){
+        if (is_array($where) || $where !== "") {
             $this->db->where($where);
         }
-        if($group!==NULL){
+        if ($group !== NULL) {
             $this->db->group_by($group);
         }
-        if($order!==NULL){
+        if ($order !== NULL) {
             $this->db->order_by($order);
         }
-        if($limit!==NULL){
+        if ($limit !== NULL) {
             $this->db->limit($limit);
         }
-        if($JOIN!==NULL){
-            for ($i=0; $i < count($JOIN); $i++) { 
-                $join_on = ($JOIN[$i]['on']!==NULL) ? $JOIN[$i]['on'] : '';
-                $join_position = ($JOIN[$i]['join']!==NULL) ? $JOIN[$i]['join'] : '';
+        if ($JOIN !== NULL) {
+            for ($i = 0; $i < count($JOIN); $i++) {
+                $join_on = ($JOIN[$i]['on'] !== NULL) ? $JOIN[$i]['on'] : '';
+                $join_position = ($JOIN[$i]['join'] !== NULL) ? $JOIN[$i]['join'] : '';
                 $this->db->join($JOIN[$i]['table'], $join_on, $join_position);
             }
         }
         return $this->db->get();
     }
 
-    
 
-    public function get_detail_where($select="*", $where, $JOIN=NULL, $group=NULL, $order=NULL, $limit=NULL)
+
+    public function get_detail_where($select = "*", $where, $JOIN = NULL, $group = NULL, $order = NULL, $limit = NULL)
     {
         $this->db->select($select);
         $this->db->from("data_detail_pemesanan detail_pemesanan");
         $this->db->where($where);
-        if($group!==NULL){
+        if ($group !== NULL) {
             $this->db->group_by($group);
         }
-        if($order!==NULL){
+        if ($order !== NULL) {
             $this->db->order_by($order);
         }
-        if($limit!==NULL){
+        if ($limit !== NULL) {
             $this->db->limit($limit);
         }
-        if($JOIN!==NULL){
-            for ($i=0; $i < count($JOIN); $i++) { 
-                $join_on = ($JOIN[$i]['on']!==NULL) ? $JOIN[$i]['on'] : '';
-                $join_position = ($JOIN[$i]['join']!==NULL) ? $JOIN[$i]['join'] : '';
+        if ($JOIN !== NULL) {
+            for ($i = 0; $i < count($JOIN); $i++) {
+                $join_on = ($JOIN[$i]['on'] !== NULL) ? $JOIN[$i]['on'] : '';
+                $join_position = ($JOIN[$i]['join'] !== NULL) ? $JOIN[$i]['join'] : '';
                 $this->db->join($JOIN[$i]['table'], $join_on, $join_position);
             }
         }
@@ -305,9 +323,8 @@ class Model_pemesanan extends CI_Model
         return $this->db->get();
     }
 
-    public function update_pemesanan(int $id_pemesanan=0, array $data=array())
+    public function update_pemesanan(int $id_pemesanan = 0, array $data = array())
     {
         return $this->db->update("data_pemesanan", $data, "id_pemesanan = $id_pemesanan", 1);
     }
-
 }
