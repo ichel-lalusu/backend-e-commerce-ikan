@@ -130,6 +130,17 @@ class Model_pemesanan extends CI_Model
         return $this->db->get();
     }
 
+    public function getDetailPemesananByIdPemesanan(int $idPemesanan)
+    {
+        $this->db->select('ddp.harga, dp.nama_produk, ddp.jml_produk, dv.nama_variasi, dp.id_produk, dp.foto_produk, ddp.sub_total, dp.berat_produk, ddp.berat_akhir, ddp.catatan, dvp.stok');
+        $this->db->from('data_detail_pemesanan ddp');
+        $this->db->join('data_variasi_produk dvp', 'ddp.id_produk = dvp.id_variasiproduk');
+        $this->db->join('data_produk dp', 'dvp.id_produk = dp.id_produk');
+        $this->db->join('data_variasi dv', 'dvp.id_variasi = dv.id_variasi');
+        $this->db->where('id_pemesanan =',$idPemesanan);
+        return $this->db->get();
+    }
+
     public function getDataPembayaranByIdPemesanan($idPemesanan)
     {
         $this->db->where('id_pemesanan' ,$idPemesanan);
