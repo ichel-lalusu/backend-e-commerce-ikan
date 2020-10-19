@@ -99,6 +99,19 @@ class Model_pemesanan extends CI_Model
         $this->nama_pemesan = $data_pembeli->nama_pb;
     }
 
+    public function getPemesananPengirimanByIdPemesanan($id_pemesanan = null)
+    {
+        $this->db->where("pemesanan.id_pemesanan =", $id_pemesanan);
+        $this->db->select("pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, usaha.nama_usaha, usaha.latitude as latitude_usaha, usaha.longitude as longitude_usaha")
+				->join("data_pembeli pembeli", "pemesanan.id_pb = pembeli.id_pb")
+				->join("data_usaha usaha", "pemesanan.id_usaha = usaha.id_usaha");
+        $this->db->select("pemesanan.`id_pemesanan`, pemesanan.`waktu_pemesanan`, pemesanan.`tipe_pengiriman`, pemesanan.`tgl_pengiriman`, pemesanan.`jarak`, pemesanan.`biaya_kirim`, pemesanan.`total_harga`, pemesanan.`status_pemesanan`, pemesanan.`id_pb`, pemesanan.`id_usaha`, 
+        pengiriman.`id_detail_pengiriman`, pengiriman.`id_pengiriman`, pengiriman.`id_pemesanan`, pengiriman.`urutan`, pengiriman.`status`, pengiriman.`penerima`");
+        $this->db->from("data_pemesanan pemesanan");
+        $this->db->join("data_detail_pengiriman pengiriman", "pemesanan.id_pemesanan = pengiriman.id_pemesanan");
+        return $this->db->get();
+    }
+
     public function get_pemesanan_pengiriman($where, $order = NULL)
     {
         $this->db->where($where);

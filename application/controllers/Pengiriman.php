@@ -141,8 +141,10 @@ class Pengiriman extends CI_Controller
 
 	protected function construct_data_produk($id_pemesanan)
 	{
-		$Pemesanan = new Model_pemesanan();
-		$Data_produk = $Pemesanan->getDetailPemesanan($id_pemesanan);
+		// $Pemesanan = new Model_pemesanan();
+		$Data_produk = $this->Model_pemesanan->getDetailPemesanan($id_pemesanan);
+		echo $this->db->last_query();
+		exit();
 		$result = array();
 		foreach ($Data_produk->result() as $produk) {
 			$result[] = array(
@@ -221,7 +223,7 @@ class Pengiriman extends CI_Controller
 			if ($detail_pengiriman->num_rows() == 0) {
 				response(404, array('status' => "failed", 'message' => "data pengiriman tidak ditemukan", 'id_pemesanan' => $id_pemesanan));
 			}
-			
+			// echo $this->db->last_query();
 			$detail = $detail_pengiriman->row();
 			$id_pengiriman = $detail->id_pengiriman;
 			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
@@ -304,44 +306,38 @@ class Pengiriman extends CI_Controller
 		try {
 			$id_kurir = $this->input->get("id_kurir", TRUE);
 			$id_pengiriman = $this->input->get("id_pengiriman", TRUE);
-
-			$Pengiriman = new Model_pengiriman();
-			$Kurir = new Model_kurir();
-			$Pesanan = new Model_pemesanan();
-			$Kendaraan = new Model_kendaraan();
-			$data_track_kurir = $Kurir->get_location_kurir($id_kurir);
-			if (!$data_track_kurir) {
-				response(404, array('message' => 'Data track kurir kosong'));
+			// $data_tracking = new Object();
+			$data_tracking = null;
+			$data_track_kurir = $this->Model_kurir->get_location_kurir($id_kurir);
+			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman)->row();
+			if($data_track_kurir->num_rows() == 0){
+				$id_pj = $data_pengiriman->id_pj;
+				$data_usaha = $this->Model_penjual->ambil_data_usaha($id_pj)->row();
+				$data_tracking = array('latitude' => floatval($data_usaha->latitude), 'longitude' => floatval($data_usaha->longitude));
+			}else{
+				$resultLokasiKurir = $data_track_kurir->row();
+				$data_tracking = array('latitude' => floatval($resultLokasiKurir->latitude), 'longitude' => floatval($resultLokasiKurir->longitude));
 			}
-			$data_pengiriman = $Pengiriman->data_pengiriman($id_pengiriman)->row();
-			$this->db->where("detail.id_pengiriman", $id_pengiriman)
-				->where("detail.status", "pengantaran");
-			$Detail_pengiriman = $Pengiriman->Detail_pengiriman()->get()->row();
-			$id_pengiriman = $id_pengiriman;
+			$this->db->where("detail.status", "pengantaran");
+			$Detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman)->row();
+			// $id_pengiriman = $id_pengiriman;
 			$id_pemesanan = $Detail_pengiriman->id_pemesanan;
 			$id_kendaraan = $data_pengiriman->id_kendaraan;
 			$this->db->reset_query();
-
-			$this->db->select("pembeli.nama_pb, pembeli.latitude_pb, pembeli.longitude_pb, usaha.nama_usaha, usaha.latitude as latitude_usaha, usaha.longitude as longitude_usaha")
-				->join("data_pembeli pembeli", "pemesanan.id_pb = pembeli.id_pb")
-				->join("data_usaha usaha", "pemesanan.id_usaha = usaha.id_usaha");
-			$where = "pemesanan.id_pemesanan = " . $id_pemesanan;
-			$Data_pesanan = $Pesanan->get_pemesanan_pengiriman($where)->row();
+			
+			$Data_pesanan = $this->Model_pemesanan->getPemesananPengirimanByIdPemesanan($id_pemesanan)->row();
 			$this->db->reset_query();
 
-			$Data_kendaraan = $Kendaraan->get_detail_kendaraan($id_kendaraan)->row();
+			$Data_kendaraan = $this->Model_kendaraan->get_detail_kendaraan($id_kendaraan)->row();
 			// var_dump($Data_pesanan);
 			$destination = array(
 				'latitude' => floatval($Data_pesanan->latitude_pb),
 				'longitude' => floatval($Data_pesanan->longitude_pb)
 			);
-			$origin = array(
-				'latitude' => floatval($Data_pesanan->latitude_usaha),
-				'longitude' => floatval($Data_pesanan->longitude_usaha)
-			);
+			$origin = $data_tracking;
 			$vehicle = array(
-				'latitude' => floatval($data_track_kurir->latitude),
-				'longitude' => floatval($data_track_kurir->longitude),
+				'latitude' => floatval($data_tracking['latitude']),
+				'longitude' => floatval($data_tracking['longitude']),
 				'detail' => array(
 					'jenis' => $Data_kendaraan->jenis_kendaraan,
 					'plat' => $Data_kendaraan->plat_kendaraan

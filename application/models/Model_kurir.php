@@ -83,11 +83,7 @@ class Model_kurir extends CI_Model
 				->order_by("id_track", 'DESC')
 				->limit(1)
 				->get();
-		if($query->num_rows() > 0){
-			return $query->row();
-		}else{
-			return false;
-		}
+		return $query;
 	}
 
 	public function insert_location_kurir(array $data=array())
