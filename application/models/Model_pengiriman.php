@@ -51,6 +51,12 @@ class Model_pengiriman extends CI_Model
 		return $this->db->update("data_detail_pengiriman", $data, "id_pemesanan = $id_pemesanan", 1);
 	}
 
+	public function updateStatusDetailPengirimanByIdPemesanan($id_pemesanan, $data)
+	{
+		$this->db->where("id_pemesanan = ", $id_pemesanan);
+		return $this->db->update("data_detail_pengiriman", $data);
+	}
+
 	public function getPengirimanByIdPenjual($id_penjual = null, $statusPengiriman=FALSE)
 	{
 		

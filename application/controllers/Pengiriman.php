@@ -53,7 +53,6 @@ class Pengiriman extends CI_Controller
 		$Penjual = new Model_penjual();
 		$Pengiriman = new Model_pengiriman();
 		$Pembeli = new Model_pembeli();
-		$id_pengiriman = $this->input->get('id_pengiriman', TRUE);
 		$id_akun = $this->input->get('akun', TRUE);
 		$result = array();
 		try {
@@ -70,6 +69,7 @@ class Pengiriman extends CI_Controller
 					response(401, array('message' => "authentication is needed"));
 				}
 			}
+			$id_pengiriman = $this->input->get('id_pengiriman', TRUE);
 			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
 			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
 			$detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman);
@@ -369,53 +369,57 @@ class Pengiriman extends CI_Controller
 	public function update_detail_tracking_pengiriman()
 	{
 		try {
-			$Pengiriman = new Model_pengiriman();
-			$Pemesanan = new Model_pemesanan();
 			$id_pemesanan = intval($this->input->post("id_pemesanan", TRUE));
 			$id_pengiriman = $this->input->post("id_pengiriman", TRUE);
 			$nama_peneriman = $this->input->post("nama_penerima", TRUE);
 			$datetime = date("Y-m-d H:i:s");
-			$status_pengiriman = 'terkirim';
+			$status_pengiriman = "terkirim";
 			$status_pemesanan = ucfirst($status_pengiriman);
 			$result = array();
 
 			//TODO: UPDATE DATA DETAIL PENGIRIMAN DAN PEMESANAN YANG SEDANG DI SELESAIKAN KURIR
 			$data_pengiriman = array('status' => $status_pengiriman, 'penerima' => ucwords($nama_peneriman));
 			$data_pemesanan = array('status_pemesanan' => $status_pemesanan);
-			$updatePengiriman = $Pengiriman->update_status_detail_pengiriman($id_pemesanan, $data_pengiriman);
+			$updatePengiriman = $this->Model_pengiriman->updateStatusDetailPengirimanByIdPemesanan($id_pemesanan, $data_pengiriman);
 			$this->db->reset_query();
 			// echo $this->db->last_query() . "\n";
-			$updatePemesanan = $Pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
+			$updatePemesanan = $this->Model_pemesanan->update_pemesanan($id_pemesanan, $data_pemesanan);
 			$this->db->reset_query();
 			// echo $this->db->last_query() . "\n";
 
 			//TODO: UPDATE DATA DETAIL PENGIRIMAN SETELAH DATA TERAKHIR TERUPDATE
-
+			$next_pengiriman = array();
 			if ($updatePengiriman && $updatePengiriman) {
-				$Pengiriman->set_id_pengiriman($id_pengiriman);
-				$this->db->order_by("detail.urutan", 'ASC');
-				$this->db->where("status", "menunggu");
-				$Detail_pengiriman1 = $Pengiriman->get_detail_pengiriman();
+				$this->db->where("status", "menunggu")
+						->order_by("detail.urutan", 'ASC');
+				$Detail_pengiriman1 = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman);
 				$result = array();
+				// CEK KONDISI PENGIRIMAN, MASIH ADA ATAU ENGGAK
 				if ($Detail_pengiriman1->num_rows() == 0) {
-					// array_push($result, ['message'])
+					// KONDISI JIKA PENGIRIMAN SUDAH TIDAK ADA YANG MENGANTRI
 					$result = array(
 						'nama_penerima' => $nama_peneriman,
 						'status_pengiriman' => $status_pengiriman,
 						'status_pemesanan' => $status_pemesanan,
 						'id_pemesanan' => $id_pemesanan,
 						'message'	=> "Pengiriman telah selesai",
-						'code'		=> 2
+						'code'		=> 2,
+						'date_end' => $datetime,
+						'next_pengiriman' => $next_pengiriman
 					);
 					response(200, $result);
 				} else {
+					// KONDISI JIKA PENGIRIMAN MASIH ADA LAINNYA / MENGANTRI
+					$next_pengiriman = $Detail_pengiriman1->row_array();
 					$result = array(
 						'nama_penerima' => $nama_peneriman,
 						'status_pengiriman' => $status_pengiriman,
 						'status_pemesanan' => $status_pemesanan,
 						'id_pemesanan' => $id_pemesanan,
 						'message' 	=> "Melanjutkan pengiriman selanjutnya",
-						'code'		=> 1
+						'code'		=> 1,
+						'date_end' => $datetime,
+						'next_pengiriman' => $next_pengiriman
 					);
 					response(200, $result);
 				}
