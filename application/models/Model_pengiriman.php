@@ -125,6 +125,7 @@ class Model_pengiriman extends CI_Model
 
 	public function get_lokasi_kurir($kurir)
 	{
+		$this->db->where("id_kurir", $kurir);
 		return $this->db->select("`id_track`, `id_kurir`, `longitude`, `latitude`")
 				 ->order_by("id_track", 'DESC')
 				 ->get("data_track_kurir");
