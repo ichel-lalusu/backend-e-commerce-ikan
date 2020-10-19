@@ -123,10 +123,16 @@ class Pengiriman extends CI_Controller
 				'latitude' => floatval($result_usaha->latitude),
 				'longitude' => floatval($result_usaha->longitude)
 			);
+			$cek_lokasi_kurir = $this->track_lokasi_kurir(intval($result['id_kurir']));
 			$result['detail_kurir'] = $this->contruct_detail_kurir($result['id_kurir']);
 			$result['detail_kendaraan'] = $this->construct_detail_kendaraan($result['id_kendaraan']);
 			$result['detail_usaha'] = $this->construct_detail_usaha($result['id_pj']);
-			$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
+			if($cek_lokasi_kurir==null){
+				
+				$result['lokasi_kurir'] = $this->construct_detail_usaha($result['id_pj']);
+			}else{
+				$result['lokasi_kurir'] = $this->track_lokasi_kurir(intval($result['id_kurir']));
+			}
 			response(200, $result);
 		} catch (Exception $e) {
 			response(500, $result);
