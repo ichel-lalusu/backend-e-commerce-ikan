@@ -35,6 +35,12 @@ class Model_pengiriman extends CI_Model
 		return $this->db->get("data_pengiriman");
 	}
 
+	public function getPengirimanByIdPengiriman($id_pengiriman)
+	{
+		$this->db->where(array('id_pengiriman' => $id_pengiriman));
+		return $this->db->get("data_pengiriman");
+	}
+
 	public function insert_detail_pengiriman($data)
 	{
 		return $this->db->insert("data_detail_pengiriman", $data);
@@ -69,13 +75,13 @@ class Model_pengiriman extends CI_Model
 	 	return $this->db->get();
 	}
 
-	public function getPengirimanByIdPengiriman($id_pengiriman=null)
-	{
-		$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`, id_pj")
-				 ->from("data_pengiriman")
-				 ->where("id_pengiriman =", $id_pengiriman);
-	 	return $this->db->get();
-	}
+	// public function getPengirimanByIdPengiriman($id_pengiriman=null)
+	// {
+	// 	$this->db->select("`id_pengiriman`, `waktu_pengiriman`, `id_kurir`, `id_kendaraan`, `status`, id_pj")
+	// 			 ->from("data_pengiriman")
+	// 			 ->where("id_pengiriman =", $id_pengiriman);
+	//  	return $this->db->get();
+	// }
 
 	public function get_pengiriman_penjual($id_penjual)
 	{
@@ -122,7 +128,8 @@ class Model_pengiriman extends CI_Model
 
 	public function getDetailPengirimanPembeliByIdPemesanan($id_pemesanan=null, $id_pembeli=null)
 	{
-		$this->db->select("detail.`id_detail_pengiriman`, detail.`id_pengiriman`, detail.`id_pemesanan`, detail.`urutan`, detail.`status`, detail.`penerima`, pemesanan.jarak as distance, pemesanan.biaya_kirim as ongkir")
+		$this->db->select("detail.`id_detail_pengiriman`, detail.`id_pengiriman`, detail.`id_pemesanan`, detail.`urutan`, detail.`status`, 
+						detail.`penerima`, pemesanan.jarak as distance, pemesanan.biaya_kirim as ongkir")
 				->from("data_detail_pengiriman detail")
 				->join("data_pemesanan pemesanan", "pemesanan.id_pemesanan = detail.id_pemesanan")
 				->where(array('detail.id_pemesanan' => $id_pemesanan, 'pemesanan.id_pb' => $id_pembeli));
