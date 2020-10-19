@@ -143,8 +143,8 @@ class Pengiriman extends CI_Controller
 	{
 		// $Pemesanan = new Model_pemesanan();
 		$Data_produk = $this->Model_pemesanan->getDetailPemesanan($id_pemesanan);
-		echo $this->db->last_query();
-		exit();
+		// echo $this->db->last_query();
+		// exit();
 		$result = array();
 		foreach ($Data_produk->result() as $produk) {
 			$result[] = array(
