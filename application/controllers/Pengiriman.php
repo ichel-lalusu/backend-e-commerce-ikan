@@ -53,7 +53,6 @@ class Pengiriman extends CI_Controller
 		$Penjual = new Model_penjual();
 		$Pengiriman = new Model_pengiriman();
 		$Pembeli = new Model_pembeli();
-		$id_pengiriman = $this->input->get('id_pengiriman', TRUE);
 		$id_akun = $this->input->get('akun', TRUE);
 		$result = array();
 		try {
@@ -70,6 +69,7 @@ class Pengiriman extends CI_Controller
 					response(401, array('message' => "authentication is needed"));
 				}
 			}
+			$id_pengiriman = $this->input->get('id_pengiriman', TRUE);
 			// echo "Proses cari pengirman dengan id penjual :" . $id_akun;
 			$data_pengiriman = $this->Model_pengiriman->getPengirimanByIdPengiriman($id_pengiriman);
 			$detail_pengiriman = $this->Model_pengiriman->getDetailPengirimanByIdPengiriman($id_pengiriman);
